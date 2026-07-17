@@ -6,6 +6,7 @@
 # ── Node / frontend ──────────────────────────────────────────────────────────
 node_modules
 dist
+routeTree.gen.ts
 dist-ssr
 .output
 .vinxi
