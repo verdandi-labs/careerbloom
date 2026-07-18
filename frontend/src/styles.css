@@ -51,18 +51,17 @@
   --radius: 1.25rem;
 
   /* Brand */
-  --background: oklch(0.972 0.012 22);          /* #F9F1F0 */
-  --foreground: oklch(0 0 0);                    /* #000000 */
+  --background: oklch(0.972 0.012 22); /* #F9F1F0 */
+  --foreground: oklch(0 0 0); /* #000000 */
 
-  --primary: oklch(0.918 0.034 18);              /* #FADCD9 */
+  --primary: oklch(0.918 0.034 18); /* #FADCD9 */
   --primary-foreground: oklch(0.15 0 0);
 
-  --secondary: oklch(0.81 0.078 22);             /* #F8AFA6 */
+  --secondary: oklch(0.81 0.078 22); /* #F8AFA6 */
   --secondary-foreground: oklch(0.15 0 0);
 
-  --accent: #FEE8E7;
+  --accent: #fee8e7;
   --accent-foreground: oklch(0.15 0 0);
-
 
   --card: oklch(1 0 0 / 0.55);
   --card-foreground: oklch(0.1 0 0);
@@ -84,7 +83,7 @@
   --sidebar-foreground: oklch(0.15 0 0);
   --sidebar-primary: oklch(0.81 0.078 22);
   --sidebar-primary-foreground: oklch(0.1 0 0);
-  --sidebar-accent: #FEE8E7;
+  --sidebar-accent: #fee8e7;
   --sidebar-accent-foreground: oklch(0.1 0 0);
 
   --sidebar-border: oklch(1 0 0 / 0.4);
@@ -102,7 +101,8 @@
     border-color: var(--color-border);
   }
 
-  html, body {
+  html,
+  body {
     background: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
@@ -111,24 +111,40 @@
 
   body {
     background-image:
-      radial-gradient(circle at 12% 10%, oklch(0.918 0.034 18 / 0.55), transparent 45%),
-      radial-gradient(circle at 88% 0%, oklch(0.81 0.078 22 / 0.35), transparent 50%),
-      radial-gradient(circle at 50% 100%, oklch(0.918 0.034 18 / 0.45), transparent 55%);
+      radial-gradient(
+        circle at 12% 10%,
+        oklch(0.918 0.034 18 / 0.55),
+        transparent 45%
+      ),
+      radial-gradient(
+        circle at 88% 0%,
+        oklch(0.81 0.078 22 / 0.35),
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 50% 100%,
+        oklch(0.918 0.034 18 / 0.45),
+        transparent 55%
+      );
     background-attachment: fixed;
   }
 
-  h1, h2, h3, h4, .font-display {
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-display {
     font-family: var(--font-display);
     letter-spacing: -0.01em;
   }
 
   ::selection {
-    background-color: #FABDC5;
+    background-color: #fabdc5;
     color: #000000;
   }
 
   ::-moz-selection {
-    background-color: #FABDC5;
+    background-color: #fabdc5;
     color: #000000;
   }
 }
@@ -137,7 +153,9 @@
   background: linear-gradient(135deg, oklch(1 0 0 / 0.55), oklch(1 0 0 / 0.32));
   backdrop-filter: blur(22px) saturate(160%);
   border: 1px solid oklch(1 0 0 / 0.55);
-  box-shadow: 0 12px 40px -16px oklch(0.6 0.12 22 / 0.28), inset 0 1px 0 oklch(1 0 0 / 0.6);
+  box-shadow:
+    0 12px 40px -16px oklch(0.6 0.12 22 / 0.28),
+    inset 0 1px 0 oklch(1 0 0 / 0.6);
   border-radius: var(--radius-lg);
 }
 
@@ -145,7 +163,9 @@
   background: linear-gradient(135deg, oklch(1 0 0 / 0.7), oklch(1 0 0 / 0.45));
   backdrop-filter: blur(28px) saturate(170%);
   border: 1px solid oklch(1 0 0 / 0.65);
-  box-shadow: 0 16px 50px -20px oklch(0.6 0.12 22 / 0.32), inset 0 1px 0 oklch(1 0 0 / 0.7);
+  box-shadow:
+    0 16px 50px -20px oklch(0.6 0.12 22 / 0.32),
+    inset 0 1px 0 oklch(1 0 0 / 0.7);
   border-radius: var(--radius-lg);
 }
 
@@ -157,10 +177,16 @@
 }
 
 @utility glass-pink {
-  background: linear-gradient(135deg, oklch(0.81 0.078 22 / 0.85), oklch(0.81 0.078 22 / 0.55));
+  background: linear-gradient(
+    135deg,
+    oklch(0.81 0.078 22 / 0.85),
+    oklch(0.81 0.078 22 / 0.55)
+  );
   backdrop-filter: blur(22px) saturate(170%);
   border: 1px solid oklch(1 0 0 / 0.55);
-  box-shadow: 0 16px 50px -16px oklch(0.65 0.16 22 / 0.45), inset 0 1px 0 oklch(1 0 0 / 0.6);
+  box-shadow:
+    0 16px 50px -16px oklch(0.65 0.16 22 / 0.45),
+    inset 0 1px 0 oklch(1 0 0 / 0.6);
   border-radius: var(--radius-lg);
   color: oklch(0.15 0 0);
 }
@@ -173,8 +199,12 @@
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
   outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
-  &::placeholder { color: oklch(0.5 0.02 20 / 0.6); }
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+  &::placeholder {
+    color: oklch(0.5 0.02 20 / 0.6);
+  }
   &:focus {
     border-color: var(--color-secondary);
     box-shadow: 0 0 0 4px oklch(0.81 0.078 22 / 0.25);

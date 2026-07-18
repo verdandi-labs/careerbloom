@@ -51,7 +51,7 @@ async function refreshAccessToken(): Promise<boolean> {
 
 export async function api<T = unknown>(
   path: string,
-  options: ApiOptions = {}
+  options: ApiOptions = {},
 ): Promise<T> {
   const { json, ...fetchOptions } = options;
   const headers = new Headers(fetchOptions.headers);
@@ -89,7 +89,7 @@ export async function api<T = unknown>(
 
 export async function apiStream(
   path: string,
-  options: ApiOptions = {}
+  options: ApiOptions = {},
 ): Promise<ReadableStream<Uint8Array>> {
   const { json, ...fetchOptions } = options;
   const headers = new Headers(fetchOptions.headers);
@@ -118,7 +118,7 @@ export async function apiStream(
 
 export async function apiUpload<T = unknown>(
   path: string,
-  file: File
+  file: File,
 ): Promise<T> {
   const formData = new FormData();
   formData.append("file", file);

@@ -5,12 +5,12 @@ export type CVData = {
   name: string;
   title: string;
   photoUrl?: string | null;
-  contact: string;      // free text, one line per entry
+  contact: string; // free text, one line per entry
   summary: string;
   experience: string;
   education: string;
-  skills: string;       // one per line
-  languages: string;    // one per line
+  skills: string; // one per line
+  languages: string; // one per line
   certifications: string;
   projects: string;
   volunteer: string;
@@ -21,21 +21,23 @@ export type CVData = {
 };
 
 export type CVTemplateId =
-  | "editorial"
-  | "classic"
-  | "editorialBig"
-  | "geometric"
-  | "soft";
+  "editorial" | "classic" | "editorialBig" | "geometric" | "soft";
 
 export type CVTemplateMeta = {
   id: CVTemplateId;
   name: string;
   blurb: string;
   hasPhoto: boolean;
-  accent: string;       // hex for swatch + DOCX accent
+  accent: string; // hex for swatch + DOCX accent
   bg: string;
   font: "serif" | "sans" | "mono" | "display-serif";
-  layout: "sidebar" | "split" | "banner" | "editorial-banner" | "geometric-band" | "soft-hero";
+  layout:
+    | "sidebar"
+    | "split"
+    | "banner"
+    | "editorial-banner"
+    | "geometric-band"
+    | "soft-hero";
 };
 
 export const CV_TEMPLATES: CVTemplateMeta[] = [

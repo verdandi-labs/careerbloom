@@ -1,5 +1,13 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, MessageCircleHeart, FileText, Mail, Settings, Upload, LogOut } from "lucide-react";
+import {
+  LayoutDashboard,
+  MessageCircleHeart,
+  FileText,
+  Mail,
+  Settings,
+  Upload,
+  LogOut,
+} from "lucide-react";
 import { useState, type ReactNode } from "react";
 import blossomAsset from "@/assets/blossom.jpg.asset.json";
 import { useAuth } from "@/lib/auth";
@@ -38,18 +46,25 @@ export function AppShell({ children }: { children: ReactNode }) {
         <header className="flex items-center justify-between gap-4 rounded-[28px] bg-secondary/70 px-6 py-3 shadow-[0_18px_50px_-20px_rgba(248,175,166,0.8)] backdrop-blur-md">
           <Link to="/" className="flex items-center gap-2 shrink-0">
             <span className="font-display text-2xl italic">Career</span>
-            <span className="font-display text-2xl font-bold tracking-tight">BLOOM</span>
+            <span className="font-display text-2xl font-bold tracking-tight">
+              BLOOM
+            </span>
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">
             {nav.map((item) => {
-              const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
+              const active =
+                item.to === "/"
+                  ? pathname === "/"
+                  : pathname.startsWith(item.to);
               return (
                 <Link
                   key={item.to}
                   to={item.to}
                   className={`rounded-full px-4 py-2 text-xs uppercase tracking-[0.18em] transition-colors ${
-                    active ? "bg-accent text-accent-foreground" : "text-foreground/80 hover:text-foreground"
+                    active
+                      ? "bg-accent text-accent-foreground"
+                      : "text-foreground/80 hover:text-foreground"
                   }`}
                 >
                   {item.label}
@@ -79,19 +94,24 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </header>
 
-        <main className="flex min-w-0 flex-1 flex-col gap-5 pb-24 md:pb-0">{children}</main>
+        <main className="flex min-w-0 flex-1 flex-col gap-5 pb-24 md:pb-0">
+          {children}
+        </main>
       </div>
 
       <nav className="glass-strong fixed inset-x-4 bottom-4 z-20 flex items-center justify-around p-2 md:hidden">
         {nav.map((item) => {
-          const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
+          const active =
+            item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
           const Icon = item.icon;
           return (
             <Link
               key={item.to}
               to={item.to}
               className={`flex flex-1 flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[10px] ${
-                active ? "bg-accent text-accent-foreground" : "text-foreground/70"
+                active
+                  ? "bg-accent text-accent-foreground"
+                  : "text-foreground/70"
               }`}
             >
               <Icon className="h-4 w-4" />

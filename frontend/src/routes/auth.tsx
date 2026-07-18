@@ -10,7 +10,10 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in · careerBloom" },
-      { name: "description", content: "Sign in to careerBloom and keep blooming." },
+      {
+        name: "description",
+        content: "Sign in to careerBloom and keep blooming.",
+      },
     ],
   }),
   component: AuthPage,
@@ -37,7 +40,9 @@ function AuthPage() {
 
       <div className="glass-strong relative z-10 w-full max-w-md p-8">
         <h1 className="font-display text-3xl">careerBloom</h1>
-        <p className="mt-1 font-display italic text-foreground/70">Welcome back.</p>
+        <p className="mt-1 font-display italic text-foreground/70">
+          Welcome back.
+        </p>
 
         <div className="mt-7 space-y-4">
           <button
