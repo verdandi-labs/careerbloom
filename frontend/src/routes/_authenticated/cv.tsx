@@ -67,15 +67,14 @@ function CVPage() {
 
   async function load() {
     try {
-      const allSections =
-        await api<
-          Array<{
-            id: string;
-            section: string;
-            content_en: string;
-            content_es: string;
-          }>
-        >("/cv/sections");
+      const allSections = await api<
+        Array<{
+          id: string;
+          section: string;
+          content_en: string;
+          content_es: string;
+        }>
+      >("/cv/sections");
       const map = EMPTY_SECTIONS();
       let nextTitle = { en: "Your title", es: "Tu cargo" };
       let nextContact = { en: "", es: "" };
