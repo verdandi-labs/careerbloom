@@ -18,14 +18,13 @@ class DatabaseRouter:
     def get_engine(self, db_url: str) -> AsyncEngine:
         if db_url not in self._engines:
             url = make_url(db_url)
-            connect_args = {"ssl": True}
-            url = url._replace(query={})
+            url = url._replace(query={}, drivername="postgresql+asyncpg")
             self._engines[db_url] = create_async_engine(
                 str(url),
                 echo=False,
                 pool_size=5,
                 max_overflow=10,
-                connect_args=connect_args,
+                connect_args={"ssl": True},
             )
         return self._engines[db_url]
 
