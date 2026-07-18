@@ -1,4 +1,5 @@
 from uuid import UUID
+from sqlalchemy import make_url
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession, AsyncEngine
 from sqlalchemy.orm import DeclarativeBase
 from config import get_settings
@@ -16,13 +17,15 @@ class DatabaseRouter:
 
     def get_engine(self, db_url: str) -> AsyncEngine:
         if db_url not in self._engines:
-            clean_url = db_url.replace("?sslmode=require", "")
+            url = make_url(db_url)
+            connect_args = {"ssl": True}
+            url = url._replace(query={})
             self._engines[db_url] = create_async_engine(
-                clean_url,
+                str(url),
                 echo=False,
                 pool_size=5,
                 max_overflow=10,
-                connect_args={"ssl": True},
+                connect_args=connect_args,
             )
         return self._engines[db_url]
 
