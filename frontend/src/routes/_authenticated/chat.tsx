@@ -37,8 +37,7 @@ function ChatLayout() {
     if (pathname !== "/chat") return;
     (async () => {
       const data = await api<Conversation[]>("/chat/conversations");
-      let id = data?.[0]?.id;
-      if (!id) id = (await createConversation()) ?? undefined;
+      const id = data?.[0]?.id ?? (await createConversation());
       if (id) navigate({ to: "/chat/$conversationId", params: { conversationId: id }, replace: true });
     })();
   }, [activeId, pathname, navigate]);
