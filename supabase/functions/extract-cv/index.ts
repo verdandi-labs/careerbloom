@@ -1,8 +1,7 @@
 // extract-cv edge function
 // Accepts multipart/form-data with `file` (PDF or DOCX) and returns { text }
-import mammoth from "npm:mammoth@1.8.0";
-// Use the no-debug build of pdf-parse to avoid its broken module-init test
-import pdf from "npm:pdf-parse@1.1.1/lib/pdf-parse.js";
+import mammoth from "https://esm.sh/mammoth@1.8.0";
+import pdf from "https://esm.sh/pdf-parse@1.1.1/lib/pdf-parse.js";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",

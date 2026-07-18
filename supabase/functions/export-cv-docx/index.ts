@@ -1,5 +1,5 @@
 // Generates a styled .docx that mirrors the chosen CV template.
-// Uses the `docx` npm package via esm.sh.
+// Uses the `docx` package via esm.sh.
 import {
   AlignmentType, BorderStyle, Document, HeadingLevel, ImageRun, LevelFormat, Packer,
   PageOrientation, Paragraph, ShadingType, Table, TableCell, TableRow, TextRun,

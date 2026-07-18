@@ -14,10 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 22
-      - run: npm install
-      - run: npm run generate-routes
-      - run: npx tsc --noEmit
-      - run: npm run lint
+      - uses: oven/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - run: bun run generate-routes
+      - run: bun run tsc --noEmit
+      - run: bun run lint
