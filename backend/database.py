@@ -16,11 +16,13 @@ class DatabaseRouter:
 
     def get_engine(self, db_url: str) -> AsyncEngine:
         if db_url not in self._engines:
+            clean_url = db_url.replace("?sslmode=require", "")
             self._engines[db_url] = create_async_engine(
-                db_url,
+                clean_url,
                 echo=False,
                 pool_size=5,
                 max_overflow=10,
+                connect_args={"ssl": True},
             )
         return self._engines[db_url]
 
