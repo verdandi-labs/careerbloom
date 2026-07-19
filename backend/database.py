@@ -20,7 +20,7 @@ class DatabaseRouter:
             url = make_url(db_url)
             url = url._replace(query={}, drivername="postgresql+asyncpg")
             self._engines[db_url] = create_async_engine(
-                str(url),
+                url,
                 echo=False,
                 pool_size=5,
                 max_overflow=10,
