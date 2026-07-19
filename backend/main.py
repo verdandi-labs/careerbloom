@@ -43,13 +43,13 @@ app.include_router(chat_router, prefix=settings.API_V1_PREFIX)
 app.include_router(cover_letters_router, prefix=settings.API_V1_PREFIX)
 app.include_router(tenant_router, prefix=settings.API_V1_PREFIX)
 
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
 frontend_dist = Path(__file__).resolve().parent / "frontend" / "dist"
 if not frontend_dist.exists():
     frontend_dist = Path(__file__).resolve().parent.parent / "frontend" / "dist"
 if frontend_dist.exists():
     app.mount("/", StaticFiles(directory=str(frontend_dist), html=True), name="frontend")
-
-
-@app.get("/health")
-async def health():
-    return {"status": "ok"}
