@@ -9,8 +9,6 @@ from database import Base, router as db_router, global_engine
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    async with global_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
     yield
     await db_router.dispose_all()
 
