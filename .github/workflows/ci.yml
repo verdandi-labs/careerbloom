@@ -18,4 +18,5 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run generate-routes
       - run: bun run tsc --noEmit
-      - run: bun run lint
+      - name: Lint (auto-fix) and check for dirty tree
+        run: bun run lint -- --fix && git diff --exit-code --name-only
