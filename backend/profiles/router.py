@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from shared.deps import get_current_user, get_db_for_current_user
+from database import get_db
+from shared.deps import get_current_user
 from shared.models.profile import Profile
 from profiles.repository import ProfileRepository
 from profiles.schemas import ProfileResponse, ProfileUpdate
@@ -17,7 +18,7 @@ async def get_profile(user: Profile = Depends(get_current_user)):
 async def update_profile(
     body: ProfileUpdate,
     user: Profile = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db_for_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
     repo = ProfileRepository(db)
     updated = await repo.update(user.id, **body.model_dump(exclude_unset=True))
