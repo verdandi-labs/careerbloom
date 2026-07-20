@@ -69,7 +69,12 @@ function SetPasswordPage() {
       await refreshUser();
       setStep("done");
       setTimeout(
-        () => navigate({ to: "/connect-database", replace: true }),
+        () =>
+          navigate({
+            to: "/auth",
+            search: { step: "byodb" },
+            replace: true,
+          }),
         1500,
       );
     } catch (err) {
