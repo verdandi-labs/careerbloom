@@ -121,7 +121,7 @@ async def save_byodb(request: ByodbRequest, profile: Profile = Depends(get_curre
         user.database_url = request.database_url
         await db.commit()
 
-    await ensure_schema(request.database_url)
+    await ensure_schema(request.database_url, user_id=user.id, display_name=profile.display_name or "")
 
     return {"message": "Database URL saved", "email": user.email}
 

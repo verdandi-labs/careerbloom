@@ -1,5 +1,5 @@
 from uuid import UUID
-from sqlalchemy import make_url
+from sqlalchemy import make_url, text
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession, AsyncEngine
 from sqlalchemy.orm import DeclarativeBase
 from config import get_settings
@@ -59,10 +59,15 @@ async def get_db():
             raise
 
 
-async def ensure_schema(db_url: str):
+async def ensure_schema(db_url: str, user_id: UUID | None = None, display_name: str = ""):
     engine = router.get_engine(db_url)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        if user_id is not None:
+            await conn.execute(
+                text("INSERT INTO profiles (id, display_name, onboarding_complete) VALUES (:id, :name, false) ON CONFLICT (id) DO NOTHING"),
+                {"id": user_id, "name": display_name},
+            )
 
 
 def get_db_for_user(db_url: str):
