@@ -16,6 +16,8 @@ class DatabaseRouter:
     _factories: dict[str, async_sessionmaker[AsyncSession]] = {}
 
     def get_engine(self, db_url: str) -> AsyncEngine:
+        if not db_url:
+            db_url = settings.NEON_DATABASE_URL
         if db_url not in self._engines:
             url = make_url(db_url)
             url = url._replace(query={}, drivername="postgresql+asyncpg")

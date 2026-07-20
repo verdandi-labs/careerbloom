@@ -30,6 +30,7 @@ app.add_middleware(
 )
 
 from auth.router import router as auth_router
+from auth.magic_router import router as magic_auth_router
 from profiles.router import router as profile_router
 from cv.router import router as cv_router
 from chat.router import router as chat_router
@@ -37,6 +38,7 @@ from cover_letters.router import router as cover_letters_router
 from tenant.router import router as tenant_router
 
 app.include_router(auth_router, prefix=settings.API_V1_PREFIX)
+app.include_router(magic_auth_router, prefix=settings.API_V1_PREFIX)
 app.include_router(profile_router, prefix=settings.API_V1_PREFIX)
 app.include_router(cv_router, prefix=settings.API_V1_PREFIX)
 app.include_router(chat_router, prefix=settings.API_V1_PREFIX)

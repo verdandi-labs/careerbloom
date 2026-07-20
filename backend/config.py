@@ -26,6 +26,9 @@ class Settings(BaseSettings):
     # Encryption
     ENCRYPTION_KEY: str = ""
 
+    # SendGrid
+    SENDGRID_API_KEY: str = ""
+
     # App
     FRONTEND_URL: str = "http://localhost:5173"
     CORS_ORIGINS: str = "http://localhost:5173"

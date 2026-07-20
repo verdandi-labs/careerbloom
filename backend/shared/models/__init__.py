@@ -3,6 +3,7 @@ from shared.models.cv import CvUpload, CvEdit, CvContent
 from shared.models.cover_letter import CoverLetter
 from shared.models.chat import ChatConversation, ChatMessage
 from shared.models.tenant import TenantConnection
+from shared.models.user import User
 
 __all__ = [
     "Profile",
@@ -13,4 +14,5 @@ __all__ = [
     "ChatConversation",
     "ChatMessage",
     "TenantConnection",
+    "User",
 ]
