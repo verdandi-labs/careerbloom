@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
-import appCss from "../styles.css?url";
+import "../styles.css";
 import { useAuth } from "../lib/auth";
 
 function NotFoundComponent() {
@@ -100,7 +100,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { name: "twitter:image", content: import.meta.env.VITE_OG_IMAGE_URL },
       ],
       links: [
-        { rel: "stylesheet", href: appCss },
         { rel: "preconnect", href: import.meta.env.VITE_GOOGLE_FONTS_URL },
         {
           rel: "preconnect",
