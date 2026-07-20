@@ -1,9 +1,9 @@
 import asyncio
 from contextlib import asynccontextmanager
 from pathlib import Path
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from config import get_settings
 from database import Base, router as db_router, global_engine
 
@@ -63,5 +63,14 @@ async def health():
 frontend_dist = Path(__file__).resolve().parent / "frontend" / "dist"
 if not frontend_dist.exists():
     frontend_dist = Path(__file__).resolve().parent.parent / "frontend" / "dist"
+api_prefix = settings.API_V1_PREFIX.strip("/")
+
 if frontend_dist.exists():
-    app.mount("/", StaticFiles(directory=str(frontend_dist), html=True), name="frontend")
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        if full_path.startswith(f"{api_prefix}/") or full_path == api_prefix:
+            raise HTTPException(status_code=404, detail="Not Found")
+        file_path = frontend_dist / full_path
+        if file_path.exists() and file_path.is_file():
+            return FileResponse(file_path)
+        return FileResponse(frontend_dist / "index.html")
