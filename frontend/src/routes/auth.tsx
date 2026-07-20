@@ -15,10 +15,11 @@ export const Route = createFileRoute("/auth")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Sign in · careerBloom" },
+      { title: "Welcome to CareerBloom!" },
       {
         name: "description",
-        content: "Sign in to careerBloom and keep blooming.",
+        content:
+          "Ready for your next career move? Enter your email and we'll send you a secure authentication link.",
       },
     ],
   }),
@@ -66,14 +67,24 @@ function AuthPage() {
   if (!user) {
     return (
       <Background>
-        <header className="rounded-[20px] bg-secondary/70 px-7 py-7 shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] backdrop-blur-md">
-          <img src="/logo.png" alt="careerBloom" className="mb-3 h-8 w-auto" />
-          <h1 className="mt-1 font-display text-3xl">Sign in to careerBloom</h1>
-          <p className="mt-1 text-sm text-foreground/75">
-            No password needed. Drop your email and we'll send a magic link.
+        <div className="text-center">
+          <img
+            src="/logo.png"
+            alt="careerBloom"
+            className="mx-auto mb-6 h-10 w-auto"
+          />
+          <p className="text-xs font-medium tracking-[0.18em] text-foreground/55 uppercase">
+            Ready for your next career move?
           </p>
-        </header>
-        <section className="glass p-6">
+          <h1 className="mt-3 font-display text-4xl leading-tight md:text-5xl">
+            Welcome to CareerBloom!
+          </h1>
+          <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-foreground/70 md:text-base">
+            Enter your email and we'll send you a secure authentication link.
+            Valid for 15 minutes
+          </p>
+        </div>
+        <section className="glass p-6 md:p-8">
           <MagicLinkScreen
             onSent={(email) => {
               setAuthEmail(email);
@@ -131,8 +142,8 @@ function Background({ children }: { children: React.ReactNode }) {
 
 function Footer() {
   return (
-    <p className="text-center text-[11px] uppercase tracking-[0.22em] text-foreground/50">
-      careerBloom — keep blooming.
+    <p className="text-center text-xs tracking-wide text-foreground/50">
+      Helping you grow into what's next.
     </p>
   );
 }

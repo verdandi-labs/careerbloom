@@ -1,20 +1,6 @@
 import { useState } from "react";
 import { api } from "@/lib/api";
-import {
-  ArrowRight,
-  Loader2,
-  Mail,
-  Check,
-  ShieldCheck,
-  Timer,
-  Sparkles,
-} from "lucide-react";
-
-const perks = [
-  { icon: ShieldCheck, label: "No password to leak or forget" },
-  { icon: Timer, label: "Link expires in 15 minutes" },
-  { icon: Sparkles, label: "One tap and you're blooming" },
-];
+import { ArrowRight, Check, Loader2, Mail } from "lucide-react";
 
 export function MagicLinkScreen({
   onSent,
@@ -48,12 +34,13 @@ export function MagicLinkScreen({
   if (sent) {
     return (
       <div className="text-center">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/60">
-          <Check className="h-8 w-8 text-foreground" />
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/70">
+          <Check className="h-6 w-6 text-foreground" />
         </div>
         <h2 className="font-display text-xl">Check your inbox</h2>
-        <p className="mt-1 text-sm text-foreground/75">
-          We sent a magic link to <strong>{email}</strong>. Click it to sign in.
+        <p className="mt-1 text-sm text-foreground/70">
+          We sent a link to <strong>{email}</strong>. Click it to create your
+          password.
         </p>
         <button
           onClick={() => onSent(email)}
@@ -75,9 +62,9 @@ export function MagicLinkScreen({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div>
-        <label className="mb-1 block text-[11px] uppercase tracking-wider text-foreground/60">
+        <label className="mb-1.5 block text-xs font-medium text-foreground/60">
           Email
         </label>
         <input
@@ -85,12 +72,13 @@ export function MagicLinkScreen({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
-          className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-accent"
+          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
+          onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
         />
       </div>
 
       {error && (
-        <p className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">
+        <p className="rounded-xl bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
           {error}
         </p>
       )}
@@ -98,28 +86,20 @@ export function MagicLinkScreen({
       <button
         onClick={handleSubmit}
         disabled={sending}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-foreground px-6 py-3 text-sm font-medium text-background disabled:opacity-50"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-foreground px-6 py-3 text-sm font-medium text-background transition hover:opacity-90 disabled:opacity-50"
       >
         {sending ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
           <Mail className="h-4 w-4" />
         )}
-        {sending ? "Sending..." : "Send magic link"}
+        {sending ? "Sending..." : "Continue"}
         <ArrowRight className="h-4 w-4" />
       </button>
 
-      <div className="flex flex-wrap gap-2 pt-2">
-        {perks.map((perk) => (
-          <span
-            key={perk.label}
-            className="inline-flex items-center gap-1.5 rounded-full bg-white/60 px-3 py-1.5 text-[11px] text-foreground/70"
-          >
-            <perk.icon className="h-3.5 w-3.5" />
-            {perk.label}
-          </span>
-        ))}
-      </div>
+      <p className="text-center text-xs text-foreground/60">
+        Click it to create your password for future logins.
+      </p>
     </div>
   );
 }
