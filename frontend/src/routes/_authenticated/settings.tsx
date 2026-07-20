@@ -1,9 +1,9 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
-import { Check, Globe2, LogOut, Trash2, Upload } from "lucide-react";
+import { Check, Database, Globe2, LogOut, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Settings · careerBloom" }] }),
@@ -93,6 +93,27 @@ function SettingsPage() {
             ))}
           </div>
         </div>
+      </section>
+
+      <section className="glass p-6 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-start gap-4">
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-accent/20">
+            <Database className="h-5 w-5 text-accent" />
+          </div>
+          <div>
+            <h2 className="font-display text-2xl">Database</h2>
+            <p className="text-xs text-foreground/60">
+              You're using the shared Neon database. Connect your own Supabase
+              project to keep your data fully private.
+            </p>
+          </div>
+        </div>
+        <Link
+          to="/connect-database"
+          className="inline-flex items-center gap-2 rounded-full bg-accent/20 px-5 py-2.5 text-sm text-accent-foreground hover:bg-accent/40"
+        >
+          <Database className="h-4 w-4" /> Change database
+        </Link>
       </section>
 
       <section className="glass p-6 flex flex-wrap items-center justify-between gap-3">

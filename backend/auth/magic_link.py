@@ -24,7 +24,7 @@ async def send_magic_link(email: str, token: str, frontend_url: str):
     settings = get_settings()
     sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
 
-    magic_link = f"{frontend_url}/auth/magic?token={token}&email={email}"
+    magic_link = f"{frontend_url}/auth/set-password?token={token}&email={email}"
 
     message = Mail(
         from_email="verdandi.labs@gmail.com",
