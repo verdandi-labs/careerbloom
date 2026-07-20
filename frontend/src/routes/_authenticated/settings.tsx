@@ -38,14 +38,14 @@ function SettingsPage() {
 
   async function signOut() {
     logout();
-    navigate({ to: "/auth" });
+    navigate({ to: "/auth", search: {} });
   }
 
   async function deleteAccount() {
     // Note: account deletion would need a dedicated backend endpoint
     // For now, just sign out
     logout();
-    navigate({ to: "/auth" });
+    navigate({ to: "/auth", search: {} });
   }
 
   return (

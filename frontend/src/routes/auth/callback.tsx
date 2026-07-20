@@ -39,7 +39,7 @@ function AuthCallback() {
         }
       });
     } else {
-      navigate({ to: "/auth", replace: true });
+      navigate({ to: "/auth", search: {}, replace: true });
     }
   }, [navigate, refreshUser]);
 

@@ -6,6 +6,7 @@ import {
   useSearch,
 } from "@tanstack/react-router";
 import React, { useEffect, useState } from "react";
+import { z } from "zod";
 import { useAuth } from "@/lib/auth";
 import { MagicLinkScreen } from "@/components/auth/MagicLinkScreen";
 import { BYODBScreen } from "@/components/auth/BYODBScreen";
@@ -23,8 +24,8 @@ export const Route = createFileRoute("/auth")({
       },
     ],
   }),
-  validateSearch: (search: Record<string, unknown>) => ({
-    step: (search.step as string) || undefined,
+  validateSearch: z.object({
+    step: z.string().optional(),
   }),
   component: AuthLayout,
 });

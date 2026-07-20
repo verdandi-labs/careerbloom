@@ -4,7 +4,7 @@ import { isLoggedIn } from "@/lib/api";
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async () => {
-    if (!isLoggedIn()) throw redirect({ to: "/auth" });
+    if (!isLoggedIn()) throw redirect({ to: "/auth", search: {} });
   },
   component: () => <Outlet />,
 });
