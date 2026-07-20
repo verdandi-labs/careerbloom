@@ -1,4 +1,8 @@
-import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  useNavigate,
+  useSearch,
+} from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { api, setTokens } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
@@ -30,7 +34,9 @@ function SetPasswordPage() {
       setStep("form");
       return;
     }
-    api(`/auth/magic?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`)
+    api(
+      `/auth/magic?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`,
+    )
       .then(() => setStep("form"))
       .catch(() => {
         setError("Link expired or invalid. Request a new magic link.");
@@ -52,15 +58,21 @@ function SetPasswordPage() {
     setSaving(true);
 
     try {
-      const res = await api<{ access_token: string; email: string }>("/auth/password", {
-        method: "POST",
-        json: { email, password },
-      });
+      const res = await api<{ access_token: string; email: string }>(
+        "/auth/password",
+        {
+          method: "POST",
+          json: { email, password },
+        },
+      );
       setTokens(res.access_token, "");
       localStorage.setItem("auth_email", res.email);
       await refreshUser();
       setStep("done");
-      setTimeout(() => navigate({ to: "/connect-database", replace: true }), 1500);
+      setTimeout(
+        () => navigate({ to: "/connect-database", replace: true }),
+        1500,
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to set password.");
     } finally {
@@ -91,7 +103,9 @@ function SetPasswordPage() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-green-500/20">
             <Check className="h-8 w-8 text-green-500" />
           </div>
-          <h2 className="font-display text-2xl text-green-700">Password set!</h2>
+          <h2 className="font-display text-2xl text-green-700">
+            Password set!
+          </h2>
           <p className="mt-1 text-sm text-foreground/70">
             Taking you to the next step...
           </p>
@@ -103,8 +117,8 @@ function SetPasswordPage() {
           <div className="flex items-center gap-3 rounded-2xl bg-accent/20 p-4">
             <Shield className="h-5 w-5 shrink-0 text-accent" />
             <p className="text-sm text-foreground/80">
-              Welcome, <strong>{email}</strong>. Create a password to secure your
-              account.
+              Welcome, <strong>{email}</strong>. Create a password to secure
+              your account.
             </p>
           </div>
 

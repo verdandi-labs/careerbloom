@@ -2,7 +2,13 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { api } from "@/lib/api";
-import { ArrowRight, Check, Database, Loader2, SkipForward } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  Database,
+  Loader2,
+  SkipForward,
+} from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/connect-database")({
   head: () => ({ meta: [{ title: "Connect Database · careerBloom" }] }),

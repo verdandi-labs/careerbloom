@@ -10,7 +10,10 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in · careerBloom" },
-      { name: "description", content: "Sign in to careerBloom and keep blooming." },
+      {
+        name: "description",
+        content: "Sign in to careerBloom and keep blooming.",
+      },
     ],
   }),
   component: AuthPage,
@@ -33,33 +36,46 @@ function AuthPage() {
   const [sent, setSent] = useState(false);
 
   async function sendMagicLink() {
-    if (!email) { setError("Enter your email."); return; }
+    if (!email) {
+      setError("Enter your email.");
+      return;
+    }
     setError(null);
     setSending(true);
     try {
       await api("/auth/magic-link", { method: "POST", json: { email } });
       setSent(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to send magic link.");
+      setError(
+        err instanceof Error ? err.message : "Failed to send magic link.",
+      );
     } finally {
       setSending(false);
     }
   }
 
   async function loginWithPassword() {
-    if (!email || !password) { setError("Enter your email and password."); return; }
+    if (!email || !password) {
+      setError("Enter your email and password.");
+      return;
+    }
     setError(null);
     setSending(true);
     try {
-      const res = await api<{ access_token: string; email: string }>("/auth/login", {
-        method: "POST",
-        json: { email, password },
-      });
+      const res = await api<{ access_token: string; email: string }>(
+        "/auth/login",
+        {
+          method: "POST",
+          json: { email, password },
+        },
+      );
       setTokens(res.access_token, "");
       localStorage.setItem("auth_email", res.email);
       window.location.href = "/";
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Invalid email or password.");
+      setError(
+        err instanceof Error ? err.message : "Invalid email or password.",
+      );
     } finally {
       setSending(false);
     }
@@ -78,21 +94,33 @@ function AuthPage() {
 
       <div className="glass-strong relative z-10 w-full max-w-md p-8">
         <h1 className="font-display text-3xl">careerBloom</h1>
-        <p className="mt-1 font-display italic text-foreground/70">Welcome back.</p>
+        <p className="mt-1 font-display italic text-foreground/70">
+          Welcome back.
+        </p>
 
         <div className="mt-6 flex gap-1 rounded-full bg-white/70 p-1 text-xs">
           <button
-            onClick={() => { setMode("magic"); setError(null); }}
+            onClick={() => {
+              setMode("magic");
+              setError(null);
+            }}
             className={`flex-1 rounded-full py-2 text-center font-medium transition ${
-              mode === "magic" ? "bg-accent text-accent-foreground" : "text-foreground/60 hover:text-foreground"
+              mode === "magic"
+                ? "bg-accent text-accent-foreground"
+                : "text-foreground/60 hover:text-foreground"
             }`}
           >
             Magic Link
           </button>
           <button
-            onClick={() => { setMode("password"); setError(null); }}
+            onClick={() => {
+              setMode("password");
+              setError(null);
+            }}
             className={`flex-1 rounded-full py-2 text-center font-medium transition ${
-              mode === "password" ? "bg-accent text-accent-foreground" : "text-foreground/60 hover:text-foreground"
+              mode === "password"
+                ? "bg-accent text-accent-foreground"
+                : "text-foreground/60 hover:text-foreground"
             }`}
           >
             Password
@@ -106,7 +134,8 @@ function AuthPage() {
             </div>
             <h2 className="font-display text-xl">Check your email</h2>
             <p className="mt-1 text-sm text-foreground/70">
-              We sent a magic link to <strong>{email}</strong>. Click it to sign in.
+              We sent a magic link to <strong>{email}</strong>. Click it to sign
+              in.
             </p>
           </div>
         ) : mode === "magic" ? (
@@ -125,7 +154,9 @@ function AuthPage() {
             </div>
 
             {error && (
-              <p className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>
+              <p className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">
+                {error}
+              </p>
             )}
 
             <button
@@ -133,8 +164,13 @@ function AuthPage() {
               disabled={sending}
               className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-foreground px-6 py-3 text-sm font-medium text-background disabled:opacity-50"
             >
-              {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
-              {sending ? "Sending..." : "Send magic link"} <ArrowRight className="h-4 w-4" />
+              {sending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Mail className="h-4 w-4" />
+              )}
+              {sending ? "Sending..." : "Send magic link"}{" "}
+              <ArrowRight className="h-4 w-4" />
             </button>
           </div>
         ) : (
@@ -166,7 +202,9 @@ function AuthPage() {
             </div>
 
             {error && (
-              <p className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>
+              <p className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">
+                {error}
+              </p>
             )}
 
             <button
@@ -174,8 +212,13 @@ function AuthPage() {
               disabled={sending}
               className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-foreground px-6 py-3 text-sm font-medium text-background disabled:opacity-50"
             >
-              {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
-              {sending ? "Signing in..." : "Sign in"} <ArrowRight className="h-4 w-4" />
+              {sending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <LogIn className="h-4 w-4" />
+              )}
+              {sending ? "Signing in..." : "Sign in"}{" "}
+              <ArrowRight className="h-4 w-4" />
             </button>
           </div>
         )}
