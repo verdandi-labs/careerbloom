@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 from pathlib import Path
 from fastapi import FastAPI
@@ -7,8 +8,17 @@ from config import get_settings
 from database import Base, router as db_router, global_engine
 
 
+async def _create_tables():
+    try:
+        async with global_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+    except Exception:
+        pass
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    asyncio.create_task(_create_tables())
     yield
     await db_router.dispose_all()
 

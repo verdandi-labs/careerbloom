@@ -1,9 +1,11 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime, timedelta, timezone
 from sqlalchemy import select
 from database import get_db
 from shared.models.user import User
+from shared.models.profile import Profile
+from shared.deps import get_current_user
 from auth.magic_link import generate_magic_token, send_magic_link, hash_password, verify_password
 from auth.router import create_access_token
 from config import get_settings
@@ -22,7 +24,6 @@ class PasswordRequest(BaseModel):
 
 
 class ByodbRequest(BaseModel):
-    email: EmailStr
     database_url: str
 
 
@@ -76,6 +77,12 @@ async def set_password(request: PasswordRequest):
             raise HTTPException(status_code=400, detail="User not found")
 
         user.password_hash = hash_password(request.password)
+
+        profile = Profile(
+            id=user.id,
+            display_name=request.email.split("@")[0],
+        )
+        db.add(profile)
         await db.commit()
 
         access_token = create_access_token(str(user.id))
@@ -101,9 +108,11 @@ async def login_with_password(request: PasswordRequest):
 
 
 @router.post("/byodb")
-async def save_byodb(request: ByodbRequest):
+async def save_byodb(request: ByodbRequest, profile: Profile = Depends(get_current_user)):
+    from database import ensure_schema
+
     async with get_db() as db:
-        result = await db.execute(select(User).where(User.email == request.email))
+        result = await db.execute(select(User).where(User.id == profile.id))
         user = result.scalars().first()
 
         if not user:
@@ -112,16 +121,18 @@ async def save_byodb(request: ByodbRequest):
         user.database_url = request.database_url
         await db.commit()
 
-        return {"message": "Database URL saved", "email": user.email}
+    await ensure_schema(request.database_url)
+
+    return {"message": "Database URL saved", "email": user.email}
 
 
-@router.get("/skip-byodb")
-async def skip_byodb(email: str = Query(...)):
+@router.post("/skip-byodb")
+async def skip_byodb(profile: Profile = Depends(get_current_user)):
     async with get_db() as db:
-        result = await db.execute(select(User).where(User.email == email))
+        result = await db.execute(select(User).where(User.id == profile.id))
         user = result.scalars().first()
 
         if not user:
             raise HTTPException(status_code=400, detail="User not found")
 
-        return {"message": "Using shared database", "email": email}
+        return {"message": "Using shared database", "email": user.email}

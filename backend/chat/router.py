@@ -3,8 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from database import get_db
-from shared.deps import get_current_user
+from shared.deps import get_current_user, get_db_for_current_user
 from shared.models.profile import Profile
 from chat.repository import ChatRepository
 from chat.schemas import (
@@ -20,7 +19,7 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 
 
 @router.get("/conversations", response_model=list[ConversationResponse])
-async def list_conversations(user: Profile = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+async def list_conversations(user: Profile = Depends(get_current_user), db: AsyncSession = Depends(get_db_for_current_user)):
     repo = ChatRepository(db)
     convs = await repo.get_conversations(user.id)
     return [ConversationResponse.model_validate(c) for c in convs]
@@ -30,7 +29,7 @@ async def list_conversations(user: Profile = Depends(get_current_user), db: Asyn
 async def create_conversation(
     body: ConversationCreate,
     user: Profile = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_db_for_current_user),
 ):
     repo = ChatRepository(db)
     conv = await repo.create_conversation(user.id, body.title)
@@ -38,7 +37,7 @@ async def create_conversation(
 
 
 @router.get("/conversations/career-direction", response_model=ConversationResponse)
-async def get_career_direction(user: Profile = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+async def get_career_direction(user: Profile = Depends(get_current_user), db: AsyncSession = Depends(get_db_for_current_user)):
     repo = ChatRepository(db)
     conv = await repo.get_or_create_career_direction(user.id)
     return ConversationResponse.model_validate(conv)
@@ -48,7 +47,7 @@ async def get_career_direction(user: Profile = Depends(get_current_user), db: As
 async def list_messages(
     conversation_id: UUID,
     user: Profile = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_db_for_current_user),
 ):
     repo = ChatRepository(db)
     conv = await repo.get_conversation(user.id, conversation_id)
@@ -63,7 +62,7 @@ async def send_message(
     conversation_id: UUID,
     body: MessageCreate,
     user: Profile = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_db_for_current_user),
 ):
     repo = ChatRepository(db)
     conv = await repo.get_conversation(user.id, conversation_id)

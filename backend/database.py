@@ -59,6 +59,12 @@ async def get_db():
             raise
 
 
+async def ensure_schema(db_url: str):
+    engine = router.get_engine(db_url)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+
 def get_db_for_user(db_url: str):
     factory = router.get_factory(db_url)
 

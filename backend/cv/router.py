@@ -3,8 +3,7 @@ from io import BytesIO
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from database import get_db
-from shared.deps import get_current_user
+from shared.deps import get_current_user, get_db_for_current_user
 from shared.models.profile import Profile
 from cv.repository import CvRepository
 from cv.schemas import (
@@ -31,7 +30,7 @@ SECTIONS = [
 
 
 @router.get("/sections", response_model=list[CvSectionResponse])
-async def get_sections(user: Profile = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+async def get_sections(user: Profile = Depends(get_current_user), db: AsyncSession = Depends(get_db_for_current_user)):
     repo = CvRepository(db)
     sections = await repo.get_all_sections(user.id)
     return [CvSectionResponse.model_validate(s) for s in sections]
@@ -42,7 +41,7 @@ async def upsert_section(
     section: str,
     body: CvSectionUpdate,
     user: Profile = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_db_for_current_user),
 ):
     repo = CvRepository(db)
     result = await repo.upsert_section(
@@ -54,7 +53,7 @@ async def upsert_section(
 
 
 @router.get("/all", response_model=CvAllSectionsResponse)
-async def get_all_cv(user: Profile = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+async def get_all_cv(user: Profile = Depends(get_current_user), db: AsyncSession = Depends(get_db_for_current_user)):
     repo = CvRepository(db)
     sections = await repo.get_all_sections(user.id)
     upload = await repo.get_latest_upload(user.id)
@@ -111,7 +110,7 @@ async def upload_cv(
 async def accept_cv(
     body: CvAcceptRequest,
     user: Profile = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_db_for_current_user),
 ):
     repo = CvRepository(db)
 

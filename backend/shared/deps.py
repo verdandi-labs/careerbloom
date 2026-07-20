@@ -5,11 +5,9 @@ from jose import JWTError, jwt
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db, get_db_for_user
-from database import router as db_router
 from shared.models.profile import Profile
-from shared.models.tenant import TenantConnection
+from shared.models.user import User
 from config import get_settings
-from tenant.service import decrypt, build_db_url
 
 security = HTTPBearer()
 settings = get_settings()
@@ -35,20 +33,14 @@ async def get_current_user(
     return profile
 
 
-async def get_tenant_db_for_user(user: Profile = Depends(get_current_user)):
+async def get_db_for_current_user(user: Profile = Depends(get_current_user)):
     from database import get_db as get_global_db
     async with await get_global_db() as db:
-        result = await db.execute(
-            select(TenantConnection).where(
-                TenantConnection.user_id == user.id,
-                TenantConnection.is_active == True,
-            )
-        )
-        tenant = result.scalar_one_or_none()
+        result = await db.execute(select(User).where(User.id == user.id))
+        db_user = result.scalar_one_or_none()
 
-    if tenant and tenant.db_password_encrypted:
-        password = decrypt(tenant.db_password_encrypted)
-        db_url = build_db_url(tenant.supabase_url, password)
+    db_url = db_user.database_url if db_user and db_user.database_url else ""
+    if db_url:
         async for session in get_db_for_user(db_url)():
             yield session
     else:

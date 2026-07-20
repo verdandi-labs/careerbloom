@@ -2,8 +2,7 @@ from io import BytesIO
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from database import get_db
-from shared.deps import get_current_user
+from shared.deps import get_current_user, get_db_for_current_user
 from shared.models.profile import Profile
 from cover_letters.repository import CoverLetterRepository
 from cover_letters.schemas import (
@@ -18,7 +17,7 @@ router = APIRouter(prefix="/cover-letters", tags=["cover-letters"])
 
 
 @router.get("", response_model=list[CoverLetterResponse])
-async def list_letters(user: Profile = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+async def list_letters(user: Profile = Depends(get_current_user), db: AsyncSession = Depends(get_db_for_current_user)):
     repo = CoverLetterRepository(db)
     letters = await repo.get_all(user.id)
     return [CoverLetterResponse.model_validate(l) for l in letters]
@@ -28,7 +27,7 @@ async def list_letters(user: Profile = Depends(get_current_user), db: AsyncSessi
 async def create_letter(
     body: CoverLetterCreate,
     user: Profile = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_db_for_current_user),
 ):
     repo = CoverLetterRepository(db)
     letter = await repo.create(user.id, body.job_title, body.company, body.job_description)
@@ -40,7 +39,7 @@ async def generate_letter(
     letter_id: str,
     body: CoverLetterGenerateRequest,
     user: Profile = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_db_for_current_user),
 ):
     from uuid import UUID
     repo = CoverLetterRepository(db)
@@ -67,7 +66,7 @@ async def generate_letter(
 async def delete_letter(
     letter_id: str,
     user: Profile = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_db_for_current_user),
 ):
     from uuid import UUID
     repo = CoverLetterRepository(db)

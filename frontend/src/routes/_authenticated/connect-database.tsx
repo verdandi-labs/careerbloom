@@ -35,7 +35,6 @@ function ConnectDatabasePage() {
       await api("/auth/byodb", {
         method: "POST",
         json: {
-          email: localStorage.getItem("auth_email"),
           database_url: val,
         },
       });
@@ -55,7 +54,7 @@ function ConnectDatabasePage() {
   async function handleSkip() {
     setSaving(true);
     try {
-      await api("/auth/skip-byodb?email=" + encodeURIComponent(localStorage.getItem("auth_email") || ""));
+      await api("/auth/skip-byodb", { method: "POST" });
       navigate({ to: "/onboarding", replace: true });
     } catch {
       navigate({ to: "/onboarding", replace: true });
