@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { api } from "@/lib/api";
-import { ArrowRight, Check, Loader2, Mail } from "lucide-react";
+import { ArrowRight, Check, Loader2, Lock, Mail } from "lucide-react";
 
 export function MagicLinkScreen({
   onSent,
+  onSwitchToLogin,
 }: {
   onSent: (email: string) => void;
+  onSwitchToLogin?: () => void;
 }) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -100,6 +102,16 @@ export function MagicLinkScreen({
       <p className="text-center text-xs text-foreground/60">
         Click it to create your password for future logins.
       </p>
+
+      {onSwitchToLogin && (
+        <button
+          onClick={onSwitchToLogin}
+          className="flex w-full items-center justify-center gap-1.5 text-center text-xs text-foreground/60 underline underline-offset-2 hover:text-foreground"
+        >
+          <Lock className="h-3 w-3" />
+          I already have a password
+        </button>
+      )}
     </div>
   );
 }

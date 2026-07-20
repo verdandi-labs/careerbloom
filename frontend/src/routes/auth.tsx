@@ -9,6 +9,7 @@ import React, { useEffect, useState } from "react";
 import { z } from "zod";
 import { useAuth } from "@/lib/auth";
 import { MagicLinkScreen } from "@/components/auth/MagicLinkScreen";
+import { LoginScreen } from "@/components/auth/LoginScreen";
 import { BYODBScreen } from "@/components/auth/BYODBScreen";
 import blossomAsset from "@/assets/blossom.jpg.asset.json";
 
@@ -60,6 +61,7 @@ function AuthPage() {
   const navigate = useNavigate();
   const search = useSearch({ from: "/auth" });
   const [authEmail, setAuthEmail] = useState("");
+  const [mode, setMode] = useState<"magic-link" | "login">("magic-link");
 
   useEffect(() => {
     if (user && !search.step) navigate({ to: "/" });
@@ -86,11 +88,16 @@ function AuthPage() {
           </p>
         </div>
         <section className="glass p-6 md:p-8">
-          <MagicLinkScreen
-            onSent={(email) => {
-              setAuthEmail(email);
-            }}
-          />
+          {mode === "magic-link" ? (
+            <MagicLinkScreen
+              onSent={(email) => setAuthEmail(email)}
+              onSwitchToLogin={() => setMode("login")}
+            />
+          ) : (
+            <LoginScreen
+              onSwitchToMagicLink={() => setMode("magic-link")}
+            />
+          )}
         </section>
         <Footer />
       </Background>
