@@ -6,6 +6,8 @@ import {
   Check,
   Database,
   Loader2,
+  Settings,
+  ShieldAlert,
   SkipForward,
 } from "lucide-react";
 
@@ -15,6 +17,7 @@ export function BYODBScreen({ email }: { email: string }) {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [confirmSkip, setConfirmSkip] = useState(false);
 
   async function handleConnect() {
     const val = connString.trim();
@@ -40,7 +43,11 @@ export function BYODBScreen({ email }: { email: string }) {
     }
   }
 
-  async function handleSkip() {
+  function handleSkip() {
+    setConfirmSkip(true);
+  }
+
+  async function handleConfirmSkip() {
     setSaving(true);
     try {
       await api("/auth/skip-byodb", { method: "POST" });
@@ -59,6 +66,44 @@ export function BYODBScreen({ email }: { email: string }) {
         <h2 className="font-display text-2xl text-green-700">Connected!</h2>
         <p className="mt-1 text-sm text-foreground/70">
           Taking you to onboarding...
+        </p>
+      </div>
+    );
+  }
+
+  if (confirmSkip) {
+    return (
+      <div className="space-y-5 text-center">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-100">
+          <ShieldAlert className="h-6 w-6 text-amber-700" />
+        </div>
+        <div>
+          <h3 className="font-display text-lg">Use the shared database?</h3>
+          <p className="mt-2 text-sm text-foreground/70 leading-relaxed">
+            Your data will be stored in careerBloom's global database. You can
+            connect your own Supabase later in <strong>Settings</strong> to keep
+            your data private.
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <button
+            onClick={handleConfirmSkip}
+            disabled={saving}
+            className="flex-1 rounded-2xl bg-foreground px-5 py-3 text-sm font-medium text-background disabled:opacity-50"
+          >
+            {saving ? "Continuing..." : "Accept"}
+          </button>
+          <button
+            onClick={() => setConfirmSkip(false)}
+            disabled={saving}
+            className="flex-1 rounded-2xl border border-border bg-white/70 px-5 py-3 text-sm text-foreground hover:bg-white disabled:opacity-50"
+          >
+            Cancel
+          </button>
+        </div>
+        <p className="flex items-center justify-center gap-1.5 text-xs text-foreground/50">
+          <Settings className="h-3.5 w-3.5" />
+          Settings &rarr; Database to connect your own later
         </p>
       </div>
     );
