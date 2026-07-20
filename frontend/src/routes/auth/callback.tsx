@@ -44,8 +44,9 @@ function AuthCallback() {
   }, [navigate, refreshUser]);
 
   return (
-    <div className="grid min-h-screen place-items-center">
-      <Loader2 className="h-6 w-6 animate-spin text-foreground/60" />
-    </div>
+    <section className="glass p-8 text-center">
+      <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-accent" />
+      <p className="text-foreground/70">Signing you in...</p>
+    </section>
   );
 }
