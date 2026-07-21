@@ -91,7 +91,7 @@ function AuthPage() {
             so you can set a password for your next login
           </p>
         </div>
-        <section className="bg-secondary/50 backdrop-blur-md rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] p-6 md:p-8">
+        <section className="bg-secondary/50 rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] p-6 md:p-8">
           {mode === "magic-link" ? (
             <MagicLinkScreen
               onSent={(email) => setAuthEmail(email)}
@@ -121,7 +121,7 @@ function AuthPage() {
             Optional: connect your own Supabase to keep data private.
           </p>
         </header>
-        <section className="bg-secondary/50 backdrop-blur-md rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] p-6">
+        <section className="bg-secondary/50 rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] p-6">
           <BYODBScreen email={authEmail} />
         </section>
         <Footer />
