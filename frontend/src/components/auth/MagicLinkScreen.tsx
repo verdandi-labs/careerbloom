@@ -14,7 +14,8 @@ export function MagicLinkScreen({
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
 
-  async function handleSubmit() {
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
     if (!email) {
       setError("Enter your email");
       return;
@@ -65,39 +66,44 @@ export function MagicLinkScreen({
 
   return (
     <div className="space-y-5">
-      <div>
-        <label className="mb-1.5 block text-center text-sm font-bold text-white">
-          Email
-        </label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
-          className="w-full rounded-xl shadow-sm bg-white/25 px-4 py-3 text-sm text-black/50 caret-accent outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
-          onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-        />
-      </div>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label
+            htmlFor="email"
+            className="mb-1.5 block text-center text-sm font-bold text-white"
+          >
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            className="w-full rounded-xl shadow-sm bg-white/25 px-4 py-3 text-sm text-black/50 caret-accent outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
+          />
+        </div>
 
-      {error && (
-        <p className="rounded-xl bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
-          {error}
-        </p>
-      )}
-
-      <button
-        onClick={handleSubmit}
-        disabled={sending}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-6 py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
-      >
-        {sending ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <Mail className="h-4 w-4" />
+        {error && (
+          <p className="rounded-xl bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
+            {error}
+          </p>
         )}
-        {sending ? "Sending..." : "Continue"}
-        <ArrowRight className="h-4 w-4" />
-      </button>
+
+        <button
+          type="submit"
+          disabled={sending}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-6 py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
+        >
+          {sending ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Mail className="h-4 w-4" />
+          )}
+          {sending ? "Sending..." : "Continue"}
+          <ArrowRight className="h-4 w-4" />
+        </button>
+      </form>
 
       <p className="text-center text-xs text-foreground/80">
         Click it to create a password for your next login
