@@ -47,7 +47,7 @@ export function LoginScreen({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
-          className="w-full rounded-xl bg-white/10 px-4 py-3 text-sm outline-none backdrop-blur-lg transition focus:border-accent focus:ring-1 focus:ring-accent/30"
+          className="w-full rounded-xl bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
           onKeyDown={(e) =>
             e.key === "Enter" &&
             !password &&
@@ -67,7 +67,7 @@ export function LoginScreen({
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Enter your password"
-          className="w-full rounded-xl bg-white/10 px-4 py-3 text-sm outline-none backdrop-blur-lg transition focus:border-accent focus:ring-1 focus:ring-accent/30"
+          className="w-full rounded-xl bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
           onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
         />
       </div>
