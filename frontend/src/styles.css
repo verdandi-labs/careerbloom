@@ -118,6 +118,7 @@
     position: fixed;
     inset: 0;
     z-index: -1;
+    pointer-events: none;
     background-color: var(--color-background);
     background-image:
       radial-gradient(
@@ -223,6 +224,7 @@
   position: fixed;
   inset: 0;
   z-index: -1;
+  pointer-events: none;
   background-size: cover;
   background-position: center;
 }
