@@ -74,7 +74,7 @@ export function MagicLinkScreen({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
-          className="w-full rounded-xl bg-[#FFF7FA]/40 px-4 py-3 text-sm outline-none backdrop-blur-md transition focus:border-accent focus:ring-1 focus:ring-accent/30"
+          className="w-full rounded-xl bg-white/10 px-4 py-3 text-sm outline-none backdrop-blur-lg transition focus:border-accent focus:ring-1 focus:ring-accent/30"
           onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
         />
       </div>
