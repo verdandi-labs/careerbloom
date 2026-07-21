@@ -78,7 +78,18 @@ export function MagicLinkScreen({
             id="email"
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              console.log("CHANGE:", e.target.value);
+              setEmail(e.target.value);
+            }}
+            onInput={(e) =>
+              console.log("INPUT event:", (e.target as HTMLInputElement).value)
+            }
+            onKeyDown={(e) => {
+              console.log("KEY PRESSED:", e.key, "propagate:", !e.cancelBubble);
+              e.key === "Enter" && handleSubmit();
+            }}
+            onKeyUp={(e) => console.log("KEY UP:", e.key)}
             placeholder="you@example.com"
             className="w-full rounded-xl shadow-sm bg-white/25 px-4 py-3 text-sm text-black/50 caret-accent outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
           />
