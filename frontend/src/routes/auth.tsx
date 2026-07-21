@@ -38,16 +38,16 @@ function AuthLayout() {
 
   if (isChildRoute) {
     return (
-      <div
-        className="relative min-h-screen"
-        style={{
-          backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.70), rgba(250,220,217,0.70)), url(${background})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundAttachment: "fixed",
-        }}
-      >
-        <div className="mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-5 p-4 md:p-6">
+      <div className="relative min-h-screen">
+        <div
+          className="fixed inset-0 -z-10"
+          style={{
+            backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.70), rgba(250,220,217,0.70)), url(${background})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
+        <div className="relative mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-5 p-4 md:p-6">
           <Outlet />
         </div>
       </div>
@@ -134,16 +134,16 @@ function AuthPage() {
 
 function Background({ children }: { children: React.ReactNode }) {
   return (
-    <div
-      className="relative min-h-screen"
-      style={{
-        backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.70), rgba(250,220,217,0.70)), url(${background})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-      }}
-    >
-      <div className="mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-5 p-4 md:p-6">
+    <div className="relative min-h-screen">
+      <div
+        className="fixed inset-0 -z-10"
+        style={{
+          backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.70), rgba(250,220,217,0.70)), url(${background})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      />
+      <div className="relative mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-5 p-4 md:p-6">
         {children}
       </div>
     </div>
