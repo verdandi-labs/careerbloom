@@ -47,7 +47,7 @@ export function LoginScreen({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
-          className="w-full rounded-xl bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
+          className="w-full rounded-xl shadow-sm bg-white/25 px-4 py-3 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
           onKeyDown={(e) =>
             e.key === "Enter" &&
             !password &&
@@ -67,7 +67,7 @@ export function LoginScreen({
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Enter your password"
-          className="w-full rounded-xl bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
+          className="w-full rounded-xl shadow-sm bg-white/25 px-4 py-3 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
           onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
         />
       </div>
@@ -81,7 +81,7 @@ export function LoginScreen({
       <button
         onClick={handleSubmit}
         disabled={loading}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-6 py-3 text-sm font-medium text-secondary-foreground transition hover:opacity-90 disabled:opacity-50"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-6 py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
       >
         {loading ? (
           <Loader2 className="h-4 w-4 animate-spin" />

@@ -46,7 +46,7 @@ export function MagicLinkScreen({
         </p>
         <button
           onClick={() => onSent(email)}
-          className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-secondary px-6 py-3 text-sm font-medium text-secondary-foreground"
+          className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-secondary px-6 py-3 text-sm font-bold text-white"
         >
           Continue <ArrowRight className="h-4 w-4" />
         </button>
@@ -74,7 +74,7 @@ export function MagicLinkScreen({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
-          className="w-full rounded-xl bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
+          className="w-full rounded-xl shadow-sm bg-white/25 px-4 py-3 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
           onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
         />
       </div>
@@ -88,7 +88,7 @@ export function MagicLinkScreen({
       <button
         onClick={handleSubmit}
         disabled={sending}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-6 py-3 text-sm font-medium text-secondary-foreground transition hover:opacity-90 disabled:opacity-50"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-6 py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
       >
         {sending ? (
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -99,14 +99,14 @@ export function MagicLinkScreen({
         <ArrowRight className="h-4 w-4" />
       </button>
 
-      <p className="text-center text-xs text-foreground">
+      <p className="text-center text-xs text-foreground/80">
         Click it to create a password for your next login
       </p>
 
       {onSwitchToLogin && (
         <button
           onClick={onSwitchToLogin}
-          className="flex w-full items-center justify-center gap-1.5 text-center text-xs text-foreground underline underline-offset-2"
+          className="flex w-full items-center justify-center gap-1.5 text-center text-sm font-bold text-white underline underline-offset-2"
         >
           <Lock className="h-3 w-3" />I already have a password
         </button>
