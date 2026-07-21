@@ -39,7 +39,7 @@ export function LoginScreen({
   return (
     <div className="space-y-5">
       <div>
-        <label className="mb-1.5 block text-center text-sm font-medium text-foreground">
+        <label className="mb-1.5 block text-center text-sm font-bold text-white">
           Email
         </label>
         <input
@@ -47,7 +47,7 @@ export function LoginScreen({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
-          className="w-full rounded-xl shadow-sm bg-white/25 px-4 py-3 text-sm text-black/50 outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
+          className="w-full rounded-xl shadow-sm bg-white/25 px-4 py-3 text-sm text-black/50 caret-accent outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
           onKeyDown={(e) =>
             e.key === "Enter" &&
             !password &&
