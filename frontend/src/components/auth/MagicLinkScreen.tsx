@@ -16,7 +16,7 @@ export function MagicLinkScreen({
 
   async function handleSubmit() {
     if (!email) {
-      setError("Enter your email.");
+      setError("Enter your email");
       return;
     }
     setError(null);
@@ -26,7 +26,7 @@ export function MagicLinkScreen({
       setSent(true);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Failed to send magic link.",
+        err instanceof Error ? err.message : "Failed to send magic link",
       );
     } finally {
       setSending(false);
@@ -41,12 +41,12 @@ export function MagicLinkScreen({
         </div>
         <h2 className="font-display text-xl">Check your inbox</h2>
         <p className="mt-1 text-sm text-foreground/70">
-          We sent a link to <strong>{email}</strong>. Click it to create your
-          password.
+          We sent a link to {email}. Click it to create a password for your next
+          login
         </p>
         <button
           onClick={() => onSent(email)}
-          className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-foreground px-6 py-3 text-sm font-medium text-background"
+          className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-secondary px-6 py-3 text-sm font-medium text-secondary-foreground"
         >
           Continue <ArrowRight className="h-4 w-4" />
         </button>
@@ -88,7 +88,7 @@ export function MagicLinkScreen({
       <button
         onClick={handleSubmit}
         disabled={sending}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-foreground px-6 py-3 text-sm font-medium text-background transition hover:opacity-90 disabled:opacity-50"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-6 py-3 text-sm font-medium text-secondary-foreground transition hover:opacity-90 disabled:opacity-50"
       >
         {sending ? (
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -100,7 +100,7 @@ export function MagicLinkScreen({
       </button>
 
       <p className="text-center text-xs text-foreground/60">
-        Click it to create your password for future logins.
+        Click it to create a password for your next login
       </p>
 
       {onSwitchToLogin && (
@@ -108,8 +108,7 @@ export function MagicLinkScreen({
           onClick={onSwitchToLogin}
           className="flex w-full items-center justify-center gap-1.5 text-center text-xs text-foreground/60 underline underline-offset-2 hover:text-foreground"
         >
-          <Lock className="h-3 w-3" />
-          I already have a password
+          <Lock className="h-3 w-3" />I already have a password
         </button>
       )}
     </div>

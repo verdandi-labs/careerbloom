@@ -21,7 +21,7 @@ export const Route = createFileRoute("/auth")({
       {
         name: "description",
         content:
-          "Ready for your next career move? Enter your email and we'll send you a secure authentication link.",
+          "Ready for your next career move? Enter your email and we'll send you a secure authentication link",
       },
     ],
   }),
@@ -40,7 +40,7 @@ function AuthLayout() {
       <div
         className="relative min-h-screen"
         style={{
-          backgroundImage: `linear-gradient(135deg, rgba(249,241,240,0.4), rgba(250,220,217,0.6)), url(${blossomAsset.url})`,
+          backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.70), rgba(250,220,217,0.70)), url(${blossomAsset.url})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundAttachment: "fixed",
@@ -76,27 +76,27 @@ function AuthPage() {
             alt="careerBloom"
             className="mx-auto mb-6 h-10 w-auto"
           />
-          <p className="text-xs font-medium tracking-[0.18em] text-foreground/55 uppercase">
-            Ready for your next career move?
-          </p>
-          <h1 className="mt-3 font-display text-4xl leading-tight md:text-5xl">
+          <h1 className="font-display text-4xl leading-tight md:text-5xl">
             Welcome to CareerBloom!
           </h1>
-          <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-foreground/70 md:text-base">
-            Enter your email and we'll send you a secure authentication link.
-            Valid for 15 minutes
+          <p className="mt-2 text-sm text-foreground/60">
+            Ready for the next step in your career?
+          </p>
+          <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-foreground/70 md:text-base">
+            Enter your email and we will send you a secure authentication link
+            (valid for 15 minutes)
+            <br />
+            so you can set a password for your next login
           </p>
         </div>
-        <section className="glass p-6 md:p-8">
+        <section className="bg-secondary/70 backdrop-blur-md rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] p-6 md:p-8">
           {mode === "magic-link" ? (
             <MagicLinkScreen
               onSent={(email) => setAuthEmail(email)}
               onSwitchToLogin={() => setMode("login")}
             />
           ) : (
-            <LoginScreen
-              onSwitchToMagicLink={() => setMode("magic-link")}
-            />
+            <LoginScreen onSwitchToMagicLink={() => setMode("magic-link")} />
           )}
         </section>
         <Footer />
@@ -119,7 +119,7 @@ function AuthPage() {
             Optional: connect your own Supabase to keep data private.
           </p>
         </header>
-        <section className="glass p-6">
+        <section className="bg-secondary/70 backdrop-blur-md rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] p-6">
           <BYODBScreen email={authEmail} />
         </section>
         <Footer />
@@ -150,8 +150,8 @@ function Background({ children }: { children: React.ReactNode }) {
 
 function Footer() {
   return (
-    <p className="text-center text-xs tracking-wide text-foreground/50">
-      Helping you grow into what's next.
+    <p className="text-center text-xs tracking-wide text-[#4A8033]">
+      Helping you grow into what's next
     </p>
   );
 }

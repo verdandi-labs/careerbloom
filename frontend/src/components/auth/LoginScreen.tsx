@@ -16,7 +16,7 @@ export function LoginScreen({
 
   async function handleSubmit() {
     if (!email || !password) {
-      setError("Enter your email and password.");
+      setError("Enter your email and password");
       return;
     }
     setError(null);
@@ -29,7 +29,7 @@ export function LoginScreen({
       await refreshUser();
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Invalid email or password.",
+        err instanceof Error ? err.message : "Invalid email or password",
       );
     } finally {
       setLoading(false);
@@ -48,7 +48,13 @@ export function LoginScreen({
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
           className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
-          onKeyDown={(e) => e.key === "Enter" && !password && (e.target as HTMLInputElement).form?.elements.namedItem("password")?.focus()}
+          onKeyDown={(e) =>
+            e.key === "Enter" &&
+            !password &&
+            (e.target as HTMLInputElement).form?.elements
+              .namedItem("password")
+              ?.focus()
+          }
         />
       </div>
       <div>
@@ -75,7 +81,7 @@ export function LoginScreen({
       <button
         onClick={handleSubmit}
         disabled={loading}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-foreground px-6 py-3 text-sm font-medium text-background transition hover:opacity-90 disabled:opacity-50"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-6 py-3 text-sm font-medium text-secondary-foreground transition hover:opacity-90 disabled:opacity-50"
       >
         {loading ? (
           <Loader2 className="h-4 w-4 animate-spin" />

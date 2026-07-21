@@ -22,11 +22,11 @@ export function BYODBScreen({ email }: { email: string }) {
   async function handleConnect() {
     const val = connString.trim();
     if (!val) {
-      setError("Paste your connection string first.");
+      setError("Paste your connection string first");
       return;
     }
     if (!val.startsWith("postgresql://")) {
-      setError("Enter a valid postgresql:// connection string.");
+      setError("Enter a valid postgresql:// connection string");
       return;
     }
 
@@ -37,7 +37,7 @@ export function BYODBScreen({ email }: { email: string }) {
       setSuccess(true);
       setTimeout(() => navigate({ to: "/onboarding", replace: true }), 2000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Connection failed.");
+      setError(err instanceof Error ? err.message : "Connection failed");
     } finally {
       setSaving(false);
     }
@@ -89,7 +89,7 @@ export function BYODBScreen({ email }: { email: string }) {
           <button
             onClick={handleConfirmSkip}
             disabled={saving}
-            className="flex-1 rounded-2xl bg-foreground px-5 py-3 text-sm font-medium text-background disabled:opacity-50"
+            className="flex-1 rounded-2xl bg-secondary px-5 py-3 text-sm font-medium text-secondary-foreground disabled:opacity-50"
           >
             {saving ? "Continuing..." : "Accept"}
           </button>
@@ -131,7 +131,7 @@ export function BYODBScreen({ email }: { email: string }) {
       <button
         onClick={handleConnect}
         disabled={saving}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-foreground px-6 py-3 text-sm font-medium text-background disabled:opacity-50"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-6 py-3 text-sm font-medium text-secondary-foreground disabled:opacity-50"
       >
         {saving ? (
           <Loader2 className="h-4 w-4 animate-spin" />

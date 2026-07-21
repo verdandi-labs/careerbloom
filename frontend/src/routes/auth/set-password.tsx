@@ -87,14 +87,14 @@ function SetPasswordPage() {
   return (
     <>
       {step === "verifying" && (
-        <section className="glass p-8 text-center">
+        <section className="bg-secondary/70 backdrop-blur-md rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] p-8 text-center">
           <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-accent" />
           <p className="text-foreground/70">Verifying your link...</p>
         </section>
       )}
 
       {step === "done" && (
-        <section className="glass p-8 text-center">
+        <section className="bg-secondary/70 backdrop-blur-md rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] p-8 text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-green-500/20">
             <Check className="h-8 w-8 text-green-500" />
           </div>
@@ -120,7 +120,7 @@ function SetPasswordPage() {
             </p>
           </header>
 
-          <section className="glass p-6 space-y-4">
+          <section className="bg-secondary/70 backdrop-blur-md rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] p-6 space-y-4">
             <div>
               <label className="mb-1 block text-[11px] uppercase tracking-wider text-foreground/50">
                 Password
@@ -156,7 +156,7 @@ function SetPasswordPage() {
             <button
               onClick={handleSubmit}
               disabled={saving}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-foreground px-6 py-3 text-sm font-medium text-background disabled:opacity-50"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-6 py-3 text-sm font-medium text-secondary-foreground disabled:opacity-50"
             >
               {saving ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
