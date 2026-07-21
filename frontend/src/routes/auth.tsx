@@ -11,7 +11,8 @@ import { useAuth } from "@/lib/auth";
 import { MagicLinkScreen } from "@/components/auth/MagicLinkScreen";
 import { LoginScreen } from "@/components/auth/LoginScreen";
 import { BYODBScreen } from "@/components/auth/BYODBScreen";
-import blossomAsset from "@/assets/blossom.jpg.asset.json";
+
+const background = "/blossom.jpg";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -40,7 +41,7 @@ function AuthLayout() {
       <div
         className="relative min-h-screen"
         style={{
-          backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.70), rgba(250,220,217,0.70)), url(${blossomAsset.url})`,
+          backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.70), rgba(250,220,217,0.70)), url(${background})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundAttachment: "fixed",
@@ -79,10 +80,10 @@ function AuthPage() {
           <h1 className="font-display text-4xl leading-tight md:text-5xl">
             Welcome to CareerBloom!
           </h1>
-          <p className="mt-2 text-sm text-foreground">
+          <p className="mt-2 text-sm text-foreground/70">
             Ready for the next step in your career?
           </p>
-          <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-justify text-foreground md:text-base">
+          <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-center text-foreground/70 md:text-base">
             Enter your email and we will send you a secure
             <br />
             authentication link (valid for 15 minutes)
@@ -136,7 +137,7 @@ function Background({ children }: { children: React.ReactNode }) {
     <div
       className="relative min-h-screen"
       style={{
-        backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.70), rgba(250,220,217,0.70)), url(${blossomAsset.url})`,
+        backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.70), rgba(250,220,217,0.70)), url(${background})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundAttachment: "fixed",

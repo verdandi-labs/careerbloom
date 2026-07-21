@@ -4,7 +4,9 @@ import { getOrCreateCareerDirection } from "@/lib/chat";
 import { AppShell } from "@/components/AppShell";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
-import blossomAsset from "@/assets/blossom.jpg.asset.json";
+
+const background = "/blossom.jpg";
+
 import {
   ArrowUpRight,
   Sparkles,
@@ -63,7 +65,7 @@ function Dashboard() {
         <article
           className="glass relative overflow-hidden p-7 lg:col-span-8 lg:row-span-2 min-h-[420px]"
           style={{
-            backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.70), rgba(250,220,217,0.70)), url(${blossomAsset.url})`,
+            backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.70), rgba(250,220,217,0.70)), url(${background})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
