@@ -12,8 +12,6 @@ import { MagicLinkScreen } from "@/components/auth/MagicLinkScreen";
 import { LoginScreen } from "@/components/auth/LoginScreen";
 import { BYODBScreen } from "@/components/auth/BYODBScreen";
 
-const background = "/blossom.jpg";
-
 export const Route = createFileRoute("/auth")({
   ssr: false,
   head: () => ({
@@ -38,15 +36,8 @@ function AuthLayout() {
 
   if (isChildRoute) {
     return (
-      <div
-        className="relative min-h-screen"
-        style={{
-          backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.70), rgba(250,220,217,0.70)), url(${background})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundAttachment: "fixed",
-        }}
-      >
+      <div className="relative min-h-screen">
+        <div className="fixed-bg fixed-bg--auth" />
         <div className="mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-5 p-4 md:p-6">
           <Outlet />
         </div>
@@ -134,15 +125,8 @@ function AuthPage() {
 
 function Background({ children }: { children: React.ReactNode }) {
   return (
-    <div
-      className="relative min-h-screen"
-      style={{
-        backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.70), rgba(250,220,217,0.70)), url(${background})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-      }}
-    >
+    <div className="relative min-h-screen">
+      <div className="fixed-bg fixed-bg--auth" />
       <div className="mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-5 p-4 md:p-6">
         {children}
       </div>

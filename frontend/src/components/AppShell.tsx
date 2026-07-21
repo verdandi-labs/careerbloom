@@ -9,7 +9,6 @@ import {
   LogOut,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
-import blossomAsset from "@/assets/blossom.jpg.asset.json";
 import { useAuth } from "@/lib/auth";
 import { CvUploadModal } from "./CvUploadModal";
 
@@ -33,16 +32,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div
-      className="relative min-h-screen"
-      style={{
-        backgroundImage: `linear-gradient(135deg, rgba(249,241,240,0.35), rgba(250,220,217,0.55)), url(${blossomAsset.url})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-      }}
-    >
-      <div className="mx-auto flex max-w-[1500px] flex-col gap-5 p-4 md:p-6">
+    <div className="relative min-h-screen">
+      <div className="fixed-bg fixed-bg--app" />
+      <div className="relative mx-auto flex max-w-[1500px] flex-col gap-5 p-4 md:p-6">
         <header className="flex items-center justify-between gap-4 rounded-[28px] bg-secondary/70 px-6 py-3 shadow-[0_18px_50px_-20px_rgba(248,175,166,0.8)] backdrop-blur-md">
           <Link to="/" className="flex items-center gap-2 shrink-0">
             <span className="font-display text-2xl italic">Career</span>

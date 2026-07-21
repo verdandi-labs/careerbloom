@@ -3,7 +3,6 @@ import { useState } from "react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { CvUploadModal } from "@/components/CvUploadModal";
-import blossomAsset from "@/assets/blossom.jpg.asset.json";
 import {
   ArrowRight,
   Compass,
@@ -37,14 +36,8 @@ function Onboarding() {
   }
 
   return (
-    <div
-      className="relative grid min-h-screen place-items-center px-4 py-10"
-      style={{
-        backgroundImage: `url(${blossomAsset.url})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
+    <div className="relative grid min-h-screen place-items-center px-4 py-10">
+      <div className="fixed-bg fixed-bg--bare" />
       <div className="pointer-events-none absolute inset-0 bg-[oklch(0.918_0.034_18/0.4)] backdrop-blur-sm" />
 
       <div className="glass-strong relative z-10 w-full max-w-2xl p-10">
