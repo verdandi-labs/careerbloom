@@ -51,7 +51,9 @@ export function LoginScreen({
           onKeyDown={(e) =>
             e.key === "Enter" &&
             !password &&
-            (e.target as HTMLInputElement).form?.querySelector<HTMLInputElement>("[name=password]")?.focus()
+            (e.target as HTMLInputElement).form
+              ?.querySelector<HTMLInputElement>("[name=password]")
+              ?.focus()
           }
         />
       </div>
