@@ -79,12 +79,13 @@ function AuthPage() {
           <h1 className="font-display text-4xl leading-tight md:text-5xl">
             Welcome to CareerBloom!
           </h1>
-          <p className="mt-2 text-sm text-foreground/60">
+          <p className="mt-2 text-sm text-foreground">
             Ready for the next step in your career?
           </p>
-          <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-foreground/70 md:text-base">
-            Enter your email and we will send you a secure authentication link
-            (valid for 15 minutes)
+          <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-justify text-foreground md:text-base">
+            Enter your email and we will send you a secure
+            <br />
+            authentication link (valid for 15 minutes)
             <br />
             so you can set a password for your next login
           </p>
@@ -109,13 +110,13 @@ function AuthPage() {
       <Background>
         <header className="rounded-[20px] bg-secondary/70 px-7 py-7 shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] backdrop-blur-md">
           <img src="/logo.png" alt="careerBloom" className="mb-3 h-8 w-auto" />
-          <p className="text-[11px] uppercase tracking-[0.22em] text-foreground/70">
+          <p className="text-[11px] uppercase tracking-[0.22em] text-foreground">
             Step 2 of 2
           </p>
           <h1 className="mt-1 font-display text-3xl">
             Bring your own database
           </h1>
-          <p className="mt-1 text-sm text-foreground/75">
+          <p className="mt-1 text-sm text-foreground">
             Optional: connect your own Supabase to keep data private.
           </p>
         </header>
@@ -135,7 +136,7 @@ function Background({ children }: { children: React.ReactNode }) {
     <div
       className="relative min-h-screen"
       style={{
-        backgroundImage: `linear-gradient(135deg, rgba(249,241,240,0.4), rgba(250,220,217,0.6)), url(${blossomAsset.url})`,
+        backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.70), rgba(250,220,217,0.70)), url(${blossomAsset.url})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundAttachment: "fixed",

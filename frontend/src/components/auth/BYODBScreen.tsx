@@ -64,7 +64,7 @@ export function BYODBScreen({ email }: { email: string }) {
           <Check className="h-8 w-8 text-green-500" />
         </div>
         <h2 className="font-display text-2xl text-green-700">Connected!</h2>
-        <p className="mt-1 text-sm text-foreground/70">
+        <p className="mt-1 text-sm text-foreground">
           Taking you to onboarding...
         </p>
       </div>
@@ -79,7 +79,7 @@ export function BYODBScreen({ email }: { email: string }) {
         </div>
         <div>
           <h3 className="font-display text-lg">Use the shared database?</h3>
-          <p className="mt-2 text-sm text-foreground/70 leading-relaxed">
+          <p className="mt-2 text-sm text-foreground leading-relaxed">
             Your data will be stored in careerBloom's global database. You can
             connect your own Supabase later in <strong>Settings</strong> to keep
             your data private.
@@ -101,7 +101,7 @@ export function BYODBScreen({ email }: { email: string }) {
             Cancel
           </button>
         </div>
-        <p className="flex items-center justify-center gap-1.5 text-xs text-foreground/50">
+        <p className="flex items-center justify-center gap-1.5 text-xs text-foreground">
           <Settings className="h-3.5 w-3.5" />
           Settings &rarr; Database to connect your own later
         </p>
@@ -111,7 +111,7 @@ export function BYODBScreen({ email }: { email: string }) {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-foreground/75">
+      <p className="text-sm text-foreground">
         Connect your own Supabase database to keep your data private.
       </p>
 
@@ -119,7 +119,7 @@ export function BYODBScreen({ email }: { email: string }) {
         value={connString}
         onChange={(e) => setConnString(e.target.value)}
         placeholder="postgresql://postgres:password@xxxxx.supabase.co/postgres"
-        className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-accent"
+        className="w-full rounded-lg bg-[#FFE3EA]/50 px-4 py-2.5 text-sm outline-none backdrop-blur-md focus:border-accent"
       />
 
       {error && (

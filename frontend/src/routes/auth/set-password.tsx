@@ -89,7 +89,7 @@ function SetPasswordPage() {
       {step === "verifying" && (
         <section className="bg-secondary/70 backdrop-blur-md rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] p-8 text-center">
           <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-accent" />
-          <p className="text-foreground/70">Verifying your link...</p>
+          <p className="text-foreground">Verifying your link...</p>
         </section>
       )}
 
@@ -101,7 +101,7 @@ function SetPasswordPage() {
           <h2 className="font-display text-2xl text-green-700">
             Password set!
           </h2>
-          <p className="mt-1 text-sm text-foreground/70">
+          <p className="mt-1 text-sm text-foreground">
             Taking you to the next step...
           </p>
         </section>
@@ -110,11 +110,11 @@ function SetPasswordPage() {
       {step === "form" && (
         <>
           <header className="rounded-[20px] bg-secondary/70 px-7 py-7 shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] backdrop-blur-md">
-            <p className="text-[11px] uppercase tracking-[0.22em] text-foreground/70">
+            <p className="text-[11px] uppercase tracking-[0.22em] text-foreground">
               Step 2 of 3
             </p>
             <h1 className="mt-2 font-display text-4xl">Set your password</h1>
-            <p className="mt-1 text-sm text-foreground/75">
+            <p className="mt-1 text-sm text-foreground">
               Welcome, <strong>{email}</strong>. Create a password to secure
               your account.
             </p>
@@ -122,7 +122,7 @@ function SetPasswordPage() {
 
           <section className="bg-secondary/70 backdrop-blur-md rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] p-6 space-y-4">
             <div>
-              <label className="mb-1 block text-[11px] uppercase tracking-wider text-foreground/50">
+              <label className="mb-1 block text-[11px] uppercase tracking-wider text-foreground">
                 Password
               </label>
               <input
@@ -130,12 +130,12 @@ function SetPasswordPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="At least 6 characters"
-                className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-accent"
+                className="w-full rounded-lg bg-[#FFE3EA]/50 px-4 py-2.5 text-sm outline-none backdrop-blur-md focus:border-accent"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-[11px] uppercase tracking-wider text-foreground/50">
+              <label className="mb-1 block text-[11px] uppercase tracking-wider text-foreground">
                 Confirm Password
               </label>
               <input
@@ -143,7 +143,7 @@ function SetPasswordPage() {
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 placeholder="Repeat your password"
-                className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-accent"
+                className="w-full rounded-lg bg-[#FFE3EA]/50 px-4 py-2.5 text-sm outline-none backdrop-blur-md focus:border-accent"
               />
             </div>
 

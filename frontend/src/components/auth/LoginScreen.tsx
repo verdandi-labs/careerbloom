@@ -39,7 +39,7 @@ export function LoginScreen({
   return (
     <div className="space-y-5">
       <div>
-        <label className="mb-1.5 block text-xs font-medium text-foreground/60">
+        <label className="mb-1.5 block text-center text-sm font-medium text-foreground">
           Email
         </label>
         <input
@@ -47,7 +47,7 @@ export function LoginScreen({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
-          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
+          className="w-full rounded-xl bg-[#FFE3EA]/50 px-4 py-3 text-sm outline-none backdrop-blur-md transition focus:border-accent focus:ring-1 focus:ring-accent/30"
           onKeyDown={(e) =>
             e.key === "Enter" &&
             !password &&
@@ -58,7 +58,7 @@ export function LoginScreen({
         />
       </div>
       <div>
-        <label className="mb-1.5 block text-xs font-medium text-foreground/60">
+        <label className="mb-1.5 block text-center text-sm font-medium text-foreground">
           Password
         </label>
         <input
@@ -67,7 +67,7 @@ export function LoginScreen({
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Enter your password"
-          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
+          className="w-full rounded-xl bg-[#FFE3EA]/50 px-4 py-3 text-sm outline-none backdrop-blur-md transition focus:border-accent focus:ring-1 focus:ring-accent/30"
           onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
         />
       </div>
@@ -93,7 +93,7 @@ export function LoginScreen({
 
       <button
         onClick={onSwitchToMagicLink}
-        className="flex w-full items-center justify-center gap-1.5 text-center text-xs text-foreground/60 underline underline-offset-2 hover:text-foreground"
+        className="flex w-full items-center justify-center gap-1.5 text-center text-xs text-foreground underline underline-offset-2"
       >
         <ArrowLeft className="h-3 w-3" />
         Send me a magic link instead

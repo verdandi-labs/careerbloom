@@ -40,7 +40,7 @@ export function MagicLinkScreen({
           <Check className="h-6 w-6 text-foreground" />
         </div>
         <h2 className="font-display text-xl">Check your inbox</h2>
-        <p className="mt-1 text-sm text-foreground/70">
+        <p className="mt-1 text-sm text-foreground">
           We sent a link to {email}. Click it to create a password for your next
           login
         </p>
@@ -55,7 +55,7 @@ export function MagicLinkScreen({
             setSent(false);
             setEmail("");
           }}
-          className="mt-3 block w-full text-xs text-foreground/60 underline underline-offset-2 hover:text-foreground"
+          className="mt-3 block w-full text-xs text-foreground underline underline-offset-2"
         >
           Use a different email
         </button>
@@ -66,7 +66,7 @@ export function MagicLinkScreen({
   return (
     <div className="space-y-5">
       <div>
-        <label className="mb-1.5 block text-xs font-medium text-foreground/60">
+        <label className="mb-1.5 block text-center text-sm font-medium text-foreground">
           Email
         </label>
         <input
@@ -74,7 +74,7 @@ export function MagicLinkScreen({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
-          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
+          className="w-full rounded-xl bg-[#FFE3EA]/50 px-4 py-3 text-sm outline-none backdrop-blur-md transition focus:border-accent focus:ring-1 focus:ring-accent/30"
           onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
         />
       </div>
@@ -99,14 +99,14 @@ export function MagicLinkScreen({
         <ArrowRight className="h-4 w-4" />
       </button>
 
-      <p className="text-center text-xs text-foreground/60">
+      <p className="text-center text-xs text-foreground">
         Click it to create a password for your next login
       </p>
 
       {onSwitchToLogin && (
         <button
           onClick={onSwitchToLogin}
-          className="flex w-full items-center justify-center gap-1.5 text-center text-xs text-foreground/60 underline underline-offset-2 hover:text-foreground"
+          className="flex w-full items-center justify-center gap-1.5 text-center text-xs text-foreground underline underline-offset-2"
         >
           <Lock className="h-3 w-3" />I already have a password
         </button>
