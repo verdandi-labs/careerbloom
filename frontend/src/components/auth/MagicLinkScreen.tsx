@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { api } from "@/lib/api";
 import { ArrowRight, Check, Loader2, Mail, ThumbsUp } from "lucide-react";
 
@@ -9,13 +9,15 @@ export function MagicLinkScreen({
   onSent: (email: string) => void;
   onSwitchToLogin?: () => void;
 }) {
-  const [email, setEmail] = useState("");
+  const emailRef = useRef<HTMLInputElement>(null);
+  const [submittedEmail, setSubmittedEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
 
   async function handleSubmit(e?: React.FormEvent) {
     if (e) e.preventDefault();
+    const email = emailRef.current?.value ?? "";
     if (!email) {
       setError("Enter your email");
       return;
@@ -24,6 +26,7 @@ export function MagicLinkScreen({
     setSending(true);
     try {
       await api("/auth/magic-link", { method: "POST", json: { email } });
+      setSubmittedEmail(email);
       setSent(true);
     } catch (err) {
       setError(
@@ -42,11 +45,11 @@ export function MagicLinkScreen({
         </div>
         <h2 className="font-display text-xl">Check your inbox</h2>
         <p className="mt-1 text-sm text-foreground">
-          We sent a link to {email}. Click it to create a password for your next
-          login
+          We sent a link to {submittedEmail}. Click it to create a password for
+          your next login
         </p>
         <button
-          onClick={() => onSent(email)}
+          onClick={() => onSent(submittedEmail)}
           className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-secondary px-6 py-3 text-sm font-bold text-white"
         >
           Continue <ArrowRight className="h-4 w-4" />
@@ -54,7 +57,7 @@ export function MagicLinkScreen({
         <button
           onClick={() => {
             setSent(false);
-            setEmail("");
+            if (emailRef.current) emailRef.current.value = "";
           }}
           className="mt-3 block w-full text-xs text-foreground underline underline-offset-2"
         >
@@ -75,11 +78,12 @@ export function MagicLinkScreen({
             Email
           </label>
           <input
+            ref={emailRef}
             id="email"
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            defaultValue=""
             placeholder="you@example.com"
+            pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$"
             className="w-full rounded-xl shadow-sm bg-white/25 px-4 py-3 text-sm text-black/50 caret-accent outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
             onKeyDown={(e) => {
               if (e.key === "Enter") {
