@@ -15,4 +15,30 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            if (id.includes("react") || id.includes("react-dom")) {
+              return "vendor-react";
+            }
+            if (id.includes("zustand") || id.includes("@tanstack")) {
+              return "vendor-core";
+            }
+            if (id.includes("lucide")) {
+              return "vendor-icons";
+            }
+            return "vendor";
+          }
+          if (id.includes("/features/auth/")) {
+            return "auth";
+          }
+          if (id.includes("/components/ui/")) {
+            return "ui";
+          }
+        },
+      },
+    },
+  },
 });

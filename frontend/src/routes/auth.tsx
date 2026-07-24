@@ -5,9 +5,36 @@ import {
   useRouterState,
   useSearch,
 } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { z } from "zod";
-import { useAuthStore, MagicLinkScreen, LoginScreen, BYODBScreen } from "@/features/auth";
+import { useAuthStore } from "@/features/auth";
+import { Loader2 } from "lucide-react";
+
+const MagicLinkScreen = lazy(() =>
+  import("@/features/auth/screens/MagicLinkScreen").then((m) => ({
+    default: m.MagicLinkScreen,
+  })),
+);
+
+const LoginScreen = lazy(() =>
+  import("@/features/auth/screens/LoginScreen").then((m) => ({
+    default: m.LoginScreen,
+  })),
+);
+
+const BYODBScreen = lazy(() =>
+  import("@/features/auth/screens/BYODBScreen").then((m) => ({
+    default: m.BYODBScreen,
+  })),
+);
+
+function LazyFallback() {
+  return (
+    <div className="flex justify-center py-12">
+      <Loader2 className="h-6 w-6 animate-spin text-foreground/50" />
+    </div>
+  );
+}
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -80,14 +107,16 @@ function AuthPage() {
           </p>
         </div>
         <section className="bg-secondary/30 rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] p-6 md:p-8">
-          {mode === "magic-link" ? (
-            <MagicLinkScreen
-              onSent={(email) => setAuthEmail(email)}
-              onSwitchToLogin={() => setMode("login")}
-            />
-          ) : (
-            <LoginScreen onSwitchToMagicLink={() => setMode("magic-link")} />
-          )}
+          <Suspense fallback={<LazyFallback />}>
+            {mode === "magic-link" ? (
+              <MagicLinkScreen
+                onSent={(email) => setAuthEmail(email)}
+                onSwitchToLogin={() => setMode("login")}
+              />
+            ) : (
+              <LoginScreen onSwitchToMagicLink={() => setMode("magic-link")} />
+            )}
+          </Suspense>
         </section>
         <Footer />
       </Background>
@@ -110,7 +139,9 @@ function AuthPage() {
           </p>
         </header>
         <section className="bg-secondary/30 rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] p-6">
-          <BYODBScreen email={authEmail} />
+          <Suspense fallback={<LazyFallback />}>
+            <BYODBScreen email={authEmail} />
+          </Suspense>
         </section>
         <Footer />
       </Background>
