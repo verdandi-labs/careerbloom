@@ -5,7 +5,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { api, setTokens } from "@/lib/api";
-import { useAuth } from "@/lib/auth";
+import { useAuthStore, verifyMagicLink, setPassword as setUserPassword } from "@/features/auth";
 import { ArrowRight, Check, Loader2, Shield } from "lucide-react";
 
 export const Route = createFileRoute("/auth/set-password")({
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/auth/set-password")({
 
 function SetPasswordPage() {
   const navigate = useNavigate();
-  const { refreshUser } = useAuth();
+  const login = useAuthStore((s) => s.login);
   const search = useSearch({ from: "/auth/set-password" });
   const token = (search as { token?: string }).token || "";
   const email = (search as { email?: string }).email || "";
@@ -33,9 +33,7 @@ function SetPasswordPage() {
       setStep("form");
       return;
     }
-    api(
-      `/auth/magic?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`,
-    )
+    verifyMagicLink(token, email)
       .then(() => setStep("form"))
       .catch(() => {
         setError("Link expired or invalid. Request a new magic link.");
@@ -57,16 +55,9 @@ function SetPasswordPage() {
     setSaving(true);
 
     try {
-      const res = await api<{ access_token: string; email: string }>(
-        "/auth/password",
-        {
-          method: "POST",
-          json: { email, password },
-        },
-      );
-      setTokens(res.access_token, "");
+      const res = await setUserPassword(email, password);
       localStorage.setItem("auth_email", res.email);
-      await refreshUser();
+      await login(res.access_token, "");
       setStep("done");
       setTimeout(
         () =>

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { api } from "@/lib/api";
 import { ArrowRight, Check, Loader2, Mail, ThumbsUp } from "lucide-react";
+import { requestMagicLink } from "../api";
 
 export function MagicLinkScreen({
   onSent,
@@ -10,7 +10,6 @@ export function MagicLinkScreen({
   onSwitchToLogin?: () => void;
 }) {
   const [email, setEmail] = useState("");
-  const [submittedEmail, setSubmittedEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -24,8 +23,7 @@ export function MagicLinkScreen({
     setError(null);
     setSending(true);
     try {
-      await api("/auth/magic-link", { method: "POST", json: { email } });
-      setSubmittedEmail(email);
+      await requestMagicLink(email);
       setSent(true);
     } catch (err) {
       setError(
@@ -44,11 +42,11 @@ export function MagicLinkScreen({
         </div>
         <h2 className="font-display text-xl">Check your inbox</h2>
         <p className="mt-1 text-sm text-foreground">
-          We sent a link to {submittedEmail}. Click it to create a password for
-          your next login
+          We sent a link to {email}. Click it to create a password for your next
+          login
         </p>
         <button
-          onClick={() => onSent(submittedEmail)}
+          onClick={() => onSent(email)}
           className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-secondary px-6 py-3 text-sm font-bold text-white"
         >
           Continue <ArrowRight className="h-4 w-4" />
@@ -81,7 +79,7 @@ export function MagicLinkScreen({
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
-            setError(null);
+            if (error) setError(null);
           }}
           placeholder="you@example.com"
           className="w-full rounded-xl shadow-sm bg-white/25 px-4 py-3 text-sm text-black/50 outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"

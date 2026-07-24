@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AuthProvider } from "./lib/auth";
+import { AuthInit } from "./features/auth";
 import { routeTree } from "./routeTree.gen";
 
 const queryClient = new QueryClient();
@@ -21,8 +21,8 @@ declare module "@tanstack/react-router" {
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
+    <AuthInit>
       <RouterProvider router={router} />
-    </AuthProvider>
+    </AuthInit>
   </QueryClientProvider>,
 );

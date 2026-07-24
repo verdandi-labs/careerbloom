@@ -10,7 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import "../styles.css";
-import { useAuth } from "../lib/auth";
+import { useAuthStore } from "../features/auth";
 
 function NotFoundComponent() {
   return (
@@ -135,7 +135,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const { refreshUser } = useAuth();
+  const refreshUser = useAuthStore((s) => s.refreshUser);
   const router = useRouter();
 
   useEffect(() => {

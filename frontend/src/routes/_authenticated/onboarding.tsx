@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { api } from "@/lib/api";
-import { useAuth } from "@/lib/auth";
+import { useAuthStore } from "@/features/auth";
 import { CvUploadModal } from "@/components/CvUploadModal";
 import {
   ArrowRight,
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_authenticated/onboarding")({
 
 function Onboarding() {
   const navigate = useNavigate();
-  const { refreshUser } = useAuth();
+  const refreshUser = useAuthStore((s) => s.refreshUser);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [goal, setGoal] = useState<"switch" | "levelup" | null>(null);

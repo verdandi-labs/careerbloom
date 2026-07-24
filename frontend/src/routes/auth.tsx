@@ -5,12 +5,9 @@ import {
   useRouterState,
   useSearch,
 } from "@tanstack/react-router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
-import { useAuth } from "@/lib/auth";
-import { MagicLinkScreen } from "@/components/auth/MagicLinkScreen";
-import { LoginScreen } from "@/components/auth/LoginScreen";
-import { BYODBScreen } from "@/components/auth/BYODBScreen";
+import { useAuthStore, MagicLinkScreen, LoginScreen, BYODBScreen } from "@/features/auth";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -49,7 +46,7 @@ function AuthLayout() {
 }
 
 function AuthPage() {
-  const { user } = useAuth();
+  const user = useAuthStore((s) => s.user);
   const navigate = useNavigate();
   const search = useSearch({ from: "/auth" });
   const [authEmail, setAuthEmail] = useState("");

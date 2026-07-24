@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { api } from "@/lib/api";
-import { useAuth } from "@/lib/auth";
+import { useAuthStore } from "@/features/auth";
 import { Check, Database, Globe2, LogOut, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/settings")({
@@ -14,7 +14,8 @@ type Lang = "en" | "es";
 
 function SettingsPage() {
   const navigate = useNavigate();
-  const { user, logout, refreshUser } = useAuth();
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
   const [displayName, setDisplayName] = useState("");
   const [lang, setLang] = useState<Lang>("en");
   const [confirmDelete, setConfirmDelete] = useState(false);
