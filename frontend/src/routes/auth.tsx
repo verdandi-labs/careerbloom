@@ -5,9 +5,10 @@ import {
   useRouterState,
   useSearch,
 } from "@tanstack/react-router";
-import { Suspense, lazy, useEffect, useState } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { z } from "zod";
-import { useAuthStore } from "@/features/auth";
+import { useSession, useAuthUI } from "@/features/auth";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { Loader2 } from "lucide-react";
 
 const MagicLinkScreen = lazy(() =>
@@ -73,11 +74,13 @@ function AuthLayout() {
 }
 
 function AuthPage() {
-  const user = useAuthStore((s) => s.user);
+  const { data: user } = useSession();
   const navigate = useNavigate();
   const search = useSearch({ from: "/auth" });
-  const [authEmail, setAuthEmail] = useState("");
-  const [mode, setMode] = useState<"magic-link" | "login">("magic-link");
+  const mode = useAuthUI((s) => s.mode);
+  const setMode = useAuthUI((s) => s.setMode);
+  const authEmail = useAuthUI((s) => s.email);
+  const setAuthEmail = useAuthUI((s) => s.setEmail);
 
   useEffect(() => {
     if (user && !search.step) navigate({ to: "/" });
@@ -107,16 +110,20 @@ function AuthPage() {
           </p>
         </div>
         <section className="bg-secondary/30 rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] p-6 md:p-8">
-          <Suspense fallback={<LazyFallback />}>
-            {mode === "magic-link" ? (
-              <MagicLinkScreen
-                onSent={(email) => setAuthEmail(email)}
-                onSwitchToLogin={() => setMode("login")}
-              />
-            ) : (
-              <LoginScreen onSwitchToMagicLink={() => setMode("magic-link")} />
-            )}
-          </Suspense>
+          <ErrorBoundary>
+            <Suspense fallback={<LazyFallback />}>
+              {mode === "magic-link" ? (
+                <MagicLinkScreen
+                  onSent={(email) => setAuthEmail(email)}
+                  onSwitchToLogin={() => setMode("login")}
+                />
+              ) : (
+                <LoginScreen
+                  onSwitchToMagicLink={() => setMode("magic-link")}
+                />
+              )}
+            </Suspense>
+          </ErrorBoundary>
         </section>
         <Footer />
       </Background>
@@ -139,9 +146,11 @@ function AuthPage() {
           </p>
         </header>
         <section className="bg-secondary/30 rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] p-6">
-          <Suspense fallback={<LazyFallback />}>
-            <BYODBScreen email={authEmail} />
-          </Suspense>
+          <ErrorBoundary>
+            <Suspense fallback={<LazyFallback />}>
+              <BYODBScreen email={authEmail} />
+            </Suspense>
+          </ErrorBoundary>
         </section>
         <Footer />
       </Background>

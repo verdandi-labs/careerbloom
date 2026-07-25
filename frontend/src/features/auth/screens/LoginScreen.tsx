@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { ArrowLeft, Loader2, LogIn } from "lucide-react";
-import { useAuthStore } from "../store";
-import { loginWithPassword } from "../api";
+import { useLogin } from "../hooks";
 
 export function LoginScreen({
   onSwitchToMagicLink,
@@ -11,8 +10,7 @@ export function LoginScreen({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const login = useAuthStore((s) => s.login);
+  const login = useLogin();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -21,17 +19,15 @@ export function LoginScreen({
       return;
     }
     setError(null);
-    setLoading(true);
-    try {
-      const res = await loginWithPassword(email, password);
-      await login(res.access_token, "");
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Invalid email or password",
-      );
-    } finally {
-      setLoading(false);
-    }
+    login.mutate(
+      { email, password },
+      {
+        onError: (err) =>
+          setError(
+            err instanceof Error ? err.message : "Invalid email or password",
+          ),
+      },
+    );
   }
 
   return (
@@ -84,15 +80,15 @@ export function LoginScreen({
 
       <button
         type="submit"
-        disabled={loading}
+        disabled={login.isPending}
         className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-6 py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
       >
-        {loading ? (
+        {login.isPending ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
           <LogIn className="h-4 w-4" />
         )}
-        {loading ? "Logging in..." : "Log in"}
+        {login.isPending ? "Logging in..." : "Log in"}
       </button>
 
       <button

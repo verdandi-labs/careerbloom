@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { api } from "@/lib/api";
-import { useAuthStore } from "@/features/auth";
+import { useQueryClient } from "@tanstack/react-query";
+import { sessionKeys } from "@/features/auth";
 import { CvUploadModal } from "@/components/CvUploadModal";
 import {
   ArrowRight,
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/_authenticated/onboarding")({
 
 function Onboarding() {
   const navigate = useNavigate();
-  const refreshUser = useAuthStore((s) => s.refreshUser);
+  const qc = useQueryClient();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [goal, setGoal] = useState<"switch" | "levelup" | null>(null);
@@ -31,7 +32,7 @@ function Onboarding() {
       method: "PATCH",
       json: { goal, onboarding_complete: true },
     });
-    await refreshUser();
+    await qc.invalidateQueries({ queryKey: sessionKeys.all });
     navigate({ to: "/" });
   }
 

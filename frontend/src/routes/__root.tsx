@@ -10,7 +10,8 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import "../styles.css";
-import { useAuthStore } from "../features/auth";
+import { sessionKeys } from "../features/auth";
+import { useQueryClient } from "@tanstack/react-query";
 
 function NotFoundComponent() {
   return (
@@ -135,17 +136,16 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const refreshUser = useAuthStore((s) => s.refreshUser);
   const router = useRouter();
 
   useEffect(() => {
     const handleStorage = () => {
-      refreshUser();
+      queryClient.invalidateQueries({ queryKey: sessionKeys.all });
       router.invalidate();
     };
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
-  }, [refreshUser, router]);
+  }, [queryClient, router]);
 
   return (
     <QueryClientProvider client={queryClient}>

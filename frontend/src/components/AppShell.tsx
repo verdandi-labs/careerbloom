@@ -9,7 +9,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
-import { useAuthStore } from "@/features/auth";
+import { useSignOut } from "@/features/auth";
 import { CvUploadModal } from "./CvUploadModal";
 
 const nav = [
@@ -23,11 +23,11 @@ const nav = [
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
-  const logout = useAuthStore((s) => s.logout);
+  const signOut = useSignOut();
   const [uploadOpen, setUploadOpen] = useState(false);
 
   function handleSignOut() {
-    logout();
+    signOut();
     navigate({ to: "/auth", search: {} });
   }
 

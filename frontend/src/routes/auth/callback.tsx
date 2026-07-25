@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { setTokens, api } from "@/lib/api";
-import { useAuthStore } from "@/features/auth";
+import { sessionKeys } from "@/features/auth";
 import { Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/auth/callback")({
@@ -20,7 +21,7 @@ async function hasTenant(): Promise<boolean> {
 
 function AuthCallback() {
   const navigate = useNavigate();
-  const login = useAuthStore((s) => s.login);
+  const qc = useQueryClient();
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -29,7 +30,8 @@ function AuthCallback() {
     const refreshToken = params.get("refresh_token");
 
     if (accessToken && refreshToken) {
-      login(accessToken, refreshToken).then(async () => {
+      setTokens(accessToken, refreshToken);
+      qc.invalidateQueries({ queryKey: sessionKeys.all }).then(async () => {
         const connected = await hasTenant();
         if (connected) {
           navigate({ to: "/onboarding", replace: true });
@@ -40,7 +42,7 @@ function AuthCallback() {
     } else {
       navigate({ to: "/auth", search: {}, replace: true });
     }
-  }, [navigate, login]);
+  }, [navigate, qc]);
 
   return (
     <section className="glass p-8 text-center">

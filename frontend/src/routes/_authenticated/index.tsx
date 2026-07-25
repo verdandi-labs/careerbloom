@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { getOrCreateCareerDirection } from "@/lib/chat";
 import { AppShell } from "@/components/AppShell";
 import { api } from "@/lib/api";
-import { useAuthStore } from "@/features/auth";
+import { useSession } from "@/features/auth";
 
 const background = "/blossom.jpg";
 
@@ -37,7 +37,7 @@ const coverLetters = [
 
 function Dashboard() {
   const navigate = useNavigate();
-  const user = useAuthStore((s) => s.user);
+  const { data: user } = useSession();
   const [checked, setChecked] = useState(false);
   const [displayName, setDisplayName] = useState("there");
 

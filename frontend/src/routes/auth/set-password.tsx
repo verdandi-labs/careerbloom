@@ -4,8 +4,8 @@ import {
   useSearch,
 } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { api, setTokens } from "@/lib/api";
-import { useAuthStore, verifyMagicLink, setPassword as setUserPassword } from "@/features/auth";
+import { api } from "@/lib/api";
+import { useSetPassword, verifyMagicLink } from "@/features/auth";
 import { ArrowRight, Check, Loader2, Shield } from "lucide-react";
 
 export const Route = createFileRoute("/auth/set-password")({
@@ -16,8 +16,8 @@ export const Route = createFileRoute("/auth/set-password")({
 
 function SetPasswordPage() {
   const navigate = useNavigate();
-  const login = useAuthStore((s) => s.login);
   const search = useSearch({ from: "/auth/set-password" });
+  const setPwd = useSetPassword();
   const token = (search as { token?: string }).token || "";
   const email = (search as { email?: string }).email || "";
 
@@ -25,7 +25,6 @@ function SetPasswordPage() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!token || !email) {
@@ -52,27 +51,30 @@ function SetPasswordPage() {
     }
 
     setError(null);
-    setSaving(true);
 
-    try {
-      const res = await setUserPassword(email, password);
-      localStorage.setItem("auth_email", res.email);
-      await login(res.access_token, "");
-      setStep("done");
-      setTimeout(
-        () =>
-          navigate({
-            to: "/auth",
-            search: { step: "byodb" },
-            replace: true,
-          }),
-        1500,
-      );
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to set password.");
-    } finally {
-      setSaving(false);
-    }
+    setPwd.mutate(
+      { email, password },
+      {
+        onSuccess: () => {
+          localStorage.setItem("auth_email", email);
+          setStep("done");
+          setTimeout(
+            () =>
+              navigate({
+                to: "/auth",
+                search: { step: "byodb" },
+                replace: true,
+              }),
+            1500,
+          );
+        },
+        onError: (err) => {
+          setError(
+            err instanceof Error ? err.message : "Failed to set password.",
+          );
+        },
+      },
+    );
   }
 
   return (
@@ -146,15 +148,15 @@ function SetPasswordPage() {
 
             <button
               onClick={handleSubmit}
-              disabled={saving}
+              disabled={setPwd.isPending}
               className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-6 py-3 text-sm font-bold text-white disabled:opacity-50"
             >
-              {saving ? (
+              {setPwd.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <Shield className="h-4 w-4" />
               )}
-              {saving ? "Setting password..." : "Create password"}{" "}
+              {setPwd.isPending ? "Setting password..." : "Create password"}{" "}
               <ArrowRight className="h-4 w-4" />
             </button>
           </section>
