@@ -84,7 +84,7 @@ function AuthPage() {
 
   useEffect(() => {
     if (user && !search.step) navigate({ to: "/" });
-  }, [user, search.step, navigate]);
+  }, [user, search.step]);
 
   if (!user) {
     return (

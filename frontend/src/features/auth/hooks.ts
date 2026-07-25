@@ -15,7 +15,7 @@ export function useSession() {
   return useQuery({
     queryKey: sessionKeys.all,
     queryFn: fetchMe,
-    enabled: isLoggedIn(),
+    enabled: !!localStorage.getItem("access_token"),
     retry: false,
     staleTime: 5 * 60 * 1000,
   });
