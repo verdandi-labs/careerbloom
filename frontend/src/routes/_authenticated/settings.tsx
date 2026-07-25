@@ -45,7 +45,7 @@ function SettingsPage() {
   async function deleteAccount() {
     // Note: account deletion would need a dedicated backend endpoint
     // For now, just sign out
-    logout();
+    signOutFn();
     navigate({ to: "/auth", search: {} });
   }
 
