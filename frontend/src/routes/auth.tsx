@@ -84,6 +84,7 @@ function AuthPage() {
 
   useEffect(() => {
     if (user && !search.step) navigate({ to: "/" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, search.step]);
 
   if (!user) {
