@@ -6,7 +6,7 @@ import {
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { useSetPassword, verifyMagicLink } from "@/features/auth";
-import { ArrowRight, Check, Loader2, Shield } from "lucide-react";
+import { ArrowRight, Check, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/auth/set-password")({
   ssr: false,
@@ -152,10 +152,8 @@ function SetPasswordPage() {
             >
               {setPwd.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Shield className="h-4 w-4" />
-              )}
-              {setPwd.isPending ? "Setting password..." : "Create password"}{" "}
+              ) : null}
+              {setPwd.isPending ? "Setting password..." : "Create password"}
               <ArrowRight className="h-4 w-4" />
             </button>
           </section>

@@ -4,6 +4,8 @@ import { useNavigate } from "@tanstack/react-router";
 import {
   ArrowRight,
   Check,
+  ChevronDown,
+  ChevronUp,
   Database,
   Loader2,
   Settings,
@@ -18,6 +20,7 @@ export function BYODBScreen({ email }: { email: string }) {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [confirmSkip, setConfirmSkip] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
 
   async function handleConnect() {
     const val = connString.trim();
@@ -60,10 +63,10 @@ export function BYODBScreen({ email }: { email: string }) {
   if (success) {
     return (
       <div className="text-center">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-green-500/20">
-          <Check className="h-8 w-8 text-green-500" />
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#4A8033]/20">
+          <Check className="h-8 w-8 text-[#4A8033]" />
         </div>
-        <h2 className="font-display text-2xl text-green-700">Connected!</h2>
+        <h2 className="font-display text-2xl text-[#4A8033]">Connected!</h2>
         <p className="mt-1 text-sm text-foreground">
           Taking you to onboarding...
         </p>
@@ -103,7 +106,7 @@ export function BYODBScreen({ email }: { email: string }) {
         </div>
         <p className="flex items-center justify-center gap-1.5 text-xs text-foreground">
           <Settings className="h-3.5 w-3.5" />
-          Settings &rarr; Database to connect your own later
+          Settings → Database to connect your own later
         </p>
       </div>
     );
@@ -114,6 +117,32 @@ export function BYODBScreen({ email }: { email: string }) {
       <p className="text-sm text-foreground">
         Connect your own Supabase database to keep your data private.
       </p>
+
+      <button
+        onClick={() => setShowInstructions((v) => !v)}
+        className="flex items-center gap-1.5 text-xs font-medium text-[#4A8033] underline-offset-2 hover:underline"
+      >
+        {showInstructions ? (
+          <ChevronUp className="h-3.5 w-3.5" />
+        ) : (
+          <ChevronDown className="h-3.5 w-3.5" />
+        )}
+        How to get your Supabase connection string
+      </button>
+
+      {showInstructions && (
+        <div className="rounded-xl bg-white/50 px-4 py-3 text-xs text-foreground space-y-1.5 leading-relaxed">
+          <p>1. Go to <a href="https://supabase.com" target="_blank" rel="noreferrer" className="underline">supabase.com</a> and sign in or create a free account.</p>
+          <p>2. Click <strong>New project</strong> and set a name and a database password. Save the password.</p>
+          <p>3. Click <strong>Connect</strong> in the top menu bar of your project.</p>
+          <p>4. In the connection screen, select <strong>Direct</strong> from the tabs at the top.</p>
+          <p>5. Select <strong>Session pooler</strong> as the connection mode.</p>
+          <p>6. Set the connection method to <strong>URI</strong> and copy the connection string.</p>
+          <p>7. Replace <code className="bg-black/5 px-1 rounded">[YOUR-PASSWORD]</code> with your database password from step 2.</p>
+          <p>8. Paste it in the field below.</p>
+          <p className="text-foreground/60 pt-1">Make sure to use Session pooler with URI format.</p>
+        </div>
+      )}
 
       <input
         value={connString}
