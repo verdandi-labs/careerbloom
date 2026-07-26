@@ -84,7 +84,7 @@ export function MagicLinkScreen({
             }}
             placeholder="you@example.com"
             autoComplete="email"
-            className="w-full rounded-xl shadow-sm bg-white/25 px-4 py-3 text-sm text-black/50 caret-accent outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
+            className="w-full rounded-xl shadow-sm bg-white/25 px-4 py-3 text-sm text-black/50 caret-[#444] outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
           />
         </div>
 
