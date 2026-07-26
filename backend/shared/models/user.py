@@ -13,5 +13,5 @@ class User(Base):
     password_hash = Column(String, nullable=True)
     database_url = Column(String, nullable=True)
     magic_token = Column(String, nullable=True)
-    magic_token_expires = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    magic_token_expires = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
