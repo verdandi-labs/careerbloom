@@ -1,11 +1,9 @@
 import secrets
 from datetime import datetime, timedelta, timezone
-from passlib.context import CryptContext
+import bcrypt
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from config import get_settings
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def generate_magic_token() -> str:
@@ -13,19 +11,17 @@ def generate_magic_token() -> str:
 
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
 
 
 async def send_magic_link(email: str, token: str, frontend_url: str):
     settings = get_settings()
     sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
-
     magic_link = f"{frontend_url}/auth/set-password?token={token}&email={email}"
-
     message = Mail(
         from_email="verdandi.labs@gmail.com",
         to_emails=email,
@@ -38,5 +34,4 @@ async def send_magic_link(email: str, token: str, frontend_url: str):
         <p>If you didn't request this, ignore this email.</p>
         """,
     )
-
     sg.send(message)
