@@ -156,6 +156,13 @@
     background-color: #fabdc5;
     color: #000000;
   }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--color-secondary) !important;
+    caret-color: var(--color-secondary) !important;
+    transition: background-color 9999s ease-in-out 0s;
+  }
 }
 
 @utility glass {

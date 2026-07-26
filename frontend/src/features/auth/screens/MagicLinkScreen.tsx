@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { api } from "@/lib/api";
-import { ArrowRight, Check, Loader2, Mail, ThumbsUp } from "lucide-react";
+import { ArrowRight, Check, Loader2, Mail } from "lucide-react";
 
 export function MagicLinkScreen({
   onSent,
@@ -72,7 +72,7 @@ export function MagicLinkScreen({
             htmlFor="email"
             className="mb-1.5 block text-center text-sm font-bold text-white"
           >
-            Email
+            EMAIL
           </label>
           <input
             id="email"
@@ -109,12 +109,16 @@ export function MagicLinkScreen({
         </button>
       </form>
 
+      <p className="text-center text-xs tracking-wide text-[#4A8033]">
+        Click it to create a password for your next login
+      </p>
+
       {onSwitchToLogin && (
         <button
           onClick={onSwitchToLogin}
           className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-6 py-3 text-sm font-bold text-white transition hover:opacity-90"
         >
-          <ThumbsUp className="h-4 w-4" />I already have a password
+          I already have a password
         </button>
       )}
     </div>
