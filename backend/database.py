@@ -1,3 +1,4 @@
+import ssl
 from uuid import UUID
 from sqlalchemy import make_url, text
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession, AsyncEngine
@@ -21,12 +22,15 @@ class DatabaseRouter:
         if db_url not in self._engines:
             url = make_url(db_url)
             url = url._replace(query={}, drivername="postgresql+asyncpg")
+            ssl_ctx = ssl.create_default_context()
+            ssl_ctx.check_hostname = False
+            ssl_ctx.verify_mode = ssl.CERT_NONE
             self._engines[db_url] = create_async_engine(
                 url,
                 echo=False,
                 pool_size=5,
                 max_overflow=10,
-                connect_args={"ssl": True},
+                connect_args={"ssl": ssl_ctx},
             )
         return self._engines[db_url]
 
