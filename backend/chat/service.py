@@ -3,7 +3,7 @@ import google.generativeai as genai
 from config import get_settings
 
 settings = get_settings()
-genai.configure(api_key=settings.GOOGLE_AI_API_KEY)
+genai.configure(api_key=settings.GEMINI_API_KEY)
 
 BLOOM_SYSTEM_PROMPT = """You are Bloom, a warm, non-judgmental career transition companion.
 You help people navigate career changes by:

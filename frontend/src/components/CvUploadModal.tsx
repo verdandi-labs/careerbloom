@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { api, apiUpload, refreshAccessToken } from "@/lib/api";
+import { api, apiUpload } from "@/lib/api";
 import {
   Loader2,
   UploadCloud,
@@ -124,8 +124,7 @@ export function CvUploadModal({
         file,
       );
       setExtractedText(uploadResult.text);
-
-      await refreshAccessToken();
+      setFileName(file.name);
 
       setStatus("parsing");
       const parsedData = await api<ParsedCV>("/cv/parse", {

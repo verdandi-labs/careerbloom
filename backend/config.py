@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     AUTHENTIK_REDIRECT_URI: str = "http://localhost:8000/api/v1/auth/authentik/callback"
 
     # Google AI
-    GOOGLE_AI_API_KEY: str = ""
+    GEMINI_API_KEY: str = ""
     GOOGLE_GEMINI_2_5_FLASH_MODEL: str = "gemini-2.5-flash"
     GOOGLE_GEMINI_3_FLASH_MODEL: str = "gemini-3-flash-preview"
 

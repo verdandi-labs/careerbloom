@@ -1,33 +1,96 @@
 import asyncio
 import json
+import re
 
 import google.generativeai as genai
 from config import get_settings
 
 settings = get_settings()
 
-genai.configure(api_key=settings.GOOGLE_AI_API_KEY)
+genai.configure(api_key=settings.GEMINI_API_KEY)
+
+SECTION_HEADERS: dict[str, list[str]] = {
+    "summary": ["summary", "professional summary", "profile", "about me", "objective", "career objective"],
+    "experience": ["experience", "work experience", "professional experience", "employment", "work history", "relevant experience"],
+    "education": ["education", "academic background", "academic experience", "academic history"],
+    "skills": ["skills", "technical skills", "core competencies", "key skills", "areas of expertise"],
+    "languages": ["languages", "language"],
+    "certifications": ["certifications", "certificates", "certification", "professional certifications", "licenses"],
+    "projects": ["projects", "project experience", "personal projects", "technical projects"],
+    "volunteer": ["volunteer", "volunteer experience", "community service", "volunteering"],
+    "awards": ["awards", "honors", "achievements", "honours", "awards and honors"],
+    "publications": ["publications", "published works", "papers"],
+    "references": ["references", "professional references"],
+}
+
+HEADER_PATTERN = re.compile(
+    r"^(?:\*{1,3}\s*)?(" + "|".join(
+        re.escape(h) for headers in SECTION_HEADERS.values() for h in headers
+    ) + r")\s*(?:\*{1,3})?[\s:]*$",
+    re.IGNORECASE | re.MULTILINE,
+)
+
+CONTACT_PATTERNS = [
+    (re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+"), "email"),
+    (re.compile(r"\+?\d[\d\s\-().]{7,}\d"), "phone"),
+    (re.compile(r"(?:linkedin\.com|github\.com)[/\w%-]+", re.IGNORECASE), "url"),
+]
+
+
+def _parse_locally(text: str) -> dict[str, str]:
+    result = {k: "" for k in [
+        "name", "title", "contact", "summary", "experience", "education",
+        "skills", "languages", "certifications", "projects", "volunteer",
+        "awards", "publications", "references", "other",
+    ]}
+
+    sections: list[tuple[str, int, int]] = []
+    for m in HEADER_PATTERN.finditer(text):
+        header_raw = m.group(1).strip().lower()
+        field = next(k for k, aliases in SECTION_HEADERS.items() if header_raw in aliases)
+        sections.append((field, m.start(), m.end()))
+
+    if not sections:
+        result["other"] = text.strip()
+        return result
+
+    blocks: dict[str, str] = {}
+    for i, (field, start, end) in enumerate(sections):
+        next_start = sections[i + 1][1] if i + 1 < len(sections) else len(text)
+        content = text[end:next_start].strip()
+        if field in blocks:
+            blocks[field] += "\n\n" + content
+        else:
+            blocks[field] = content
+        result[field] = blocks[field]
+
+    preamble = text[:sections[0][0]].strip()
+    if preamble:
+        lines = preamble.split("\n")
+        result["name"] = lines[0].strip()
+        contact_parts = []
+        for line in lines[1:]:
+            line = line.strip()
+            if not line:
+                continue
+            matched = False
+            for pattern, _ in CONTACT_PATTERNS:
+                if pattern.search(line):
+                    contact_parts.append(line)
+                    matched = True
+                    break
+            if not matched and not result["title"]:
+                result["title"] = line
+            elif not matched:
+                contact_parts.append(line)
+        if contact_parts:
+            result["contact"] = "\n".join(contact_parts)
+
+    return result
 
 
 async def parse_cv_text(text: str) -> dict[str, str]:
-    model = genai.GenerativeModel(settings.GOOGLE_GEMINI_2_5_FLASH_MODEL)
-    prompt = f"""Parse the following CV text into structured fields.
-Return a JSON object with these keys: name, title, contact, summary, experience, education, skills, languages, certifications, projects, volunteer, awards, publications, references, other.
-Each value is a string. Empty string if the section is not present.
-Do not summarize or reorder. Preserve verbatim text.
-
-CV TEXT:
-{text[:32000]}"""
-
-    response = await asyncio.to_thread(
-        model.generate_content,
-        prompt,
-        generation_config=genai.GenerationConfig(
-            temperature=0.1,
-            response_mime_type="application/json",
-        ),
-    )
-    return json.loads(response.text)
+    return _parse_locally(text)
 
 
 async def translate_fields(fields: dict[str, str], target_lang: str) -> dict[str, str]:
