@@ -31,14 +31,13 @@ export function isLoggedIn(): boolean {
   return !!getToken();
 }
 
-async function refreshAccessToken(): Promise<boolean> {
+export async function refreshAccessToken(): Promise<boolean> {
   const refresh = localStorage.getItem("refresh_token");
   if (!refresh) return false;
   try {
     const res = await fetch(`${API_BASE}/auth/refresh`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refresh_token: refresh }),
+      headers: { Authorization: `Bearer ${refresh}` },
     });
     if (!res.ok) return false;
     const data = await res.json();

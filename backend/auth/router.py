@@ -1,7 +1,7 @@
 from uuid import uuid4
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urlencode
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.responses import RedirectResponse
 from jose import jwt
 from sqlalchemy import select
@@ -118,8 +118,13 @@ async def authentik_callback(
 
 
 @router.post("/refresh", response_model=TokenResponse)
-async def refresh(refresh_token: str = Query(...), db: AsyncSession = Depends(get_db)):
-    payload = decode_token(refresh_token)
+async def refresh_token(request: Request, db: AsyncSession = Depends(get_db)):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing token")
+
+    token = auth_header.replace("Bearer ", "")
+    payload = decode_token(token)
     if not payload or payload.get("type") != "refresh":
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
 
