@@ -41,7 +41,7 @@ export function BYODBScreen({ email }: { email: string }) {
       await api("/auth/byodb", { method: "POST", json: { database_url: val } });
       setChecking(false);
       setSuccess(true);
-      setTimeout(() => navigate({ to: "/onboarding", replace: true }), 3000);
+      setTimeout(() => navigate({ to: "/onboarding", replace: true }), 6000);
     } catch (err) {
       setChecking(false);
       setError(err instanceof Error ? err.message : "Connection failed");
