@@ -87,7 +87,7 @@ async def upload_cv(
     if file.filename and file.filename.endswith(".pdf"):
         import pdfplumber
 
-        async def extract_pdf() -> str:
+        def extract_pdf() -> str:
             with pdfplumber.open(BytesIO(content)) as pdf:
                 return "\n".join(page.extract_text() or "" for page in pdf.pages)
 
@@ -95,7 +95,7 @@ async def upload_cv(
     elif file.filename and file.filename.endswith(".docx"):
         from docx import Document
 
-        async def extract_docx() -> str:
+        def extract_docx() -> str:
             doc = Document(BytesIO(content))
             return "\n".join(p.text for p in doc.paragraphs)
 
