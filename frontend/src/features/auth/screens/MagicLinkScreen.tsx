@@ -109,7 +109,7 @@ export function MagicLinkScreen({
         </button>
       </form>
 
-      <p className="text-center text-xs tracking-wide text-[#4A8033]">
+      <p className="text-center text-xs tracking-wide text-green">
         Click it to create a password for your next login
       </p>
 

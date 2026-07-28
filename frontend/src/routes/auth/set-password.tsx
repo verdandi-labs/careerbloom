@@ -88,10 +88,10 @@ function SetPasswordPage() {
 
       {step === "done" && (
         <section className="bg-secondary/30 rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] p-6 md:p-8 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-green-500/20">
-            <Check className="h-8 w-8 text-green-500" />
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-green/20">
+            <Check className="h-8 w-8 text-green" />
           </div>
-          <h2 className="font-display text-2xl text-green-700">
+          <h2 className="font-display text-2xl text-green">
             Password set!
           </h2>
           <p className="mt-1 text-sm text-foreground">

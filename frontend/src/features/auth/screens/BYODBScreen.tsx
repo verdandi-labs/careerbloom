@@ -18,6 +18,7 @@ export function BYODBScreen({ email }: { email: string }) {
   const [connString, setConnString] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [checking, setChecking] = useState(false);
   const [success, setSuccess] = useState(false);
   const [confirmSkip, setConfirmSkip] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
@@ -35,11 +36,14 @@ export function BYODBScreen({ email }: { email: string }) {
 
     setError(null);
     setSaving(true);
+    setChecking(true);
     try {
       await api("/auth/byodb", { method: "POST", json: { database_url: val } });
+      setChecking(false);
       setSuccess(true);
-      setTimeout(() => navigate({ to: "/onboarding", replace: true }), 2000);
+      setTimeout(() => navigate({ to: "/onboarding", replace: true }), 3000);
     } catch (err) {
+      setChecking(false);
       setError(err instanceof Error ? err.message : "Connection failed");
     } finally {
       setSaving(false);
@@ -60,15 +64,15 @@ export function BYODBScreen({ email }: { email: string }) {
     navigate({ to: "/onboarding", replace: true });
   }
 
-  if (success) {
+if (success) {
     return (
-      <div className="text-center">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#4A8033]/20">
-          <Check className="h-8 w-8 text-[#4A8033]" />
+      <div className="text-center space-y-3">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-green/20">
+          <Check className="h-8 w-8 text-green" />
         </div>
-        <h2 className="font-display text-2xl text-[#4A8033]">Connected!</h2>
-        <p className="mt-1 text-sm text-foreground">
-          Taking you to onboarding...
+        <h2 className="font-display text-2xl text-green">Connected!</h2>
+        <p className="text-sm text-foreground">
+          Your Supabase database is connected and ready. Taking you to onboarding in a moment...
         </p>
       </div>
     );
@@ -120,7 +124,7 @@ export function BYODBScreen({ email }: { email: string }) {
 
       <button
         onClick={() => setShowInstructions((v) => !v)}
-        className="flex items-center gap-1.5 text-xs font-medium text-[#4A8033] underline-offset-2 hover:underline"
+        className="flex items-center gap-1.5 text-xs font-medium text-green underline-offset-2 hover:underline"
       >
         {showInstructions ? (
           <ChevronUp className="h-3.5 w-3.5" />
@@ -198,7 +202,7 @@ export function BYODBScreen({ email }: { email: string }) {
         ) : (
           <Database className="h-4 w-4" />
         )}
-        {saving ? "Connecting..." : "Validate & Connect"}
+        {checking ? "Verifying connection..." : saving ? "Connecting..." : "Validate & Connect"}
         <ArrowRight className="h-4 w-4" />
       </button>
 

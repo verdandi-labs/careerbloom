@@ -174,7 +174,7 @@ function Background({ children }: { children: React.ReactNode }) {
 
 function Footer() {
   return (
-    <p className="text-center text-xs tracking-wide text-[#4A8033]">
+    <p className="text-center text-xs tracking-wide text-green">
       Helping you grow into what's next
     </p>
   );
