@@ -64,7 +64,7 @@ export function BYODBScreen({ email }: { email: string }) {
     navigate({ to: "/onboarding", replace: true });
   }
 
-if (success) {
+  if (success) {
     return (
       <div className="text-center space-y-3">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-green/20">
@@ -72,7 +72,8 @@ if (success) {
         </div>
         <h2 className="font-display text-2xl text-green">Connected!</h2>
         <p className="text-sm text-foreground">
-          Your Supabase database is connected and ready. Taking you to onboarding in a moment...
+          Your Supabase database is connected and ready. Taking you to
+          onboarding in a moment...
         </p>
       </div>
     );
@@ -202,7 +203,11 @@ if (success) {
         ) : (
           <Database className="h-4 w-4" />
         )}
-        {checking ? "Verifying connection..." : saving ? "Connecting..." : "Validate & Connect"}
+        {checking
+          ? "Verifying connection..."
+          : saving
+            ? "Connecting..."
+            : "Validate & Connect"}
         <ArrowRight className="h-4 w-4" />
       </button>
 

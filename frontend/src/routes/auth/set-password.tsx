@@ -91,9 +91,7 @@ function SetPasswordPage() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-green/20">
             <Check className="h-8 w-8 text-green" />
           </div>
-          <h2 className="font-display text-2xl text-green">
-            Password set!
-          </h2>
+          <h2 className="font-display text-2xl text-green">Password set!</h2>
           <p className="mt-1 text-sm text-foreground">
             Taking you to the next step...
           </p>
