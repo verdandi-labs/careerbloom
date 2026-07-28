@@ -132,15 +132,46 @@ export function BYODBScreen({ email }: { email: string }) {
 
       {showInstructions && (
         <div className="rounded-xl bg-white/50 px-4 py-3 text-xs text-foreground space-y-1.5 leading-relaxed">
-          <p>1. Go to <a href="https://supabase.com" target="_blank" rel="noreferrer" className="underline">supabase.com</a> and sign in or create a free account.</p>
-          <p>2. Click <strong>New project</strong> and set a name and a database password. Save the password.</p>
-          <p>3. Click <strong>Connect</strong> in the top menu bar of your project.</p>
-          <p>4. In the connection screen, select <strong>Direct</strong> from the tabs at the top.</p>
-          <p>5. Select <strong>Session pooler</strong> as the connection mode.</p>
-          <p>6. Set the connection method to <strong>URI</strong> and copy the connection string.</p>
-          <p>7. Replace <code className="bg-black/5 px-1 rounded">[YOUR-PASSWORD]</code> with your database password from step 2.</p>
+          <p>
+            1. Go to{" "}
+            <a
+              href="https://supabase.com"
+              target="_blank"
+              rel="noreferrer"
+              className="underline"
+            >
+              supabase.com
+            </a>{" "}
+            and sign in or create a free account.
+          </p>
+          <p>
+            2. Click <strong>New project</strong> and set a name and a database
+            password. Save the password.
+          </p>
+          <p>
+            3. Click <strong>Connect</strong> in the top menu bar of your
+            project.
+          </p>
+          <p>
+            4. In the connection screen, select <strong>Direct</strong> from the
+            tabs at the top.
+          </p>
+          <p>
+            5. Select <strong>Session pooler</strong> as the connection mode.
+          </p>
+          <p>
+            6. Set the connection method to <strong>URI</strong> and copy the
+            connection string.
+          </p>
+          <p>
+            7. Replace{" "}
+            <code className="bg-black/5 px-1 rounded">[YOUR-PASSWORD]</code>{" "}
+            with your database password from step 2.
+          </p>
           <p>8. Paste it in the field below.</p>
-          <p className="text-foreground/60 pt-1">Make sure to use Session pooler with URI format.</p>
+          <p className="text-foreground/60 pt-1">
+            Make sure to use Session pooler with URI format.
+          </p>
         </div>
       )}
 
