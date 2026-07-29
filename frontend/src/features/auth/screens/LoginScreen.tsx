@@ -2,12 +2,19 @@ import { useState } from "react";
 import { ArrowLeft, Loader2, LogIn } from "lucide-react";
 import { useLogin } from "../hooks";
 
+const STORAGE_KEY = "auth_email";
+
 export function LoginScreen({
   onSwitchToMagicLink,
 }: {
   onSwitchToMagicLink: () => void;
 }) {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(
+    () => localStorage.getItem(STORAGE_KEY) || "",
+  );
+  const [remember, setRemember] = useState(
+    () => !!localStorage.getItem(STORAGE_KEY),
+  );
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const login = useLogin();
@@ -19,6 +26,13 @@ export function LoginScreen({
       return;
     }
     setError(null);
+
+    if (remember) {
+      localStorage.setItem(STORAGE_KEY, email);
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+
     login.mutate(
       { email, password },
       {
@@ -68,9 +82,19 @@ export function LoginScreen({
             if (error) setError(null);
           }}
           placeholder="Enter your password"
-          className="w-full rounded-xl shadow-sm bg-white/25 px-4 py-3 text-sm text-black/50 outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
+          className="w-full rounded-xl shadow-sm bg-white/25 px-4 py-3 text-sm text-black/50 caret-accent outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
         />
       </div>
+
+      <label className="flex cursor-pointer items-center gap-2 text-xs text-foreground">
+        <input
+          type="checkbox"
+          checked={remember}
+          onChange={(e) => setRemember(e.target.checked)}
+          className="h-4 w-4 rounded border-white/30 bg-white/25 text-accent focus:ring-accent/30"
+        />
+        Remember me
+      </label>
 
       {error && (
         <p className="rounded-xl bg-destructive/10 px-4 py-2.5 text-sm text-destructive">

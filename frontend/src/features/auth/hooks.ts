@@ -53,6 +53,7 @@ export function useSignOut() {
   const qc = useQueryClient();
   return () => {
     clearTokens();
+    localStorage.removeItem("auth_email");
     qc.setQueryData(sessionKeys.all, null);
   };
 }
