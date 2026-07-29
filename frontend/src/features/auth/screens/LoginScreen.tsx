@@ -68,7 +68,7 @@ export function LoginScreen({
       <div>
         <label
           htmlFor="login-password"
-          className="mb-1.5 block text-center text-sm font-medium text-foreground"
+          className="mb-1.5 block text-center text-sm font-bold text-white"
         >
           Password
         </label>
@@ -86,12 +86,12 @@ export function LoginScreen({
         />
       </div>
 
-      <label className="flex cursor-pointer items-center gap-2 text-xs text-foreground">
+      <label className="flex cursor-pointer items-center justify-center gap-2 text-xs text-white">
         <input
           type="checkbox"
           checked={remember}
           onChange={(e) => setRemember(e.target.checked)}
-          className="h-4 w-4 rounded border-white/30 bg-white/25 text-accent focus:ring-accent/30"
+          className="h-4 w-4 rounded border-white/30 bg-white/25 accent-[var(--color-green)] focus:ring-[var(--color-green)]/30"
         />
         Remember me
       </label>
@@ -118,7 +118,7 @@ export function LoginScreen({
       <button
         type="button"
         onClick={onSwitchToMagicLink}
-        className="flex w-full items-center justify-center gap-1.5 text-center text-xs text-foreground underline underline-offset-2"
+        className="flex w-full items-center justify-center gap-1.5 text-center text-xs text-white underline underline-offset-2"
       >
         <ArrowLeft className="h-3 w-3" />
         Send me a magic link instead
