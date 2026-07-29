@@ -121,7 +121,7 @@ export function LoginScreen({
         className="flex w-full items-center justify-center gap-1.5 text-center text-xs text-white underline underline-offset-2"
       >
         <ArrowLeft className="h-3 w-3" />
-        Send me a magic link instead
+        Back
       </button>
     </form>
   );
