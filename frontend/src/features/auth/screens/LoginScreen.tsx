@@ -86,7 +86,7 @@ export function LoginScreen({
         />
       </div>
 
-      <label className="flex cursor-pointer items-center justify-center gap-2 text-xs text-white">
+      <label className="flex cursor-pointer items-center justify-center gap-2 text-[15px] text-black/40">
         <input
           type="checkbox"
           checked={remember}
@@ -118,7 +118,7 @@ export function LoginScreen({
       <button
         type="button"
         onClick={onSwitchToMagicLink}
-        className="flex w-full items-center justify-center gap-1.5 text-center text-xs text-white underline underline-offset-2"
+        className="flex w-full items-center justify-center gap-1.5 text-center text-[15px] text-black/40 underline underline-offset-2"
       >
         <ArrowLeft className="h-3 w-3" />
         Back
