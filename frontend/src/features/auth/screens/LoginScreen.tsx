@@ -91,7 +91,7 @@ export function LoginScreen({
           type="checkbox"
           checked={remember}
           onChange={(e) => setRemember(e.target.checked)}
-          className="h-4 w-4 rounded border-white/30 bg-white/25 accent-[var(--color-green)] focus:ring-[var(--color-green)]/30"
+          className="h-4 w-4 rounded border-white/30 bg-white/25 accent-[var(--color-secondary)] focus:ring-[var(--color-secondary)]/30"
         />
         Remember me
       </label>
