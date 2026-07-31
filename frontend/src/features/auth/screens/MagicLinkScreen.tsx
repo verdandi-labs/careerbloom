@@ -5,7 +5,11 @@ import { ArrowRight, Check, Loader2, Mail } from "lucide-react";
 const REMEMBER_EMAIL_KEY = "remember_email";
 const SAVED_EMAIL_KEY = "auth_email";
 
-export function MagicLinkScreen({ onSent }: { onSent: (email: string) => void }) {
+export function MagicLinkScreen({
+  onSent,
+}: {
+  onSent: (email: string) => void;
+}) {
   const [email, setEmail] = useState("");
   const [rememberEmail, setRememberEmail] = useState(false);
   const [error, setError] = useState<string | null>(null);

@@ -98,8 +98,6 @@ function AuthPage() {
             Enter your email and we will send you a secure
             <br />
             authentication link (valid for 15 minutes)
-            <br />
-            so you can set a password for your next login
           </p>
         </div>
         <section className="bg-secondary/30 rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] p-6 md:p-8">

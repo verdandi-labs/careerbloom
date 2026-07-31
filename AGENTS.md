@@ -1,3 +1,13 @@
+## Schema migrations
+
+No Alembic. Schema changes are documented as numbered SQL files in `backend/migrations/`.
+
+Convention: `001_description.sql`, `002_description.sql`, etc.
+- One file per change
+- Files are append-only documentation of what ran against the live DB
+- Never edit a file that has already been executed
+- New environments: run files in order against the target DB
+
 ## Python dependency management
 - Always use `uv` for Python operations. Never use `pip`, `pip install`, or `uv pip install`.
 - When adding packages: `uv add <package>`.
@@ -17,8 +27,8 @@
 - Supabase functions live in `supabase/functions/`
 
 ## Frontend architecture
-- **Server state** belongs in TanStack Query. Use `useSession()` for the user query, `useLogin()`/`useSetPassword()`/`useSignOut()` for auth mutations. Never put API data in Zustand.
-- **Zustand** is for ephemeral UI state only — auth flow mode (`magic-link` | `login`), cross-screen email, modal visibility. Actions must be stable references defined once in the store.
+- **Server state** belongs in TanStack Query. Use `useSession()` for the user query and `useSignOut()` for sign-out. Never put API data in Zustand.
+- **Zustand** is for ephemeral UI state only — cross-screen email, modal visibility. Actions must be stable references defined once in the store.
 - **State boundary rule**: before adding anything to Zustand, ask if it has a server source (API response) or a URL source (search param / route state). If yes, keep it in TanStack Query or TanStack Router instead. Most "UI state" like banner visibility, selected tab, or onboarding progress is actually derived from server data or URL params.
 - **Feature colocation**: feature-specific code goes in `frontend/src/features/<name>/` with its own screens/, hooks/, api/, types/, and index.ts for the public API. Shared UI primitives in `components/ui/`. Shared utilities in `lib/`.
 - **Code splitting**: use `React.lazy()` + `<Suspense>` for feature screens at the route level. Vite auto-splits these into separate chunks — no `manualChunks` in vite config needed.
