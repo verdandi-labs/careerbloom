@@ -12,12 +12,6 @@ class Settings(BaseSettings):
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
-    # Authentik
-    AUTHENTIK_ENDPOINT: str = ""  # e.g. http://localhost:9000/application/o/careerBloom/
-    AUTHENTIK_CLIENT_ID: str = ""
-    AUTHENTIK_CLIENT_SECRET: str = ""
-    AUTHENTIK_REDIRECT_URI: str = "http://localhost:8000/api/v1/auth/authentik/callback"
-
     # Google AI
     GEMINI_API_KEY: str = ""
     GOOGLE_GEMINI_2_5_FLASH_MODEL: str = "gemini-2.5-flash"
