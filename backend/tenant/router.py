@@ -1,51 +1,42 @@
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from database import get_db as get_global_db
+from database import ensure_schema, get_db
 from shared.deps import get_current_user
 from shared.models.profile import Profile
-from tenant.schemas import ConnectDbRequest, ConnectDbResponse, TenantStatusResponse
-from tenant.repository import TenantRepository
-from tenant.service import encrypt, validate_connection, build_db_url, assert_schema_exists, generate_schema_sql
+from shared.models.user import User
+from tenant.schemas import ConnectDbRequest, TenantStatusResponse
+from tenant.service import build_db_url, validate_connection
 
 router = APIRouter(prefix="/tenant", tags=["tenant"])
 
 
-@router.post("/connect", response_model=ConnectDbResponse)
+@router.post("/connect")
 async def connect_database(
     body: ConnectDbRequest,
     user: Profile = Depends(get_current_user),
-    db: AsyncSession = Depends(get_global_db),
+    db: AsyncSession = Depends(get_db),
 ):
     valid = await validate_connection(body.supabase_url, body.db_password)
     if not valid:
         raise HTTPException(status_code=400, detail="Could not connect to the database. Check your URL and password.")
 
     db_url = build_db_url(body.supabase_url, body.db_password)
-    await assert_schema_exists(db_url)
+    await ensure_schema(db_url, user_id=user.id, display_name=user.display_name or "")
 
-    repo = TenantRepository(db)
-    await repo.upsert(
-        user_id=user.id,
-        supabase_url=body.supabase_url,
-        db_password_encrypted=encrypt(body.db_password),
-    )
-    return ConnectDbResponse(ok=True, user_id=str(user.id))
+    result = await db.execute(select(User).where(User.id == user.id))
+    db_user = result.scalars().first()
+    db_user.database_url = db_url
+    await db.commit()
+
+    return {"message": "Tenant database connected"}
 
 
 @router.get("/status", response_model=TenantStatusResponse)
 async def tenant_status(
     user: Profile = Depends(get_current_user),
-    db: AsyncSession = Depends(get_global_db),
+    db: AsyncSession = Depends(get_db),
 ):
-    repo = TenantRepository(db)
-    tenant = await repo.get_by_user(user.id)
-    return TenantStatusResponse(
-        connected=tenant is not None,
-        supabase_url=tenant.supabase_url if tenant else None,
-    )
-
-
-@router.get("/schema-sql")
-async def schema_sql(user: Profile = Depends(get_current_user)):
-    sql = generate_schema_sql()
-    return {"sql": sql}
+    result = await db.execute(select(User).where(User.id == user.id))
+    db_user = result.scalars().first()
+    return TenantStatusResponse(connected=bool(db_user and db_user.database_url))
