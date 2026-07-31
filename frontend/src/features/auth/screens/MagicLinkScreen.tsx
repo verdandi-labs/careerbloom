@@ -1,18 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { api } from "@/lib/api";
 import { ArrowRight, Check, Loader2, Mail } from "lucide-react";
 
-export function MagicLinkScreen({
-  onSent,
-  onSwitchToLogin,
-}: {
-  onSent: (email: string) => void;
-  onSwitchToLogin?: () => void;
-}) {
+const REMEMBER_EMAIL_KEY = "remember_email";
+const SAVED_EMAIL_KEY = "auth_email";
+
+export function MagicLinkScreen({ onSent }: { onSent: (email: string) => void }) {
   const [email, setEmail] = useState("");
+  const [rememberEmail, setRememberEmail] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(SAVED_EMAIL_KEY);
+    if (saved) {
+      setEmail(saved);
+      setRememberEmail(true);
+    }
+  }, []);
 
   async function handleSubmit(e?: React.FormEvent) {
     if (e) e.preventDefault();
@@ -22,6 +28,15 @@ export function MagicLinkScreen({
     }
     setError(null);
     setSending(true);
+
+    if (rememberEmail) {
+      localStorage.setItem(SAVED_EMAIL_KEY, email);
+      localStorage.setItem(REMEMBER_EMAIL_KEY, "true");
+    } else {
+      localStorage.removeItem(SAVED_EMAIL_KEY);
+      localStorage.removeItem(REMEMBER_EMAIL_KEY);
+    }
+
     try {
       await api("/auth/magic-link", { method: "POST", json: { email } });
       setSent(true);
@@ -42,8 +57,7 @@ export function MagicLinkScreen({
         </div>
         <h2 className="font-display text-xl">Check your inbox</h2>
         <p className="mt-1 text-sm text-foreground">
-          We sent a link to {email}. Click it to create a password for your next
-          login
+          We sent a link to {email}. Click on the link to sign in.
         </p>
         <button
           onClick={() => onSent(email)}
@@ -88,6 +102,16 @@ export function MagicLinkScreen({
           />
         </div>
 
+        <label className="flex cursor-pointer select-none items-center gap-2.5">
+          <input
+            type="checkbox"
+            checked={rememberEmail}
+            onChange={(e) => setRememberEmail(e.target.checked)}
+            className="h-4 w-4 rounded border-white/30 bg-white/20 accent-secondary"
+          />
+          <span className="text-xs text-white/70">Remember my email</span>
+        </label>
+
         {error && (
           <p className="rounded-xl bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
             {error}
@@ -110,17 +134,8 @@ export function MagicLinkScreen({
       </form>
 
       <p className="text-center text-xs tracking-wide text-green">
-        Click it to create a password for your next login
+        Helping you grow into what's next
       </p>
-
-      {onSwitchToLogin && (
-        <button
-          onClick={onSwitchToLogin}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-6 py-3 text-sm font-bold text-white transition hover:opacity-90"
-        >
-          I already have a password
-        </button>
-      )}
     </div>
   );
 }

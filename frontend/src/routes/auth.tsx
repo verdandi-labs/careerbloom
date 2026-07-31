@@ -17,12 +17,6 @@ const MagicLinkScreen = lazy(() =>
   })),
 );
 
-const LoginScreen = lazy(() =>
-  import("@/features/auth/screens/LoginScreen").then((m) => ({
-    default: m.LoginScreen,
-  })),
-);
-
 const BYODBScreen = lazy(() =>
   import("@/features/auth/screens/BYODBScreen").then((m) => ({
     default: m.BYODBScreen,
@@ -77,8 +71,6 @@ function AuthPage() {
   const { data: user } = useSession();
   const navigate = useNavigate();
   const search = useSearch({ from: "/auth" });
-  const mode = useAuthUI((s) => s.mode);
-  const setMode = useAuthUI((s) => s.setMode);
   const authEmail = useAuthUI((s) => s.email);
   const setAuthEmail = useAuthUI((s) => s.setEmail);
 
@@ -113,16 +105,7 @@ function AuthPage() {
         <section className="bg-secondary/30 rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] p-6 md:p-8">
           <ErrorBoundary>
             <Suspense fallback={<LazyFallback />}>
-              {mode === "magic-link" ? (
-                <MagicLinkScreen
-                  onSent={(email) => setAuthEmail(email)}
-                  onSwitchToLogin={() => setMode("login")}
-                />
-              ) : (
-                <LoginScreen
-                  onSwitchToMagicLink={() => setMode("magic-link")}
-                />
-              )}
+              <MagicLinkScreen onSent={(email) => setAuthEmail(email)} />
             </Suspense>
           </ErrorBoundary>
         </section>
