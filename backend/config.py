@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     NEON_DATABASE_URL: str = ""
 
     # JWT
-    JWT_SECRET: str = "change-me-in-production"
+    JWT_SECRET: str
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 7
@@ -30,8 +30,8 @@ class Settings(BaseSettings):
     SENDGRID_API_KEY: str = ""
 
     # App
-    FRONTEND_URL: str = "http://localhost:5173"
-    CORS_ORIGINS: str = "http://localhost:5173"
+    FRONTEND_URL: str = "https://careerbloom-e5ne.onrender.com"
+    CORS_ORIGINS: str = "http://localhost:5173,https://careerbloom-e5ne.onrender.com"
     API_V1_PREFIX: str = "/api/v1"
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}

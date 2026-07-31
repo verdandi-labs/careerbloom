@@ -54,6 +54,6 @@ export function useSignOut() {
   return () => {
     clearTokens();
     localStorage.removeItem("auth_email");
-    qc.setQueryData(sessionKeys.all, null);
+    qc.clear();
   };
 }
