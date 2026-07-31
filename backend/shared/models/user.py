@@ -10,7 +10,6 @@ class User(Base):
 
     id = Column(UUID, primary_key=True, default=uuid.uuid4)
     email = Column(String, unique=True, index=True)
-    password_hash = Column(String, nullable=True)
     database_url = Column(String, nullable=True)
     magic_token = Column(String, nullable=True)
     magic_token_expires = Column(DateTime(timezone=True), nullable=True)
