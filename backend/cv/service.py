@@ -1,13 +1,13 @@
-import asyncio
 import json
 import re
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from config import get_settings
 
 settings = get_settings()
 
-genai.configure(api_key=settings.GEMINI_API_KEY)
+client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
 SECTION_HEADERS: dict[str, list[str]] = {
     "summary": ["summary", "professional summary", "profile", "about me", "objective", "career objective"],
@@ -94,7 +94,6 @@ async def parse_cv_text(text: str) -> dict[str, str]:
 
 
 async def translate_fields(fields: dict[str, str], target_lang: str) -> dict[str, str]:
-    model = genai.GenerativeModel(settings.GOOGLE_GEMINI_2_5_FLASH_MODEL)
     prompt = f"""Translate the following CV fields to {target_lang}.
 Preserve line breaks, bullet points, dashes, and indentation exactly.
 Do not summarize, expand, reorder, or add commentary.
@@ -105,10 +104,10 @@ Return a JSON object with the same keys and translated values.
 FIELDS:
 {json.dumps(fields)}"""
 
-    response = await asyncio.to_thread(
-        model.generate_content,
-        prompt,
-        generation_config=genai.GenerationConfig(
+    response = await client.aio.models.generate_content(
+        model=settings.GOOGLE_GEMINI_2_5_FLASH_MODEL,
+        contents=prompt,
+        config=types.GenerateContentConfig(
             temperature=0.2,
             response_mime_type="application/json",
         ),
@@ -117,7 +116,6 @@ FIELDS:
 
 
 async def generate_cover_letter_ai(job_title: str, company: str, job_description: str, cv_text: str) -> dict[str, str]:
-    model = genai.GenerativeModel(settings.GOOGLE_GEMINI_3_FLASH_MODEL)
     prompt = f"""Write a warm, ATS-friendly cover letter for a {job_title} position at {company}.
 250-350 words. Open with a hook tied to the company. Avoid cliches.
 Return JSON with keys: content_en, content_es (natural Spanish translation).
@@ -125,10 +123,10 @@ Return JSON with keys: content_en, content_es (natural Spanish translation).
 Job description: {job_description}
 CV: {cv_text[:8000]}"""
 
-    response = await asyncio.to_thread(
-        model.generate_content,
-        prompt,
-        generation_config=genai.GenerationConfig(
+    response = await client.aio.models.generate_content(
+        model=settings.GOOGLE_GEMINI_3_FLASH_MODEL,
+        contents=prompt,
+        config=types.GenerateContentConfig(
             response_mime_type="application/json",
         ),
     )
