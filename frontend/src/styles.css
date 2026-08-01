@@ -196,8 +196,8 @@
 @utility glass-pink {
   background: linear-gradient(
     135deg,
-    oklch(0.81 0.078 22 / 0.85),
-    oklch(0.81 0.078 22 / 0.55)
+    oklch(0.81 0.078 22 / 0.4),
+    oklch(0.81 0.078 22 / 0.22)
   );
   backdrop-filter: blur(22px) saturate(170%);
   border: 1px solid oklch(1 0 0 / 0.55);

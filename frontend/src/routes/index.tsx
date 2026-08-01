@@ -37,26 +37,32 @@ function LandingPage() {
       <div className="fixed-bg fixed-bg--app" />
 
       <div className="relative z-10 mx-auto flex min-h-screen max-w-xl flex-col items-center justify-center gap-10 px-6 py-16 text-center">
-        <img src="/logo.png" alt="CareerBloom" className="h-14 w-auto" />
+        <img
+          src="/logo.png"
+          alt="CareerBloom"
+          className="relative z-0 h-28 w-auto -mb-8"
+        />
 
-        <div className="space-y-4">
-          <h1 className="font-display text-5xl leading-[1.04] md:text-6xl">
-            Helping you translate experience into opportunity.
+        <div className="relative z-10 space-y-4">
+          <h1 className="font-display text-[46px] leading-[1.04] md:text-[58px]">
+            Helping you translate experience into opportunity
           </h1>
-          <p className="text-base text-foreground/70 leading-relaxed">
+          <p className="text-[15px] text-foreground/70 leading-relaxed">
             Career transitions are exciting, but they can also challenge your
             confidence and make you lose sight of the value your previous
-            experience holds.
+            experience holds
           </p>
           <p className="font-display text-2xl md:text-3xl text-foreground">
-            You don't have to navigate this transition alone.
+            You don't have to navigate this transition alone
           </p>
         </div>
 
-        <div className="glass w-full px-6 py-6 text-left space-y-4">
+        <div className="glass-pink w-full space-y-4 -mt-6 px-6 py-6 text-left">
           <p className="text-sm text-foreground/80 leading-relaxed">
             CareerBloom was designed to reconnect you with your strengths, so
             you can share your experience with confidence and authenticity.
+          </p>
+          <p className="text-sm text-foreground/80 leading-relaxed">
             Think of it as a supportive framework that brings together
             structure, insight, and tools to reduce friction and make the
             process feel lighter.
@@ -88,7 +94,7 @@ function LandingPage() {
           </button>
         </div>
 
-        <p className="text-xs tracking-wide text-green">
+        <p className="text-sm font-bold tracking-wide text-green">
           Helping you grow into what's next
         </p>
       </div>
