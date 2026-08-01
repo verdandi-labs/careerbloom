@@ -70,8 +70,7 @@ function LandingPage() {
           <p className="text-sm text-foreground/80 leading-relaxed">
             CareerBloom uses AI to support you through every stage: tailoring
             your CV, writing cover letters, optimizing your professional online
-            presence, translating your documents into Spanish, and preparing for
-            interviews.
+            presence, translating your documents, and preparing for interviews.
           </p>
           <p className="font-display text-xl text-foreground leading-relaxed">
             We don't make you employable; we help you recognize that you already
