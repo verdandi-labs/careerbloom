@@ -43,6 +43,9 @@ async def upsert_section(
     user: Profile = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_for_current_user),
 ):
+    if section not in SECTIONS:
+        raise HTTPException(status_code=400, detail="Invalid section")
+
     repo = CvRepository(db)
     result = await repo.upsert_section(
         user.id, section,
@@ -78,32 +81,46 @@ async def get_all_cv(user: Profile = Depends(get_current_user), db: AsyncSession
     )
 
 
+MAX_SIZE = 5 * 1024 * 1024
+MAX_TEXT_LENGTH = 20_000
+
+
+def is_valid_file(contents: bytes) -> bool:
+    pdf_signature = contents[:4] == b"%PDF"
+    docx_signature = contents[:4] == b"PK\x03\x04"
+    return pdf_signature or docx_signature
+
+
 @router.post("/upload")
 async def upload_cv(
     file: UploadFile = File(...),
+    user: Profile = Depends(get_current_user),
 ):
-    content = await file.read()
-    text = ""
-    if file.filename and file.filename.endswith(".pdf"):
+    contents = await file.read()
+    if len(contents) > MAX_SIZE:
+        raise HTTPException(status_code=413, detail="File too large")
+
+    if not is_valid_file(contents):
+        raise HTTPException(status_code=415, detail="Unsupported file type. Use PDF or DOCX.")
+
+    if contents[:4] == b"%PDF":
         import pdfplumber
 
         def extract_pdf() -> str:
-            with pdfplumber.open(BytesIO(content)) as pdf:
+            with pdfplumber.open(BytesIO(contents)) as pdf:
                 return "\n".join(page.extract_text() or "" for page in pdf.pages)
 
         text = await asyncio.to_thread(extract_pdf)
-    elif file.filename and file.filename.endswith(".docx"):
+    else:
         from docx import Document
 
         def extract_docx() -> str:
-            doc = Document(BytesIO(content))
+            doc = Document(BytesIO(contents))
             return "\n".join(p.text for p in doc.paragraphs)
 
         text = await asyncio.to_thread(extract_docx)
-    else:
-        raise HTTPException(status_code=415, detail="Unsupported file type. Use PDF or DOCX.")
 
-    return {"text": text}
+    return {"text": text[:MAX_TEXT_LENGTH]}
 
 
 @router.post("/accept")
@@ -118,7 +135,7 @@ async def accept_cv(
         user.id,
         file_url="",
         file_name=body.file_name,
-        extracted_text=body.extracted_text,
+        extracted_text=body.extracted_text[:MAX_TEXT_LENGTH],
     )
 
     for s in body.sections:
