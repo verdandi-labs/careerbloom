@@ -9,6 +9,7 @@ from shared.models.profile import Profile
 from shared.deps import get_current_user
 from auth.magic_link import generate_magic_token, send_magic_link
 from auth.router import create_access_token, create_refresh_token
+from auth.service import get_or_create_user
 from config import get_settings
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -57,9 +58,16 @@ async def verify_magic_link(token: str = Query(...), email: str = Query(...), db
     user.magic_token_expires = None
     await db.commit()
 
+    profile = await get_or_create_user(db, str(user.id), user.email)
+
     access_token = create_access_token(str(user.id))
     refresh_token = create_refresh_token(str(user.id))
-    return {"access_token": access_token, "refresh_token": refresh_token}
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "has_database_url": user.database_url is not None,
+        "onboarding_complete": profile.onboarding_complete,
+    }
 
 
 @router.post("/byodb")
