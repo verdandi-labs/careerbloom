@@ -36,14 +36,14 @@ function LandingPage() {
     <div className="relative min-h-screen">
       <div className="fixed-bg fixed-bg--app" />
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-xl flex-col items-center justify-center gap-10 px-6 py-16 text-center">
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-xl flex-col items-center justify-start gap-10 px-6 pt-6 pb-16 text-center">
         <img
           src="/logo.png"
           alt="CareerBloom"
           className="relative z-0 h-28 w-auto -mb-8"
         />
 
-        <div className="relative z-10 space-y-4">
+        <div className="relative z-10 -mt-6 space-y-4">
           <h1 className="font-display text-[46px] leading-[1.04] md:text-[58px]">
             Helping you translate experience into opportunity
           </h1>
@@ -57,7 +57,7 @@ function LandingPage() {
           </p>
         </div>
 
-        <div className="glass-pink w-full space-y-4 -mt-6 px-6 py-6 text-left">
+        <div className="glass w-full space-y-4 -mt-6 px-6 py-6 text-left">
           <p className="text-sm text-foreground/80 leading-relaxed">
             CareerBloom was designed to reconnect you with your strengths, so
             you can share your experience with confidence and authenticity.
