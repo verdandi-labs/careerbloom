@@ -33,7 +33,7 @@ function Onboarding() {
       json: { goal, onboarding_complete: true },
     });
     await qc.invalidateQueries({ queryKey: sessionKeys.all });
-    navigate({ to: "/" });
+    navigate({ to: "/dashboard" });
   }
 
   return (

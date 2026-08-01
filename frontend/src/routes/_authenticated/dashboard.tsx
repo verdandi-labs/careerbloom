@@ -16,7 +16,7 @@ import {
   Loader2,
 } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/")({
+export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
       { title: "careerBloom — Your AI Career Companion" },

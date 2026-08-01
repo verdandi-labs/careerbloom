@@ -30,7 +30,7 @@ function MagicPage() {
     verifyMagicLink(search.token, search.email)
       .then(({ access_token, refresh_token }) => {
         setTokens(access_token, refresh_token);
-        navigate({ to: "/", replace: true });
+        navigate({ to: "/dashboard", replace: true });
       })
       .catch(() => {
         navigate({ to: "/auth", replace: true });

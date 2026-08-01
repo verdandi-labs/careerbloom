@@ -75,7 +75,7 @@ function AuthPage() {
   const setAuthEmail = useAuthUI((s) => s.setEmail);
 
   useEffect(() => {
-    if (user && !search.step) navigate({ to: "/" });
+    if (user && !search.step) navigate({ to: "/dashboard" });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, search.step]);
 

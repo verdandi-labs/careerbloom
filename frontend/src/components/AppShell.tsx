@@ -13,7 +13,7 @@ import { useSignOut } from "@/features/auth";
 import { CvUploadModal } from "./CvUploadModal";
 
 const nav = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/chat", label: "Chat", icon: MessageCircleHeart },
   { to: "/cv", label: "CV Builder", icon: FileText },
   { to: "/cover-letters", label: "Cover Letters", icon: Mail },
@@ -46,8 +46,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           <nav className="hidden items-center gap-1 md:flex">
             {nav.map((item) => {
               const active =
-                item.to === "/"
-                  ? pathname === "/"
+                item.to === "/dashboard"
+                  ? pathname === "/dashboard"
                   : pathname.startsWith(item.to);
               return (
                 <Link
@@ -94,7 +94,9 @@ export function AppShell({ children }: { children: ReactNode }) {
       <nav className="glass-strong fixed inset-x-4 bottom-4 z-20 flex items-center justify-around p-2 md:hidden">
         {nav.map((item) => {
           const active =
-            item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
+            item.to === "/dashboard"
+              ? pathname === "/dashboard"
+              : pathname.startsWith(item.to);
           const Icon = item.icon;
           return (
             <Link
