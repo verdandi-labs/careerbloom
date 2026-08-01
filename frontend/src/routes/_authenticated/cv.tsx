@@ -42,7 +42,6 @@ const EMPTY_SECTIONS = (): Record<
 function CVPage() {
   const [lang, setLang] = useState<Lang>("en");
   const [template, setTemplate] = useState<CVTemplateId>(DEFAULT_TEMPLATE);
-  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [name, setName] = useState("Your Name");
   const [title, setTitle] = useState<{ en: string; es: string }>({
     en: "Your title",
@@ -103,7 +102,6 @@ function CVPage() {
     () => ({
       name,
       title: title[lang],
-      photoUrl,
       contact: contact[lang],
       summary: sections.summary[lang],
       experience: sections.experience[lang],
@@ -118,7 +116,7 @@ function CVPage() {
       references: sections.references[lang],
       other: sections.other[lang],
     }),
-    [name, title, contact, sections, lang, photoUrl],
+    [name, title, contact, sections, lang],
   );
 
   async function saveField(field: EditableField, value: string) {

@@ -4,7 +4,6 @@
 export type CVData = {
   name: string;
   title: string;
-  photoUrl?: string | null;
   contact: string; // free text, one line per entry
   summary: string;
   experience: string;

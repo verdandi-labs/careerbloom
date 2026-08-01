@@ -48,7 +48,7 @@ function WelcomeBack() {
             </Suspense>
           </ErrorBoundary>
         </section>
-        <p className="text-center text-xs tracking-wide text-green">
+        <p className="font-display text-center text-xs tracking-wide text-green">
           Helping you grow into what's next
         </p>
       </div>

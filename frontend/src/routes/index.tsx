@@ -94,7 +94,7 @@ function LandingPage() {
           </button>
         </div>
 
-        <p className="text-sm font-bold tracking-wide text-green">
+        <p className="font-display text-sm font-bold tracking-wide text-green">
           Helping you grow into what's next
         </p>
       </div>

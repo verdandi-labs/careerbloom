@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import type { CVData, CVTemplateId } from "@/lib/cv-templates";
-import { Camera, Mail, MapPin, Phone, Globe } from "lucide-react";
+import { Mail, MapPin, Phone, Globe } from "lucide-react";
 
 export type EditableField = keyof CVData;
 
@@ -19,7 +19,6 @@ type Props = {
   template: CVTemplateId;
   editable?: boolean;
   onChange?: (field: EditableField, value: string) => void;
-  onPhotoClick?: () => void;
 };
 
 // --- helpers ---------------------------------------------------------------
@@ -71,45 +70,6 @@ function lines(s: string): string[] {
     .split(/\n+/)
     .map((l) => l.trim())
     .filter(Boolean);
-}
-
-function PhotoSlot({
-  url,
-  onClick,
-  shape = "circle",
-  size = 140,
-}: {
-  url?: string | null;
-  onClick?: () => void;
-  shape?: "circle" | "square";
-  size?: number;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      style={{
-        width: size,
-        height: size,
-        borderRadius: shape === "circle" ? "50%" : 8,
-      }}
-      className="relative shrink-0 overflow-hidden bg-neutral-200 group"
-      aria-label="Upload photo"
-    >
-      {url ? (
-        <img src={url} alt="" className="h-full w-full object-cover" />
-      ) : (
-        <div className="grid h-full w-full place-items-center bg-neutral-100 text-neutral-400">
-          <Camera className="h-6 w-6" />
-        </div>
-      )}
-      {onClick && (
-        <div className="absolute inset-0 grid place-items-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
-          <Camera className="h-5 w-5 text-white" />
-        </div>
-      )}
-    </button>
-  );
 }
 
 // Map of optional/extra section keys to the human label shown in CV.
@@ -183,7 +143,6 @@ function Editorial({
   data,
   editable,
   onChange,
-  onPhotoClick,
 }: Required<Pick<Props, "data">> & Props) {
   const e = !!editable;
   const accent = "#B96A4B";
@@ -199,12 +158,6 @@ function Editorial({
     >
       <div className="grid grid-cols-[180px_1fr] gap-8 p-12">
         <div className="space-y-6">
-          <PhotoSlot
-            url={data.photoUrl}
-            onClick={onPhotoClick}
-            shape="circle"
-            size={180}
-          />
           <Section title="Contact" accent={accent} serif>
             <Editable
               value={data.contact}
@@ -454,7 +407,6 @@ function EditorialBig({
   data,
   editable,
   onChange,
-  onPhotoClick,
 }: Required<Pick<Props, "data">> & Props) {
   const e = !!editable;
   const accent = "#3D3D3D";
@@ -493,14 +445,7 @@ function EditorialBig({
               { letterSpacing: "-0.04em", color: accent } as React.CSSProperties
             }
           />
-          <div className="-mt-12 z-10">
-            <PhotoSlot
-              url={data.photoUrl}
-              onClick={onPhotoClick}
-              shape="square"
-              size={240}
-            />
-          </div>
+          <div className="-mt-12 z-10"></div>
         </div>
 
         <div className="mt-10">
@@ -604,7 +549,6 @@ function Geometric({
   data,
   editable,
   onChange,
-  onPhotoClick,
 }: Required<Pick<Props, "data">> & Props) {
   const e = !!editable;
   const accent = "#B47A5C";
@@ -640,12 +584,6 @@ function Geometric({
               className="mt-2 text-xs uppercase tracking-[0.3em] text-neutral-600"
             />
           </div>
-          <PhotoSlot
-            url={data.photoUrl}
-            onClick={onPhotoClick}
-            shape="circle"
-            size={140}
-          />
         </div>
       </div>
 
@@ -769,7 +707,6 @@ function Soft({
   data,
   editable,
   onChange,
-  onPhotoClick,
 }: Required<Pick<Props, "data">> & Props) {
   const e = !!editable;
   const xs = extras(data, e, onChange);
@@ -788,14 +725,6 @@ function Soft({
           style={{ background: "#F5DDE6" }}
         />
         <div className="relative grid grid-cols-[160px_1fr] items-center gap-8">
-          <div className="pt-4 pl-2">
-            <PhotoSlot
-              url={data.photoUrl}
-              onClick={onPhotoClick}
-              shape="circle"
-              size={150}
-            />
-          </div>
           <div>
             <Editable
               as="h1"
