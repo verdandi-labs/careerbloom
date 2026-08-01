@@ -18,6 +18,7 @@ settings = get_settings()
 
 class MagicLinkRequest(BaseModel):
     email: EmailStr
+    flow: str = "new"
 
 
 class ByodbRequest(BaseModel):
@@ -38,7 +39,7 @@ async def request_magic_link(request: MagicLinkRequest, db: AsyncSession = Depen
     user.magic_token_expires = datetime.now(timezone.utc) + timedelta(minutes=15)
 
     await db.commit()
-    await send_magic_link(request.email, token, settings.FRONTEND_URL)
+    await send_magic_link(request.email, token, settings.FRONTEND_URL, flow=request.flow)
 
     return {"message": "Check your email for magic link", "email": request.email}
 
