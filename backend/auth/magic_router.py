@@ -21,10 +21,6 @@ class MagicLinkRequest(BaseModel):
     flow: str = "new"
 
 
-class ByodbRequest(BaseModel):
-    database_url: str
-
-
 @router.post("/magic-link")
 async def request_magic_link(request: MagicLinkRequest, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.email == request.email))
@@ -69,32 +65,3 @@ async def verify_magic_link(token: str = Query(...), email: str = Query(...), db
         "has_database_url": user.database_url is not None,
         "onboarding_complete": profile.onboarding_complete,
     }
-
-
-@router.post("/byodb")
-async def save_byodb(request: ByodbRequest, profile: Profile = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    from database import ensure_schema
-
-    result = await db.execute(select(User).where(User.id == profile.id))
-    user = result.scalars().first()
-
-    if not user:
-        raise HTTPException(status_code=400, detail="User not found")
-
-    user.database_url = request.database_url
-    await db.commit()
-
-    await ensure_schema(request.database_url, user_id=user.id, display_name=profile.display_name or "")
-
-    return {"message": "Database URL saved", "email": user.email}
-
-
-@router.post("/skip-byodb")
-async def skip_byodb(profile: Profile = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(User).where(User.id == profile.id))
-    user = result.scalars().first()
-
-    if not user:
-        raise HTTPException(status_code=400, detail="User not found")
-
-    return {"message": "Using shared database", "email": user.email}

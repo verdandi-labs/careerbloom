@@ -51,13 +51,7 @@ export function BYODBScreen() {
     setConfirmSkip(true);
   }
 
-  async function handleConfirmSkip() {
-    setSaving(true);
-    try {
-      await api("/auth/skip-byodb", { method: "POST" });
-    } catch {
-      /* skip anyway */
-    }
+  function handleConfirmSkip() {
     setConfirmSkip(false);
   }
 

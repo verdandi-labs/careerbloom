@@ -57,14 +57,8 @@ function ConnectDatabasePage() {
     }
   }
 
-  async function handleSkip() {
-    setSaving(true);
-    try {
-      await api("/auth/skip-byodb", { method: "POST" });
-      navigate({ to: "/onboarding", replace: true });
-    } catch {
-      navigate({ to: "/onboarding", replace: true });
-    }
+  function handleSkip() {
+    navigate({ to: "/onboarding", replace: true });
   }
 
   return (
