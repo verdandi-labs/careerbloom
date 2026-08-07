@@ -2,8 +2,7 @@ from pydantic import BaseModel
 
 
 class ConnectDbRequest(BaseModel):
-    supabase_url: str
-    db_password: str
+    connection_string: str
 
 
 class TenantStatusResponse(BaseModel):

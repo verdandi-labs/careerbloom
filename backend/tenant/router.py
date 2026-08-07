@@ -17,11 +17,11 @@ async def connect_database(
     user: Profile = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    valid = await validate_connection(body.supabase_url, body.db_password)
+    valid = await validate_connection(body.connection_string)
     if not valid:
-        raise HTTPException(status_code=400, detail="Could not connect to the database. Check your URL and password.")
+        raise HTTPException(status_code=400, detail="Could not connect to the database. Check your connection string.")
 
-    db_url = build_db_url(body.supabase_url, body.db_password)
+    db_url = build_db_url(body.connection_string)
     await ensure_schema(db_url, user_id=user.id, display_name=user.display_name or "")
 
     result = await db.execute(select(User).where(User.id == user.id))
@@ -29,7 +29,7 @@ async def connect_database(
     db_user.database_url = db_url
     await db.commit()
 
-    return {"message": "Tenant database connected"}
+    return {"message": "Database connected successfully"}
 
 
 @router.get("/status", response_model=TenantStatusResponse)

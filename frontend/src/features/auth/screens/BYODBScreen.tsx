@@ -4,8 +4,6 @@ import { useNavigate } from "@tanstack/react-router";
 import {
   ArrowRight,
   Check,
-  ChevronDown,
-  ChevronUp,
   Database,
   Loader2,
   Settings,
@@ -21,7 +19,6 @@ export function BYODBScreen({ email }: { email: string }) {
   const [checking, setChecking] = useState(false);
   const [success, setSuccess] = useState(false);
   const [confirmSkip, setConfirmSkip] = useState(false);
-  const [showInstructions, setShowInstructions] = useState(false);
 
   async function handleConnect() {
     const val = connString.trim();
@@ -29,7 +26,7 @@ export function BYODBScreen({ email }: { email: string }) {
       setError("Paste your connection string first");
       return;
     }
-    if (!val.startsWith("postgresql://")) {
+    if (!val.startsWith("postgresql")) {
       setError("Enter a valid postgresql:// connection string");
       return;
     }
@@ -38,7 +35,10 @@ export function BYODBScreen({ email }: { email: string }) {
     setSaving(true);
     setChecking(true);
     try {
-      await api("/auth/byodb", { method: "POST", json: { database_url: val } });
+      await api("/tenant/connect", {
+        method: "POST",
+        json: { connection_string: val },
+      });
       setChecking(false);
       setSuccess(true);
       setTimeout(() => navigate({ to: "/onboarding", replace: true }), 6000);
@@ -72,8 +72,8 @@ export function BYODBScreen({ email }: { email: string }) {
         </div>
         <h2 className="font-display text-2xl text-green">Connected!</h2>
         <p className="text-sm text-foreground">
-          Your Supabase database is connected and ready. Taking you to
-          onboarding in a moment...
+          Your database is connected and ready. Taking you to onboarding in a
+          moment...
         </p>
       </div>
     );
@@ -89,7 +89,7 @@ export function BYODBScreen({ email }: { email: string }) {
           <h3 className="font-display text-lg">Use the shared database?</h3>
           <p className="mt-2 text-sm text-foreground leading-relaxed">
             Your data will be stored in careerBloom's global database. You can
-            connect your own Supabase later in <strong>Settings</strong> to keep
+            connect your own database later in <strong>Settings</strong> to keep
             your data private.
           </p>
         </div>
@@ -119,73 +119,26 @@ export function BYODBScreen({ email }: { email: string }) {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-foreground">
-        Connect your own Supabase database to keep your data private.
+      <h2 className="font-display text-2xl">Bring your own database</h2>
+      <p className="text-sm text-foreground/70">
+        Connect any PostgreSQL database to keep your data entirely under your
+        control. Your CV, cover letters, and career data will be stored there —
+        we never see it.
       </p>
 
-      <button
-        onClick={() => setShowInstructions((v) => !v)}
-        className="flex items-center gap-1.5 text-xs font-medium text-green underline-offset-2 hover:underline"
-      >
-        {showInstructions ? (
-          <ChevronUp className="h-3.5 w-3.5" />
-        ) : (
-          <ChevronDown className="h-3.5 w-3.5" />
-        )}
-        How to get your Supabase connection string
-      </button>
-
-      {showInstructions && (
-        <div className="rounded-xl bg-white/50 px-4 py-3 text-xs text-foreground space-y-1.5 leading-relaxed">
-          <p>
-            1. Go to{" "}
-            <a
-              href="https://supabase.com"
-              target="_blank"
-              rel="noreferrer"
-              className="underline"
-            >
-              supabase.com
-            </a>{" "}
-            and sign in or create a free account.
-          </p>
-          <p>
-            2. Click <strong>New project</strong> and set a name and a database
-            password. Save the password.
-          </p>
-          <p>
-            3. Click <strong>Connect</strong> in the top menu bar of your
-            project.
-          </p>
-          <p>
-            4. In the connection screen, select <strong>Direct</strong> from the
-            tabs at the top.
-          </p>
-          <p>
-            5. Select <strong>Session pooler</strong> as the connection mode.
-          </p>
-          <p>
-            6. Set the connection method to <strong>URI</strong> and copy the
-            connection string.
-          </p>
-          <p>
-            7. Replace{" "}
-            <code className="bg-black/5 px-1 rounded">[YOUR-PASSWORD]</code>{" "}
-            with your database password from step 2.
-          </p>
-          <p>8. Paste it in the field below.</p>
-          <p className="text-foreground/60 pt-1">
-            Make sure to use Session pooler with URI format.
-          </p>
-        </div>
-      )}
-
+      <label className="block text-sm font-medium text-foreground">
+        Connection string
+      </label>
       <input
+        type="password"
         value={connString}
         onChange={(e) => setConnString(e.target.value)}
-        placeholder="postgresql://postgres:password@xxxxx.supabase.co/postgres"
-        className="w-full rounded-lg bg-[#FFE3EA]/50 px-4 py-2.5 text-sm outline-none backdrop-blur-md focus:border-accent"
+        placeholder="postgresql://user:password@host:5432/dbname"
+        className="w-full rounded-xl bg-white/25 px-4 py-3 text-sm outline-none"
       />
+      <p className="text-xs text-foreground/50">
+        Works with Supabase, Neon, Railway, Render, or any PostgreSQL provider.
+      </p>
 
       {error && (
         <p className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">

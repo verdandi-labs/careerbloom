@@ -1,32 +1,21 @@
-import re
-from urllib.parse import quote
-import httpx
-from config import get_settings
-
-settings = get_settings()
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import create_async_engine
 
 
-def _extract_project_ref(url: str) -> str:
-    match = re.search(r"https?://([^.]+)\.supabase\.co", url)
-    if not match:
-        raise ValueError("Invalid Supabase URL. Must be like https://xxxxx.supabase.co")
-    return match.group(1)
+def build_db_url(connection_string: str) -> str:
+    if connection_string.startswith("postgresql+asyncpg://"):
+        return connection_string
+    if connection_string.startswith("postgresql://"):
+        return connection_string.replace("postgresql://", "postgresql+asyncpg://", 1)
+    raise ValueError("Invalid PostgreSQL connection string. Must start with postgresql:// or postgresql+asyncpg://")
 
 
-def build_db_url(supabase_url: str, password: str) -> str:
-    ref = _extract_project_ref(supabase_url)
-    encoded = quote(password, safe="")
-    return f"postgresql+asyncpg://postgres:{encoded}@db.{ref}.supabase.co:5432/postgres"
-
-
-async def validate_connection(supabase_url: str, password: str) -> bool:
-    from sqlalchemy.ext.asyncio import create_async_engine
-
-    db_url = build_db_url(supabase_url, password)
+async def validate_connection(connection_string: str) -> bool:
+    db_url = build_db_url(connection_string)
     engine = create_async_engine(db_url, echo=False)
     try:
         async with engine.connect() as conn:
-            await conn.execute(conn.default_schema_name or "SELECT 1")
+            await conn.execute(text("SELECT 1"))
         return True
     except Exception:
         return False
