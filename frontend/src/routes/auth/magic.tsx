@@ -9,13 +9,12 @@ export const Route = createFileRoute("/auth/magic")({
   validateSearch: z.object({
     token: z.string(),
     email: z.string(),
-    flow: z.enum(["new", "returning"]).optional().default("new"),
   }),
   component: MagicVerify,
 });
 
 function MagicVerify() {
-  const { token, email, flow } = Route.useSearch();
+  const { token, email } = Route.useSearch();
   const navigate = useNavigate();
   const called = useRef(false);
 
@@ -35,11 +34,6 @@ function MagicVerify() {
         );
 
         setTokens(data.access_token, data.refresh_token);
-
-        if (flow === "new" && !data.has_database_url) {
-          navigate({ to: "/auth", search: { step: "byodb" } });
-          return;
-        }
 
         if (!data.onboarding_complete) {
           navigate({ to: "/onboarding" });

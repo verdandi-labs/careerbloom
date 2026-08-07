@@ -3,7 +3,6 @@ import {
   createFileRoute,
   useNavigate,
   useRouterState,
-  useSearch,
 } from "@tanstack/react-router";
 import { Suspense, lazy, useEffect } from "react";
 import { z } from "zod";
@@ -14,12 +13,6 @@ import { Loader2 } from "lucide-react";
 const MagicLinkScreen = lazy(() =>
   import("@/features/auth/screens/MagicLinkScreen").then((m) => ({
     default: m.MagicLinkScreen,
-  })),
-);
-
-const BYODBScreen = lazy(() =>
-  import("@/features/auth/screens/BYODBScreen").then((m) => ({
-    default: m.BYODBScreen,
   })),
 );
 
@@ -43,9 +36,7 @@ export const Route = createFileRoute("/auth")({
       },
     ],
   }),
-  validateSearch: z.object({
-    step: z.string().optional(),
-  }),
+  validateSearch: z.object({}),
   component: AuthLayout,
 });
 
@@ -70,14 +61,12 @@ function AuthLayout() {
 function AuthPage() {
   const { data: user } = useSession();
   const navigate = useNavigate();
-  const search = useSearch({ from: "/auth" });
-  const authEmail = useAuthUI((s) => s.email);
   const setAuthEmail = useAuthUI((s) => s.setEmail);
 
   useEffect(() => {
-    if (user && !search.step) navigate({ to: "/dashboard" });
+    if (user) navigate({ to: "/dashboard" });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, search.step]);
+  }, [user]);
 
   if (!user) {
     return (
@@ -104,33 +93,6 @@ function AuthPage() {
           <ErrorBoundary>
             <Suspense fallback={<LazyFallback />}>
               <MagicLinkScreen onSent={(email) => setAuthEmail(email)} />
-            </Suspense>
-          </ErrorBoundary>
-        </section>
-        <Footer />
-      </Background>
-    );
-  }
-
-  if (search.step === "byodb") {
-    return (
-      <Background>
-        <header className="rounded-[20px] bg-secondary/70 px-7 py-7 shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] backdrop-blur-md">
-          <img src="/logo.png" alt="careerBloom" className="mb-3 h-8 w-auto" />
-          <p className="text-[11px] uppercase tracking-[0.22em] text-foreground">
-            Step 2 of 2
-          </p>
-          <h1 className="mt-1 font-display text-3xl">
-            Bring your own database
-          </h1>
-          <p className="mt-1 text-sm text-foreground">
-            Optional: connect your own Supabase to keep data private.
-          </p>
-        </header>
-        <section className="bg-secondary/30 rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] p-6">
-          <ErrorBoundary>
-            <Suspense fallback={<LazyFallback />}>
-              <BYODBScreen email={authEmail} />
             </Suspense>
           </ErrorBoundary>
         </section>

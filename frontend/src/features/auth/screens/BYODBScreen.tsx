@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { api } from "@/lib/api";
-import { useNavigate } from "@tanstack/react-router";
 import {
   ArrowRight,
   Check,
@@ -11,8 +10,7 @@ import {
   SkipForward,
 } from "lucide-react";
 
-export function BYODBScreen({ email }: { email: string }) {
-  const navigate = useNavigate();
+export function BYODBScreen() {
   const [connString, setConnString] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -41,7 +39,6 @@ export function BYODBScreen({ email }: { email: string }) {
       });
       setChecking(false);
       setSuccess(true);
-      setTimeout(() => navigate({ to: "/onboarding", replace: true }), 6000);
     } catch (err) {
       setChecking(false);
       setError(err instanceof Error ? err.message : "Connection failed");
@@ -61,7 +58,7 @@ export function BYODBScreen({ email }: { email: string }) {
     } catch {
       /* skip anyway */
     }
-    navigate({ to: "/onboarding", replace: true });
+    setConfirmSkip(false);
   }
 
   if (success) {
@@ -72,8 +69,7 @@ export function BYODBScreen({ email }: { email: string }) {
         </div>
         <h2 className="font-display text-2xl text-green">Connected!</h2>
         <p className="text-sm text-foreground">
-          Your database is connected and ready. Taking you to onboarding in a
-          moment...
+          Your database is connected and ready.
         </p>
       </div>
     );

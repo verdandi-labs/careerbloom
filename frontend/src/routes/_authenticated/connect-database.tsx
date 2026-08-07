@@ -38,10 +38,10 @@ function ConnectDatabasePage() {
     setSaving(true);
 
     try {
-      await api("/auth/byodb", {
+      await api("/tenant/connect", {
         method: "POST",
         json: {
-          database_url: val,
+          connection_string: val,
         },
       });
       setSuccess(true);
