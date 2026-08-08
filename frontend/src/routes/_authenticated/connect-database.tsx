@@ -54,11 +54,17 @@ function ConnectDatabasePage() {
         >
           <X className="h-4 w-4" />
         </button>
-        <h1 className="mt-2 font-display text-4xl">Bring your own database</h1>
+        <h1 className="mt-2 font-display text-4xl">Want full control of your data?</h1>
+
         <p className="mt-2 text-sm text-foreground/75">
-          Connect any PostgreSQL database to keep your data entirely under your
-          control. Your CV, cover letters, and career data will be stored there
-          — we never see it.
+          By default CareerBloom stores your data securely. But, if you would
+          prefer full control over where your data lives, we offer you the
+          option to connect your own PostgreSQL database
+        </p>
+
+        <p className="mt-3 text-sm font-semibold text-foreground">
+          Paste your connection string below and your data stays entirely in
+          your hands
         </p>
       </header>
 
