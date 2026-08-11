@@ -6,11 +6,9 @@ class Settings(BaseSettings):
     # Neon / PostgreSQL
     NEON_DATABASE_URL: str = ""
 
-    # JWT
-    JWT_SECRET: str
-    JWT_ALGORITHM: str = "HS256"
-    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-    JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+    # Crypto
+    MASTER_KEY: str
+    HMAC_SECRET: str
 
     # Google AI
     GEMINI_API_KEY: str = ""

@@ -1,8 +1,9 @@
 import secrets
-from datetime import datetime, timedelta, timezone
 from urllib.parse import quote
+
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
+
 from config import get_settings
 
 

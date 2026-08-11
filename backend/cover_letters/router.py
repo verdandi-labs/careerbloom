@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from shared.deps import get_current_user, get_db_for_current_user
-from shared.models.profile import Profile
+from shared.models.user import User
 from cover_letters.repository import CoverLetterRepository
 from cover_letters.schemas import (
     CoverLetterCreate,
@@ -17,20 +17,20 @@ router = APIRouter(prefix="/cover-letters", tags=["cover-letters"])
 
 
 @router.get("", response_model=list[CoverLetterResponse])
-async def list_letters(user: Profile = Depends(get_current_user), db: AsyncSession = Depends(get_db_for_current_user)):
+async def list_letters(user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db_for_current_user)):
     repo = CoverLetterRepository(db)
-    letters = await repo.get_all(user.id)
+    letters = await repo.get_all(user.user_id)
     return [CoverLetterResponse.model_validate(l) for l in letters]
 
 
 @router.post("", response_model=CoverLetterResponse)
 async def create_letter(
     body: CoverLetterCreate,
-    user: Profile = Depends(get_current_user),
+    user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_for_current_user),
 ):
     repo = CoverLetterRepository(db)
-    letter = await repo.create(user.id, body.job_title, body.company, body.job_description)
+    letter = await repo.create(user.user_id, body.job_title, body.company, body.job_description)
     return CoverLetterResponse.model_validate(letter)
 
 
@@ -38,12 +38,12 @@ async def create_letter(
 async def generate_letter(
     letter_id: str,
     body: CoverLetterGenerateRequest,
-    user: Profile = Depends(get_current_user),
+    user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_for_current_user),
 ):
     from uuid import UUID
     repo = CoverLetterRepository(db)
-    letter = await repo.get_by_id(user.id, UUID(letter_id))
+    letter = await repo.get_by_id(user.user_id, UUID(letter_id))
     if not letter:
         raise HTTPException(status_code=404, detail="Cover letter not found")
 
@@ -55,7 +55,7 @@ async def generate_letter(
     )
 
     updated = await repo.update_content(
-        user.id, letter.id,
+        user.user_id, letter.id,
         content_en=result.get("content_en", ""),
         content_es=result.get("content_es", ""),
     )
@@ -65,12 +65,12 @@ async def generate_letter(
 @router.delete("/{letter_id}")
 async def delete_letter(
     letter_id: str,
-    user: Profile = Depends(get_current_user),
+    user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_for_current_user),
 ):
     from uuid import UUID
     repo = CoverLetterRepository(db)
-    deleted = await repo.delete(user.id, UUID(letter_id))
+    deleted = await repo.delete(user.user_id, UUID(letter_id))
     if not deleted:
         raise HTTPException(status_code=404, detail="Cover letter not found")
     return {"ok": True}
@@ -80,7 +80,7 @@ async def delete_letter(
 async def export_letter_pdf(
     letter_id: str,
     body: CoverLetterExportPdfRequest,
-    user: Profile = Depends(get_current_user),
+    user: User = Depends(get_current_user),
 ):
     from reportlab.lib.pagesizes import letter
     from reportlab.lib.units import inch

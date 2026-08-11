@@ -26,7 +26,6 @@ export type CVTemplateMeta = {
   id: CVTemplateId;
   name: string;
   blurb: string;
-  hasPhoto: boolean;
   accent: string; // hex for swatch + DOCX accent
   bg: string;
   font: "serif" | "sans" | "mono" | "display-serif";
@@ -43,8 +42,7 @@ export const CV_TEMPLATES: CVTemplateMeta[] = [
   {
     id: "editorial",
     name: "Editorial",
-    blurb: "Elegant serif with photo and a quiet terracotta accent.",
-    hasPhoto: true,
+    blurb: "Elegant serif with a quiet terracotta accent.",
     accent: "#B96A4B",
     bg: "#FFFFFF",
     font: "serif",
@@ -53,8 +51,7 @@ export const CV_TEMPLATES: CVTemplateMeta[] = [
   {
     id: "classic",
     name: "Classic",
-    blurb: "Centered letter-spaced name. Two-column sidebar, no photo.",
-    hasPhoto: false,
+    blurb: "Centered letter-spaced name. Two-column sidebar.",
     accent: "#5C5C5C",
     bg: "#FFFFFF",
     font: "sans",
@@ -64,8 +61,7 @@ export const CV_TEMPLATES: CVTemplateMeta[] = [
     id: "editorialBig",
 
     name: "Statement",
-    blurb: "Huge display name behind a centred portrait. Beige.",
-    hasPhoto: true,
+    blurb: "Huge display name on a beige backdrop.",
     accent: "#3D3D3D",
     bg: "#EFEAE3",
     font: "display-serif",
@@ -74,8 +70,7 @@ export const CV_TEMPLATES: CVTemplateMeta[] = [
   {
     id: "geometric",
     name: "Geometric",
-    blurb: "Soft sage band, round portrait top-right, copper rules.",
-    hasPhoto: true,
+    blurb: "Soft sage band, copper rules.",
     accent: "#B47A5C",
     bg: "#FFFFFF",
     font: "sans",
@@ -84,8 +79,7 @@ export const CV_TEMPLATES: CVTemplateMeta[] = [
   {
     id: "soft",
     name: "Soft",
-    blurb: "Round portrait with a pink blossom blob, pill headers.",
-    hasPhoto: true,
+    blurb: "Pink blossom blob, pill headers.",
     accent: "#E8C5D0",
     bg: "#FFFFFF",
     font: "sans",

@@ -1,67 +1,81 @@
-from fastapi import APIRouter, HTTPException, Query, Depends
-from pydantic import BaseModel, EmailStr
 from datetime import datetime, timedelta, timezone
-from sqlalchemy import select
+
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, EmailStr
+from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
-from database import get_db
-from shared.models.user import User
-from shared.models.profile import Profile
-from shared.deps import get_current_user
+
 from auth.magic_link import generate_magic_token, send_magic_link
-from auth.router import create_access_token, create_refresh_token
-from auth.service import get_or_create_user
+from auth.service import create_session, create_user
+from database import get_db
+from shared.crypto import hash_email, hash_token
+from shared.models.user import MagicLinkToken, User
 from config import get_settings
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 settings = get_settings()
+SESSION_COOKIE = "session"
 
 
 class MagicLinkRequest(BaseModel):
     email: EmailStr
-    flow: str = "new"
 
 
 @router.post("/magic-link")
 async def request_magic_link(request: MagicLinkRequest, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(User).where(User.email == request.email))
-    user = result.scalars().first()
-
-    if not user:
-        user = User(email=request.email)
-        db.add(user)
+    email_hash = hash_email(request.email)
+    result = await db.execute(select(User).where(User.email_hash == email_hash))
+    user = result.scalar_one_or_none()
+    flow = "returning" if user else "new"
 
     token = generate_magic_token()
-    user.magic_token = token
-    user.magic_token_expires = datetime.now(timezone.utc) + timedelta(minutes=15)
-
+    db.add(
+        MagicLinkToken(
+            email_hash=email_hash,
+            token_hash=hash_token(token),
+            expires_at=datetime.now(timezone.utc) + timedelta(minutes=15),
+        )
+    )
     await db.commit()
-    await send_magic_link(request.email, token, settings.FRONTEND_URL, flow=request.flow)
+    await send_magic_link(request.email, token, settings.FRONTEND_URL, flow=flow)
 
     return {"message": "Check your email for magic link", "email": request.email}
 
 
 @router.get("/magic")
-async def verify_magic_link(token: str = Query(...), email: str = Query(...), db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(User).where(User.email == email))
-    user = result.scalars().first()
-
-    if not user or user.magic_token != token:
+async def verify_magic_link(
+    request: Request,
+    token: str = Query(...),
+    email: str = Query(...),
+    db: AsyncSession = Depends(get_db),
+):
+    token_hash_value = hash_token(token)
+    result = await db.execute(select(MagicLinkToken).where(MagicLinkToken.token_hash == token_hash_value))
+    magic_token = result.scalar_one_or_none()
+    if not magic_token:
         raise HTTPException(status_code=400, detail="Invalid link")
-
-    if user.magic_token_expires is None or user.magic_token_expires < datetime.now(timezone.utc):
+    if magic_token.expires_at < datetime.now(timezone.utc):
         raise HTTPException(status_code=400, detail="Link expired")
 
-    user.magic_token = None
-    user.magic_token_expires = None
+    email_hash = hash_email(email)
+    result = await db.execute(select(User).where(User.email_hash == email_hash))
+    user = result.scalar_one_or_none()
+    if not user:
+        user = await create_user(db, "magic_link", email=email)
+
+    await db.execute(delete(MagicLinkToken).where(MagicLinkToken.token_id == magic_token.token_id))
+
+    raw_session = await create_session(db, user.user_id)
     await db.commit()
 
-    profile = await get_or_create_user(db, str(user.id), user.email)
-
-    access_token = create_access_token(str(user.id))
-    refresh_token = create_refresh_token(str(user.id))
-    return {
-        "access_token": access_token,
-        "refresh_token": refresh_token,
-        "has_database_url": user.database_url is not None,
-        "onboarding_complete": profile.onboarding_complete,
-    }
+    response = JSONResponse(content={"onboarding": user.onboarding})
+    response.set_cookie(
+        SESSION_COOKIE,
+        raw_session,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=7 * 24 * 60 * 60,
+    )
+    return response

@@ -1,11 +1,9 @@
-from shared.models.profile import Profile
 from shared.models.cv import CvUpload, CvEdit, CvContent
 from shared.models.cover_letter import CoverLetter
 from shared.models.chat import ChatConversation, ChatMessage
-from shared.models.user import User
+from shared.models.user import User, MagicLinkToken, Session
 
 __all__ = [
-    "Profile",
     "CvUpload",
     "CvEdit",
     "CvContent",
@@ -13,4 +11,6 @@ __all__ = [
     "ChatConversation",
     "ChatMessage",
     "User",
+    "MagicLinkToken",
+    "Session",
 ]

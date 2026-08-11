@@ -3,7 +3,6 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from shared.models.cv import CvContent, CvUpload
-from shared.models.profile import Profile
 
 
 class CvRepository:

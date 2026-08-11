@@ -23,7 +23,6 @@ class CvAllSectionsResponse(BaseModel):
     name: str | None
     title: dict[str, str]
     contact: dict[str, str]
-    photo_url: str | None
     sections: dict[str, dict[str, str]]
 
 

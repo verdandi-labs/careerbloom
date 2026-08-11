@@ -1,49 +1,51 @@
-from uuid import UUID
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import JWTError, jwt
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-from database import get_db, get_db_for_user
-from shared.models.profile import Profile
-from shared.models.user import User
-from config import get_settings
+from datetime import datetime, timedelta, timezone
 
-security = HTTPBearer()
-settings = get_settings()
+from fastapi import Depends, HTTPException, Request, Response, status
+from sqlalchemy import delete, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from auth.service import SESSION_TTL_DAYS, create_session
+from database import get_db
+from shared.crypto import hash_token
+from shared.models.user import Session as SessionRow
+from shared.models.user import User
+
+SESSION_COOKIE = "session"
 
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    request: Request,
+    response: Response,
     db: AsyncSession = Depends(get_db),
-) -> Profile:
-    token = credentials.credentials
-    try:
-        payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
-        user_id: str = payload.get("sub")
-        if user_id is None:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token missing subject")
-    except JWTError as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Token decode failed: {str(e)}")
+) -> User:
+    raw_token = request.cookies.get(SESSION_COOKIE)
+    if not raw_token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No session")
 
-    result = await db.execute(select(Profile).where(Profile.id == UUID(user_id)))
-    profile = result.scalar_one_or_none()
-    if profile is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Profile not found for user {user_id}")
-    return profile
+    result = await db.execute(select(SessionRow).where(SessionRow.token_hash == hash_token(raw_token)))
+    session = result.scalar_one_or_none()
+    if not session:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid session")
+    if session.expires_at < datetime.now(timezone.utc):
+        await db.execute(delete(SessionRow).where(SessionRow.session_id == session.session_id))
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session expired")
 
+    result = await db.execute(select(User).where(User.user_id == session.user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
 
-async def get_db_for_current_user(user: Profile = Depends(get_current_user)):
-    from database import get_db as get_global_db
-    async for db in get_global_db():
-        result = await db.execute(select(User).where(User.id == user.id))
-        db_user = result.scalar_one_or_none()
-        break
-
-    db_url = db_user.database_url if db_user and db_user.database_url else ""
-    if db_url:
-        async for session in get_db_for_user(db_url)():
-            yield session
-    else:
-        async for session in get_db():
-            yield session
+    new_raw = await create_session(db, user.user_id)
+    await db.execute(delete(SessionRow).where(SessionRow.session_id == session.session_id))
+    response.set_cookie(
+        SESSION_COOKIE,
+        new_raw,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=SESSION_TTL_DAYS * 24 * 60 * 60,
+    )
+    return user
+async def get_db_for_current_user(user: User = Depends(get_current_user)):
+    async for session in get_db():
+        yield session
