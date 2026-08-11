@@ -54,7 +54,9 @@ function ConnectDatabasePage() {
         >
           <X className="h-4 w-4" />
         </button>
-        <h1 className="mt-2 font-display text-4xl">Want full control of your data?</h1>
+        <h1 className="mt-2 font-display text-4xl">
+          Want full control of your data?
+        </h1>
 
         <p className="mt-2 text-sm text-foreground/75">
           By default CareerBloom stores your data securely. But, if you would
