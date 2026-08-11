@@ -22,8 +22,8 @@ function ConnectDatabasePage() {
       setError("Paste your connection string first.");
       return;
     }
-    if (!val.startsWith("postgresql")) {
-      setError("Enter a valid postgresql:// connection string.");
+    if (!val.startsWith("postgres://") && !val.startsWith("postgresql://")) {
+      setError("Enter a valid postgresql:// or postgres:// connection string.");
       return;
     }
     setError(null);

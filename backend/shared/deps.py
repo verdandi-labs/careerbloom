@@ -4,7 +4,6 @@ from fastapi import Depends, HTTPException, Request, Response, status
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from auth.service import SESSION_TTL_DAYS, create_session
 from database import get_db
 from shared.crypto import hash_token
 from shared.models.user import Session as SessionRow
@@ -18,6 +17,8 @@ async def get_current_user(
     response: Response,
     db: AsyncSession = Depends(get_db),
 ) -> User:
+    from auth.service import SESSION_TTL_DAYS, create_session
+
     raw_token = request.cookies.get(SESSION_COOKIE)
     if not raw_token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No session")
