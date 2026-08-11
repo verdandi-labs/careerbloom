@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from shared.deps import get_current_user, get_db_for_current_user
-from shared.models.profile import Profile
+from shared.models.user import User
 from cv.repository import CvRepository
 from cv.schemas import (
     CvSectionResponse,
@@ -30,9 +30,9 @@ SECTIONS = [
 
 
 @router.get("/sections", response_model=list[CvSectionResponse])
-async def get_sections(user: Profile = Depends(get_current_user), db: AsyncSession = Depends(get_db_for_current_user)):
+async def get_sections(user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db_for_current_user)):
     repo = CvRepository(db)
-    sections = await repo.get_all_sections(user.id)
+    sections = await repo.get_all_sections(user.user_id)
     return [CvSectionResponse.model_validate(s) for s in sections]
 
 
@@ -40,7 +40,7 @@ async def get_sections(user: Profile = Depends(get_current_user), db: AsyncSessi
 async def upsert_section(
     section: str,
     body: CvSectionUpdate,
-    user: Profile = Depends(get_current_user),
+    user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_for_current_user),
 ):
     if section not in SECTIONS:
@@ -48,7 +48,7 @@ async def upsert_section(
 
     repo = CvRepository(db)
     result = await repo.upsert_section(
-        user.id, section,
+        user.user_id, section,
         content_en=body.content_en,
         content_es=body.content_es,
     )
@@ -56,10 +56,10 @@ async def upsert_section(
 
 
 @router.get("/all", response_model=CvAllSectionsResponse)
-async def get_all_cv(user: Profile = Depends(get_current_user), db: AsyncSession = Depends(get_db_for_current_user)):
+async def get_all_cv(user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db_for_current_user)):
     repo = CvRepository(db)
-    sections = await repo.get_all_sections(user.id)
-    upload = await repo.get_latest_upload(user.id)
+    sections = await repo.get_all_sections(user.user_id)
+    upload = await repo.get_latest_upload(user.user_id)
 
     sections_map = {}
     title = {"en": "", "es": ""}
@@ -73,15 +73,15 @@ async def get_all_cv(user: Profile = Depends(get_current_user), db: AsyncSession
             sections_map[s.section] = {"en": s.content_en or "", "es": s.content_es or ""}
 
     return CvAllSectionsResponse(
-        name=user.display_name,
+        name="",
         title=title,
         contact=contact,
-        photo_url=user.cv_photo_url,
         sections=sections_map,
     )
 
 
 MAX_SIZE = 5 * 1024 * 1024
+MIN_SIZE = 20 * 1024
 MAX_TEXT_LENGTH = 20_000
 
 
@@ -94,11 +94,14 @@ def is_valid_file(contents: bytes) -> bool:
 @router.post("/upload")
 async def upload_cv(
     file: UploadFile = File(...),
-    user: Profile = Depends(get_current_user),
+    user: User = Depends(get_current_user),
 ):
     contents = await file.read()
     if len(contents) > MAX_SIZE:
-        raise HTTPException(status_code=413, detail="File too large")
+        raise HTTPException(status_code=413, detail="File too large (max 5MB)")
+
+    if len(contents) < MIN_SIZE:
+        raise HTTPException(status_code=400, detail="File too small (min 20KB)")
 
     if not is_valid_file(contents):
         raise HTTPException(status_code=415, detail="Unsupported file type. Use PDF or DOCX.")
@@ -126,13 +129,13 @@ async def upload_cv(
 @router.post("/accept")
 async def accept_cv(
     body: CvAcceptRequest,
-    user: Profile = Depends(get_current_user),
+    user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_for_current_user),
 ):
     repo = CvRepository(db)
 
     upload = await repo.create_upload(
-        user.id,
+        user.user_id,
         file_url="",
         file_name=body.file_name,
         extracted_text=body.extracted_text[:MAX_TEXT_LENGTH],
@@ -140,7 +143,7 @@ async def accept_cv(
 
     for s in body.sections:
         await repo.upsert_section(
-            user.id,
+            user.user_id,
             s.section,
             content_en=s.content_en or "",
             content_es=s.content_es or "",
@@ -150,19 +153,19 @@ async def accept_cv(
 
 
 @router.post("/parse", response_model=CvParseResponse)
-async def parse_cv(body: CvParseRequest, user: Profile = Depends(get_current_user)):
+async def parse_cv(body: CvParseRequest, user: User = Depends(get_current_user)):
     result = await parse_cv_text(body.text)
     return CvParseResponse(**result)
 
 
 @router.post("/translate", response_model=CvTranslateResponse)
-async def translate_cv(body: CvTranslateRequest, user: Profile = Depends(get_current_user)):
+async def translate_cv(body: CvTranslateRequest, user: User = Depends(get_current_user)):
     result = await translate_fields(body.fields, body.target_lang)
     return CvTranslateResponse(fields=result)
 
 
 @router.post("/export/pdf")
-async def export_pdf(body: CvExportPdfRequest, user: Profile = Depends(get_current_user)):
+async def export_pdf(body: CvExportPdfRequest, user: User = Depends(get_current_user)):
     from reportlab.lib.pagesizes import letter
     from reportlab.lib.units import inch
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
@@ -198,7 +201,7 @@ async def export_pdf(body: CvExportPdfRequest, user: Profile = Depends(get_curre
 
 
 @router.post("/export/docx")
-async def export_docx(body: CvExportDocxRequest, user: Profile = Depends(get_current_user)):
+async def export_docx(body: CvExportDocxRequest, user: User = Depends(get_current_user)):
     from docx import Document
     from docx.shared import Pt, Inches
     from docx.enum.text import WD_ALIGN_PARAGRAPH

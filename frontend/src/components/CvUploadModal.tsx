@@ -232,8 +232,9 @@ export function CvUploadModal({
           <>
             <h2 className="font-display text-3xl">Upload your CV</h2>
             <p className="mt-1 text-sm text-foreground/70">
-              PDF or DOCX, up to 20MB. We'll read it gently and pre-fill your CV
-              builder.
+              PDF or DOCX format, size: 20KB–5MB. We'll read your file and
+              prefill your CV. You review it first, and your info stays local
+              until you click save.
             </p>
 
             <div
