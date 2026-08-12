@@ -1,19 +1,30 @@
-from io import BytesIO
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from shared.deps import get_current_user, get_db_for_current_user
 from shared.models.user import User
 from cover_letters.repository import CoverLetterRepository
-from cover_letters.schemas import (
-    CoverLetterCreate,
-    CoverLetterResponse,
-    CoverLetterGenerateRequest,
-    CoverLetterExportPdfRequest,
-)
+from cover_letters.schemas import CoverLetterGenerateRequest, CoverLetterResponse
 from cv.service import generate_cover_letter_ai
 
 router = APIRouter(prefix="/cover-letters", tags=["cover-letters"])
+
+
+@router.post("/generate", response_model=CoverLetterResponse)
+async def generate_letter(
+    body: CoverLetterGenerateRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db_for_current_user),
+):
+    text = await generate_cover_letter_ai(
+        body.job_title,
+        body.company,
+        body.job_description or "",
+        body.context or "",
+        body.language,
+    )
+    repo = CoverLetterRepository(db)
+    letter = await repo.create(user.user_id, body.name, body.language, text)
+    return CoverLetterResponse.model_validate(letter)
 
 
 @router.get("", response_model=list[CoverLetterResponse])
@@ -23,45 +34,6 @@ async def list_letters(user: User = Depends(get_current_user), db: AsyncSession 
     return [CoverLetterResponse.model_validate(l) for l in letters]
 
 
-@router.post("", response_model=CoverLetterResponse)
-async def create_letter(
-    body: CoverLetterCreate,
-    user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db_for_current_user),
-):
-    repo = CoverLetterRepository(db)
-    letter = await repo.create(user.user_id, body.job_title, body.company, body.job_description)
-    return CoverLetterResponse.model_validate(letter)
-
-
-@router.post("/{letter_id}/generate", response_model=CoverLetterResponse)
-async def generate_letter(
-    letter_id: str,
-    body: CoverLetterGenerateRequest,
-    user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db_for_current_user),
-):
-    from uuid import UUID
-    repo = CoverLetterRepository(db)
-    letter = await repo.get_by_id(user.user_id, UUID(letter_id))
-    if not letter:
-        raise HTTPException(status_code=404, detail="Cover letter not found")
-
-    result = await generate_cover_letter_ai(
-        letter.job_title,
-        letter.company,
-        letter.job_description or "",
-        body.cv_text or "",
-    )
-
-    updated = await repo.update_content(
-        user.user_id, letter.id,
-        content_en=result.get("content_en", ""),
-        content_es=result.get("content_es", ""),
-    )
-    return CoverLetterResponse.model_validate(updated)
-
-
 @router.delete("/{letter_id}")
 async def delete_letter(
     letter_id: str,
@@ -69,45 +41,14 @@ async def delete_letter(
     db: AsyncSession = Depends(get_db_for_current_user),
 ):
     from uuid import UUID
+
+    try:
+        parsed = UUID(letter_id)
+    except ValueError:
+        raise HTTPException(status_code=404, detail="Cover letter not found")
+
     repo = CoverLetterRepository(db)
-    deleted = await repo.delete(user.user_id, UUID(letter_id))
+    deleted = await repo.delete(user.user_id, parsed)
     if not deleted:
         raise HTTPException(status_code=404, detail="Cover letter not found")
     return {"ok": True}
-
-
-@router.post("/{letter_id}/export/pdf")
-async def export_letter_pdf(
-    letter_id: str,
-    body: CoverLetterExportPdfRequest,
-    user: User = Depends(get_current_user),
-):
-    from reportlab.lib.pagesizes import letter
-    from reportlab.lib.units import inch
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-
-    buf = BytesIO()
-    doc = SimpleDocTemplate(buf, pagesize=letter, topMargin=0.75 * inch, bottomMargin=0.75 * inch,
-                            leftMargin=0.75 * inch, rightMargin=0.75 * inch)
-    styles = getSampleStyleSheet()
-    elements = []
-
-    elements.append(Paragraph(
-        f"{body.job_title} - {body.company}",
-        ParagraphStyle("Header", parent=styles["Title"], fontSize=14, spaceAfter=12),
-    ))
-
-    for para in body.content.split("\n\n"):
-        if para.strip():
-            elements.append(Paragraph(para.strip().replace("\n", "<br/>"), styles["Normal"]))
-            elements.append(Spacer(1, 8))
-
-    doc.build(elements)
-    buf.seek(0)
-    slug = body.company.lower().replace(" ", "-")
-    return StreamingResponse(
-        buf,
-        media_type="application/pdf",
-        headers={"Content-Disposition": f"attachment; filename=cover-letter-{slug}.pdf"},
-    )

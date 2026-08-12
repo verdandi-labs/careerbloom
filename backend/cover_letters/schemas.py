@@ -1,32 +1,28 @@
-from pydantic import BaseModel
-from uuid import UUID
 from datetime import datetime
+from uuid import UUID
 
-
-class CoverLetterCreate(BaseModel):
-    job_title: str
-    company: str
-    job_description: str | None = None
-
-
-class CoverLetterResponse(BaseModel):
-    id: UUID
-    job_title: str
-    company: str
-    job_description: str | None
-    content_en: str
-    content_es: str
-    created_at: datetime
-    updated_at: datetime
-
-    model_config = {"from_attributes": True}
+from pydantic import BaseModel, field_validator
 
 
 class CoverLetterGenerateRequest(BaseModel):
-    cv_text: str | None = None
-
-
-class CoverLetterExportPdfRequest(BaseModel):
     job_title: str
     company: str
-    content: str
+    job_description: str
+    context: str | None = None
+    language: str
+    name: str | None = None
+
+    @field_validator("job_title", "company", "job_description", "context", "name")
+    @classmethod
+    def clean(cls, v: str | None) -> str | None:
+        return v.strip() or None if v else None
+
+
+class CoverLetterResponse(BaseModel):
+    letter_id: UUID
+    name: str | None
+    language: str
+    text: str
+    created_at: datetime
+
+    model_config = {"from_attributes": True}

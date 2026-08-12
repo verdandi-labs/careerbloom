@@ -1,7 +1,11 @@
 from uuid import UUID
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from shared.models.cover_letter import CoverLetter
+
+from shared.models.cover_letters import CoverLetter
+
+MAX_LETTERS = 4
 
 
 class CoverLetterRepository:
@@ -19,31 +23,20 @@ class CoverLetterRepository:
     async def get_by_id(self, user_id: UUID, letter_id: UUID) -> CoverLetter | None:
         result = await self.db.execute(
             select(CoverLetter).where(
-                CoverLetter.id == letter_id,
+                CoverLetter.letter_id == letter_id,
                 CoverLetter.user_id == user_id,
             )
         )
         return result.scalar_one_or_none()
 
-    async def create(self, user_id: UUID, job_title: str, company: str, job_description: str | None = None) -> CoverLetter:
-        letter = CoverLetter(
-            user_id=user_id,
-            job_title=job_title,
-            company=company,
-            job_description=job_description,
-        )
+    async def create(self, user_id: UUID, name: str | None, language: str, text: str) -> CoverLetter:
+        letters = await self.get_all(user_id)
+        if len(letters) >= MAX_LETTERS:
+            oldest = letters[-1]
+            await self.db.delete(oldest)
+            await self.db.flush()
+        letter = CoverLetter(user_id=user_id, name=name, language=language, text=text)
         self.db.add(letter)
-        await self.db.flush()
-        return letter
-
-    async def update_content(self, user_id: UUID, letter_id: UUID, content_en: str | None = None, content_es: str | None = None) -> CoverLetter | None:
-        letter = await self.get_by_id(user_id, letter_id)
-        if not letter:
-            return None
-        if content_en is not None:
-            letter.content_en = content_en
-        if content_es is not None:
-            letter.content_es = content_es
         await self.db.flush()
         return letter
 
