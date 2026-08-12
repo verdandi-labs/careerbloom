@@ -1,51 +1,27 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { api } from "@/lib/api";
 import { useSession, useSignOut } from "@/features/auth";
-import { Check, Database, Globe2, LogOut, Trash2 } from "lucide-react";
+import { Database, LogOut, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Settings · careerBloom" }] }),
   component: SettingsPage,
 });
 
-type Lang = "en" | "es";
-
 function SettingsPage() {
   const navigate = useNavigate();
   const { data: user } = useSession();
   const signOutFn = useSignOut();
-  const [displayName, setDisplayName] = useState("");
-  const [lang, setLang] = useState<Lang>("en");
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    if (!user) return;
-    setDisplayName(user.display_name || "");
-    setLang(user.preferred_language as Lang);
-  }, [user]);
-
-  async function saveLang(next: Lang) {
-    setLang(next);
-    setSaving(true);
-    await api("/profile", {
-      method: "PATCH",
-      json: { preferred_language: next },
-    });
-    setSaving(false);
-  }
 
   async function signOut() {
-    signOutFn();
+    await signOutFn();
     navigate({ to: "/auth", search: {} });
   }
 
   async function deleteAccount() {
-    // Note: account deletion would need a dedicated backend endpoint
-    // For now, just sign out
-    signOutFn();
+    await signOutFn();
     navigate({ to: "/auth", search: {} });
   }
 
@@ -64,35 +40,7 @@ function SettingsPage() {
       <section className="glass p-6 space-y-4">
         <h2 className="font-display text-2xl">Account</h2>
         <div className="grid gap-3 md:grid-cols-2">
-          <Row label="Display name" value={displayName || "\u2014"} />
-          <Row
-            label="Language"
-            value={lang === "en" ? "English" : "Espa\u00f1ol"}
-          />
-        </div>
-      </section>
-
-      <section className="glass p-6 space-y-4">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h2 className="font-display text-2xl">Language preference</h2>
-            <p className="text-xs text-foreground/60">
-              Sets the default for your CV and cover letters.
-            </p>
-          </div>
-          <div className="flex items-center gap-1 rounded-full bg-white/70 p-1">
-            {(["en", "es"] as Lang[]).map((l) => (
-              <button
-                key={l}
-                onClick={() => saveLang(l)}
-                disabled={saving}
-                className={`flex items-center gap-1 rounded-full px-4 py-2 text-xs ${lang === l ? "bg-accent text-accent-foreground" : "text-foreground/70"}`}
-              >
-                <Globe2 className="h-3 w-3" />{" "}
-                {l === "en" ? "English" : "Espa\u00f1ol"}
-              </button>
-            ))}
-          </div>
+          <Row label="Email" value={user?.email || "not provided"} />
         </div>
       </section>
 
@@ -104,8 +52,8 @@ function SettingsPage() {
           <div>
             <h2 className="font-display text-2xl">Database</h2>
             <p className="text-xs text-foreground/60">
-              You're using the shared Neon database. Connect your own Supabase
-              project to keep your data fully private.
+              You're using the shared Neon database. Connect your own database
+              to keep your data fully private.
             </p>
           </div>
         </div>

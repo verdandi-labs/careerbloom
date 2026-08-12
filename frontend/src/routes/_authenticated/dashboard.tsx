@@ -43,11 +43,11 @@ function Dashboard() {
 
   useEffect(() => {
     if (!user) return;
-    if (!user.onboarding_complete) {
+    if (!user.onboarding) {
       navigate({ to: "/onboarding" });
       return;
     }
-    setDisplayName(user.display_name || "there");
+    setDisplayName(user.email || "there");
     setChecked(true);
   }, [user, navigate]);
 

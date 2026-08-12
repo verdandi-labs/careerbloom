@@ -180,13 +180,6 @@ export function CvUploadModal({
         },
       });
 
-      if (parsed.name.trim()) {
-        await api("/profile", {
-          method: "PATCH",
-          json: { display_name: parsed.name.trim() },
-        });
-      }
-
       setStatus("done");
     } catch (err) {
       console.error(err);

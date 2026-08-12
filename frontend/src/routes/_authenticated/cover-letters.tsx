@@ -308,9 +308,9 @@ function LetterDetail({
         `/api/v1/cover-letters/${letter.id}/export/pdf`,
         {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
           },
           body: JSON.stringify({
             job_title: letter.job_title,

@@ -1,24 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { api } from "@/lib/api";
 import { ArrowRight, Check, Loader2, Mail } from "lucide-react";
 
-const REMEMBER_EMAIL_KEY = "remember_email";
-const SAVED_EMAIL_KEY = "auth_email";
-
 export function MagicLinkScreenReturning() {
   const [email, setEmail] = useState("");
-  const [rememberEmail, setRememberEmail] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
-
-  useEffect(() => {
-    const saved = localStorage.getItem(SAVED_EMAIL_KEY);
-    if (saved) {
-      setEmail(saved);
-      setRememberEmail(true);
-    }
-  }, []);
 
   async function handleSubmit(e?: React.FormEvent) {
     if (e) e.preventDefault();
@@ -28,14 +16,6 @@ export function MagicLinkScreenReturning() {
     }
     setError(null);
     setSending(true);
-
-    if (rememberEmail) {
-      localStorage.setItem(SAVED_EMAIL_KEY, email);
-      localStorage.setItem(REMEMBER_EMAIL_KEY, "true");
-    } else {
-      localStorage.removeItem(SAVED_EMAIL_KEY);
-      localStorage.removeItem(REMEMBER_EMAIL_KEY);
-    }
 
     try {
       await api("/auth/magic-link", {
@@ -98,16 +78,6 @@ export function MagicLinkScreenReturning() {
             className="w-full rounded-xl shadow-sm bg-white/25 px-4 py-3 text-sm text-black/50 caret-[#444] outline-none transition focus:border-accent focus:ring-1 focus:ring-accent/30"
           />
         </div>
-
-        <label className="flex items-center gap-2.5 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            checked={rememberEmail}
-            onChange={(e) => setRememberEmail(e.target.checked)}
-            className="h-4 w-4 rounded border-white/30 bg-white/20 accent-secondary"
-          />
-          <span className="text-xs text-white/70">Remember my email</span>
-        </label>
 
         {error && (
           <p className="rounded-xl bg-destructive/10 px-4 py-2.5 text-sm text-destructive">

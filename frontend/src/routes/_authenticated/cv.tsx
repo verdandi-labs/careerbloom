@@ -79,6 +79,60 @@ const EMPTY_SECTIONS = (): Record<
 > =>
   Object.fromEntries(SECTIONS.map((s) => [s, { en: "", other: "" }])) as never;
 
+type CvRow = {
+  line_num: number;
+  [key: string]: string | number | null | undefined;
+};
+
+type CvResponse = {
+  full_name: string | null;
+  title: string | null;
+  self_summary: string | null;
+  contact_details: CvRow[] | null;
+  experience: CvRow[] | null;
+  skills: CvRow[] | null;
+  studies: CvRow[] | null;
+  awards: CvRow[] | null;
+  publications: CvRow[] | null;
+  volunteering: CvRow[] | null;
+  projects: CvRow[] | null;
+  languages: CvRow[] | null;
+};
+
+const SECTION_KEYS = {
+  summary: "self_summary" as const,
+  experience: "experience" as const,
+  education: "studies" as const,
+  skills: "skills" as const,
+  languages: "languages" as const,
+  certifications: null as const,
+  projects: "projects" as const,
+  volunteer: "volunteering" as const,
+  awards: "awards" as const,
+  publications: "publications" as const,
+  references: null as const,
+  other: null as const,
+};
+
+const joinCells = (row: CvRow) =>
+  Object.entries(row)
+    .filter(([k, v]) => k !== "line_num" && typeof v === "string" && v)
+    .map(([, v]) => v)
+    .join(" · ");
+
+function cvToSections(data: CvResponse) {
+  const map = EMPTY_SECTIONS();
+  map.summary.en = data.self_summary ?? "";
+  for (const key of SECTIONS) {
+    const apiKey = SECTION_KEYS[key];
+    if (apiKey) {
+      const rows = data[apiKey];
+      if (rows) map[key].en = rows.map(joinCells).join("\n\n");
+    }
+  }
+  return map;
+}
+
 function CVPage() {
   const [lang, setLang] = useState<Lang>("en");
   const [template, setTemplate] = useState<CVTemplateId>(DEFAULT_TEMPLATE);
@@ -102,43 +156,25 @@ function CVPage() {
   const [translateTarget, setTranslateTarget] = useState("Spanish");
   const [translatedLangLabel, setTranslatedLangLabel] = useState("ES");
 
-  useEffect(() => {
-    void load();
-  }, []);
-
   async function load() {
     try {
-      const allSections = await api<
-        Array<{
-          id: string;
-          section: string;
-          content_en: string;
-          content_es: string;
-        }>
-      >("/cv/sections");
-      const map = EMPTY_SECTIONS();
-      let nextTitle = { en: "Your title", other: "" };
-      let nextContact = { en: "", other: "" };
-      for (const r of allSections) {
-        if ((SECTIONS as readonly string[]).includes(r.section)) {
-          map[r.section as SectionKey] = {
-            id: r.id,
-            en: r.content_en ?? "",
-            other: r.content_es ?? "",
-          };
-        } else if (r.section === "title") {
-          nextTitle = { en: r.content_en ?? "", other: r.content_es ?? "" };
-        } else if (r.section === "contact") {
-          nextContact = { en: r.content_en ?? "", other: r.content_es ?? "" };
-        }
-      }
+      const data = await api<CvResponse>("/cv");
+      const map = cvToSections(data);
       setSections(map);
-      setTitle(nextTitle);
-      setContact(nextContact);
+      setName(data.full_name || "Your Name");
+      setTitle({ en: data.title ?? "", other: "" });
+      setContact({
+        en: (data.contact_details ?? []).map(joinCells).join("\n"),
+        other: "",
+      });
     } catch {
       /* ignore */
     }
   }
+
+  useEffect(() => {
+    void load();
+  }, []);
 
   const data: CVData = useMemo(
     () => ({
@@ -166,10 +202,6 @@ function CVPage() {
     try {
       if (field === "name") {
         setName(value);
-        await api("/profile", {
-          method: "PATCH",
-          json: { display_name: value },
-        });
       } else if (field === "title") {
         const next = { ...title, [lang]: value };
         setTitle(next);
@@ -204,7 +236,6 @@ function CVPage() {
 
   async function changeTemplate(id: CVTemplateId) {
     setTemplate(id);
-    await api("/profile", { method: "PATCH", json: { cv_template: id } });
   }
 
   async function exportDocx() {
@@ -212,9 +243,9 @@ function CVPage() {
     try {
       const blob = await fetch("/api/v1/cv/export/docx", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },
         body: JSON.stringify({ data, template, language: lang }),
       }).then((r) => r.blob());

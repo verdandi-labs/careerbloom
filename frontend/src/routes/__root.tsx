@@ -3,15 +3,11 @@ import {
   Outlet,
   Link,
   createRootRouteWithContext,
-  useRouter,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect } from "react";
 
 import "../styles.css";
-import { sessionKeys } from "../features/auth";
-import { useQueryClient } from "@tanstack/react-query";
 
 function NotFoundComponent() {
   return (
@@ -121,16 +117,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const router = useRouter();
-
-  useEffect(() => {
-    const handleStorage = () => {
-      queryClient.invalidateQueries({ queryKey: sessionKeys.all });
-      router.invalidate();
-    };
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
-  }, [queryClient, router]);
 
   return (
     <QueryClientProvider client={queryClient}>

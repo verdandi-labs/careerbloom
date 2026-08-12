@@ -1,7 +1,7 @@
 export interface User {
-  id: string;
-  display_name: string | null;
-  onboarding_complete: boolean;
-  preferred_language: string;
-  cv_template: string;
+  user_id: string;
+  email: string | null;
+  auth_method: "google" | "github" | "magic_link";
+  onboarding: boolean;
+  created_at: string;
 }

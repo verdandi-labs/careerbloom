@@ -27,7 +27,7 @@ function Onboarding() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (user?.onboarding_complete) {
+    if (user?.onboarding) {
       navigate({ to: "/dashboard" });
     }
   }, [user, navigate]);
@@ -35,10 +35,6 @@ function Onboarding() {
   async function complete() {
     if (!goal) return;
     setSaving(true);
-    await api("/profile", {
-      method: "PATCH",
-      json: { goal, onboarding_complete: true },
-    });
     await qc.invalidateQueries({ queryKey: sessionKeys.all });
     navigate({ to: "/dashboard" });
   }

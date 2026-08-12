@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 import { z } from "zod";
-import { api, setTokens } from "@/lib/api";
+import { api } from "@/lib/api";
 import { Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/auth/magic")({
@@ -24,18 +24,11 @@ function MagicVerify() {
 
     async function verify() {
       try {
-        const data = await api<{
-          access_token: string;
-          refresh_token: string;
-          has_database_url: boolean;
-          onboarding_complete: boolean;
-        }>(
+        const data = await api<{ onboarding: boolean }>(
           `/auth/magic?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`,
         );
 
-        setTokens(data.access_token, data.refresh_token);
-
-        if (!data.onboarding_complete) {
+        if (!data.onboarding) {
           navigate({ to: "/onboarding" });
           return;
         }

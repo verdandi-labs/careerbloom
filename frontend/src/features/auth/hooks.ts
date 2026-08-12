@@ -1,5 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { clearTokens } from "@/lib/api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 import { fetchMe, requestMagicLink } from "./api";
 
 export const sessionKeys = {
@@ -10,7 +10,6 @@ export function useSession() {
   return useQuery({
     queryKey: sessionKeys.all,
     queryFn: fetchMe,
-    enabled: !!localStorage.getItem("access_token"),
     retry: false,
     staleTime: 5 * 60 * 1000,
   });
@@ -22,11 +21,8 @@ export function useSendMagicLink() {
 
 export function useSignOut() {
   const qc = useQueryClient();
-  return () => {
-    clearTokens();
-    if (!localStorage.getItem("remember_email")) {
-      localStorage.removeItem("auth_email");
-    }
+  return async () => {
+    await api("/auth/logout", { method: "POST" }).catch(() => undefined);
     qc.clear();
   };
 }
