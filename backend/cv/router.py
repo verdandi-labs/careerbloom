@@ -92,7 +92,7 @@ async def get_cv(
     return await repo.get_current_cv(user.user_id)
 
 
-@router.patch("/edit", response_model=CvData)
+@router.post("/edit", response_model=CvData)
 async def edit_cv(
     body: CvEditRequest,
     user: User = Depends(get_current_user),
