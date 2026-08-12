@@ -1,40 +1,83 @@
-import uuid
-from datetime import datetime
-from sqlalchemy import Column, String, Text, DateTime, ForeignKey, UniqueConstraint, func
+from uuid import uuid4
+
+from sqlalchemy import Column, DateTime, ForeignKey, Text, func
 from sqlalchemy.dialects.postgresql import UUID, JSONB
+
 from database import Base
+
+CV_FIELDS = [
+    "full_name",
+    "title",
+    "self_summary",
+    "contact_details",
+    "experience",
+    "skills",
+    "studies",
+    "awards",
+    "publications",
+    "volunteering",
+    "projects",
+    "languages",
+]
 
 
 class CvUpload(Base):
-    __tablename__ = "cv_uploads"
+    __tablename__ = "cv_upload"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False)
-    file_url = Column(Text, nullable=False)
-    file_name = Column(Text)
-    extracted_text = Column(Text)
+    upload_id = Column(UUID, primary_key=True, default=uuid4)
+    user_id = Column(UUID, ForeignKey("users.user_id"), nullable=False)
+    full_name = Column(Text)
+    title = Column(Text)
+    self_summary = Column(Text)
+    contact_details = Column(JSONB)
+    experience = Column(JSONB)
+    skills = Column(JSONB)
+    studies = Column(JSONB)
+    awards = Column(JSONB)
+    publications = Column(JSONB)
+    volunteering = Column(JSONB)
+    projects = Column(JSONB)
+    languages = Column(JSONB)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
 
 class CvEdit(Base):
-    __tablename__ = "cv_edits"
+    __tablename__ = "cv_edit"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False)
-    original_text = Column(Text, nullable=False)
-    approved_text = Column(Text, nullable=False)
-    section = Column(Text)
+    edit_id = Column(UUID, primary_key=True, default=uuid4)
+    upload_id = Column(UUID, ForeignKey("cv_upload.upload_id", ondelete="CASCADE"), nullable=False)
+    user_id = Column(UUID, ForeignKey("users.user_id"), nullable=False)
+    full_name = Column(Text)
+    title = Column(Text)
+    self_summary = Column(Text)
+    contact_details = Column(JSONB)
+    experience = Column(JSONB)
+    skills = Column(JSONB)
+    studies = Column(JSONB)
+    awards = Column(JSONB)
+    publications = Column(JSONB)
+    volunteering = Column(JSONB)
+    projects = Column(JSONB)
+    languages = Column(JSONB)
+    edit_date = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+
+class CvTranslate(Base):
+    __tablename__ = "cv_translate"
+
+    translate_id = Column(UUID, primary_key=True, default=uuid4)
+    user_id = Column(UUID, ForeignKey("users.user_id"), nullable=False)
+    language = Column(Text, nullable=False)
+    full_name = Column(Text)
+    title = Column(Text)
+    self_summary = Column(Text)
+    contact_details = Column(JSONB)
+    experience = Column(JSONB)
+    skills = Column(JSONB)
+    studies = Column(JSONB)
+    awards = Column(JSONB)
+    publications = Column(JSONB)
+    volunteering = Column(JSONB)
+    projects = Column(JSONB)
+    languages = Column(JSONB)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
-
-
-class CvContent(Base):
-    __tablename__ = "cv_content"
-    __table_args__ = (UniqueConstraint("user_id", "section", name="cv_content_user_section_key"),)
-
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False)
-    section = Column(Text, nullable=False)
-    content_en = Column(Text, server_default="")
-    content_es = Column(Text, server_default="")
-    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())

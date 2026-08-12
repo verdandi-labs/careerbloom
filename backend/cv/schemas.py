@@ -1,72 +1,121 @@
 from pydantic import BaseModel, field_validator
-from uuid import UUID
 
 MAX_EXPORT_STRING = 20_000
 MAX_EXPORT_SECTIONS = 50
 
 
-class CvSectionResponse(BaseModel):
-    id: UUID
-    section: str
-    content_en: str
-    content_es: str
+class _LineItem(BaseModel):
+    line_num: int
+
+    @field_validator("*")
+    @classmethod
+    def _clean(cls, v):
+        if isinstance(v, str):
+            return v.strip() or None
+        return v
+
+
+class ContactDetailItem(_LineItem):
+    detail: str | None = None
+
+
+class ExperienceItem(_LineItem):
+    company: str | None = None
+    city: str | None = None
+    start_date: str | None = None
+    end_date: str | None = None
+    comments: str | None = None
+
+
+class SkillItem(_LineItem):
+    skill: str | None = None
+    comments: str | None = None
+
+
+class StudyItem(_LineItem):
+    edu_center: str | None = None
+    city: str | None = None
+    start_date: str | None = None
+    end_date: str | None = None
+    comments: str | None = None
+
+
+class AwardItem(_LineItem):
+    name: str | None = None
+    date: str | None = None
+    comments: str | None = None
+
+
+class PublicationItem(_LineItem):
+    name: str | None = None
+    date: str | None = None
+    comments: str | None = None
+
+
+class VolunteeringItem(_LineItem):
+    center: str | None = None
+    city: str | None = None
+    start_date: str | None = None
+    end_date: str | None = None
+    comments: str | None = None
+
+
+class ProjectItem(_LineItem):
+    name: str | None = None
+    url: str | None = None
+    comments: str | None = None
+
+
+class LanguageItem(_LineItem):
+    language: str | None = None
+    level: str | None = None
+    comments: str | None = None
+
+
+FIELD_MODELS = {
+    "contact_details": ContactDetailItem,
+    "experience": ExperienceItem,
+    "skills": SkillItem,
+    "studies": StudyItem,
+    "awards": AwardItem,
+    "publications": PublicationItem,
+    "volunteering": VolunteeringItem,
+    "projects": ProjectItem,
+    "languages": LanguageItem,
+}
+
+TEXT_FIELDS = {"full_name", "title", "self_summary"}
+
+
+class CvData(BaseModel):
+    full_name: str | None = None
+    title: str | None = None
+    self_summary: str | None = None
+    contact_details: list[ContactDetailItem] | None = None
+    experience: list[ExperienceItem] | None = None
+    skills: list[SkillItem] | None = None
+    studies: list[StudyItem] | None = None
+    awards: list[AwardItem] | None = None
+    publications: list[PublicationItem] | None = None
+    volunteering: list[VolunteeringItem] | None = None
+    projects: list[ProjectItem] | None = None
+    languages: list[LanguageItem] | None = None
+
+    @field_validator("full_name", "title", "self_summary")
+    @classmethod
+    def _clean_text(cls, v: str | None) -> str | None:
+        return v.strip() or None if v else None
 
     model_config = {"from_attributes": True}
 
 
-class CvSectionUpdate(BaseModel):
-    content_en: str | None = None
-    content_es: str | None = None
-
-
-class CvAllSectionsResponse(BaseModel):
-    name: str | None
-    title: dict[str, str]
-    contact: dict[str, str]
-    sections: dict[str, dict[str, str]]
-
-
-class CvParseRequest(BaseModel):
-    text: str
-
-
-class CvParseResponse(BaseModel):
-    name: str
-    title: str
-    contact: str
-    summary: str
-    experience: str
-    education: str
-    skills: str
-    languages: str
-    certifications: str
-    projects: str
-    volunteer: str
-    awards: str
-    publications: str
-    references: str
-    other: str
+class CvEditRequest(BaseModel):
+    field: str
+    value: str | list[dict] | None = None
 
 
 class CvTranslateRequest(BaseModel):
-    fields: dict[str, str]
-    target_lang: str = "Spanish"
-
-
-class CvTranslateResponse(BaseModel):
-    fields: dict[str, str]
-
-
-class CvAcceptSection(BaseModel):
-    section: str
-    content_en: str = ""
-    content_es: str = ""
-
-
-class CvAcceptRequest(BaseModel):
-    file_name: str | None = None
-    extracted_text: str
-    sections: list[CvAcceptSection]
+    language: str
 
 
 class CvExportPdfRequest(BaseModel):

@@ -1,111 +1,37 @@
 import asyncio
 from io import BytesIO
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
+
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from shared.deps import get_current_user, get_db_for_current_user
-from shared.models.user import User
+
 from cv.repository import CvRepository
 from cv.schemas import (
-    CvSectionResponse,
-    CvSectionUpdate,
-    CvAllSectionsResponse,
-    CvParseRequest,
-    CvParseResponse,
-    CvTranslateRequest,
-    CvTranslateResponse,
-    CvAcceptRequest,
-    CvExportPdfRequest,
+    CvData,
+    CvEditRequest,
     CvExportDocxRequest,
+    CvExportPdfRequest,
+    CvTranslateRequest,
+    FIELD_MODELS,
+    TEXT_FIELDS,
 )
-from cv.service import parse_cv_text, translate_fields
+from cv.service import extract_cv, translate_cv
+from database import get_db
+from shared.deps import get_current_user
+from shared.models.cv import CV_FIELDS
+from shared.models.user import User
 
 router = APIRouter(prefix="/cv", tags=["cv"])
 
-SECTIONS = [
-    "summary", "experience", "education", "skills", "languages",
-    "certifications", "projects", "volunteer", "awards", "publications",
-    "references", "other",
-]
-
-
-@router.get("/sections", response_model=list[CvSectionResponse])
-async def get_sections(user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db_for_current_user)):
-    repo = CvRepository(db)
-    sections = await repo.get_all_sections(user.user_id)
-    return [CvSectionResponse.model_validate(s) for s in sections]
-
-
-@router.put("/sections/{section}", response_model=CvSectionResponse)
-async def upsert_section(
-    section: str,
-    body: CvSectionUpdate,
-    user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db_for_current_user),
-):
-    if section not in SECTIONS:
-        raise HTTPException(status_code=400, detail="Invalid section")
-
-    repo = CvRepository(db)
-    result = await repo.upsert_section(
-        user.user_id, section,
-        content_en=body.content_en,
-        content_es=body.content_es,
-    )
-    return CvSectionResponse.model_validate(result)
-
-
-@router.get("/all", response_model=CvAllSectionsResponse)
-async def get_all_cv(user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db_for_current_user)):
-    repo = CvRepository(db)
-    sections = await repo.get_all_sections(user.user_id)
-    upload = await repo.get_latest_upload(user.user_id)
-
-    sections_map = {}
-    title = {"en": "", "es": ""}
-    contact = {"en": "", "es": ""}
-    for s in sections:
-        if s.section == "title":
-            title = {"en": s.content_en or "", "es": s.content_es or ""}
-        elif s.section == "contact":
-            contact = {"en": s.content_en or "", "es": s.content_es or ""}
-        else:
-            sections_map[s.section] = {"en": s.content_en or "", "es": s.content_es or ""}
-
-    return CvAllSectionsResponse(
-        name="",
-        title=title,
-        contact=contact,
-        sections=sections_map,
-    )
-
-
 MAX_SIZE = 5 * 1024 * 1024
 MIN_SIZE = 20 * 1024
-MAX_TEXT_LENGTH = 20_000
 
 
 def is_valid_file(contents: bytes) -> bool:
-    pdf_signature = contents[:4] == b"%PDF"
-    docx_signature = contents[:4] == b"PK\x03\x04"
-    return pdf_signature or docx_signature
+    return contents[:4] in (b"%PDF", b"PK\x03\x04")
 
 
-@router.post("/upload")
-async def upload_cv(
-    file: UploadFile = File(...),
-    user: User = Depends(get_current_user),
-):
-    contents = await file.read()
-    if len(contents) > MAX_SIZE:
-        raise HTTPException(status_code=413, detail="File too large (max 5MB)")
-
-    if len(contents) < MIN_SIZE:
-        raise HTTPException(status_code=400, detail="File too small (min 20KB)")
-
-    if not is_valid_file(contents):
-        raise HTTPException(status_code=415, detail="Unsupported file type. Use PDF or DOCX.")
-
+async def extract_file_text(filename: str, contents: bytes) -> str:
     if contents[:4] == b"%PDF":
         import pdfplumber
 
@@ -113,55 +39,104 @@ async def upload_cv(
             with pdfplumber.open(BytesIO(contents)) as pdf:
                 return "\n".join(page.extract_text() or "" for page in pdf.pages)
 
-        text = await asyncio.to_thread(extract_pdf)
-    else:
+        return await asyncio.to_thread(extract_pdf)
+
+    if contents[:4] == b"PK\x03\x04":
         from docx import Document
 
         def extract_docx() -> str:
             doc = Document(BytesIO(contents))
             return "\n".join(p.text for p in doc.paragraphs)
 
-        text = await asyncio.to_thread(extract_docx)
+        return await asyncio.to_thread(extract_docx)
 
-    return {"text": text[:MAX_TEXT_LENGTH]}
+    if filename.lower().endswith(".txt"):
+        return contents.decode("utf-8", errors="ignore")
+
+    raise HTTPException(status_code=415, detail="Unsupported file type. Use PDF, DOCX, or TXT.")
 
 
-@router.post("/accept")
-async def accept_cv(
-    body: CvAcceptRequest,
+@router.post("/upload", response_model=CvData)
+async def upload_cv(
+    file: UploadFile = File(...),
     user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db_for_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    contents = await file.read()
+    if len(contents) > MAX_SIZE:
+        raise HTTPException(status_code=413, detail="File too large (max 5MB)")
+    if len(contents) < MIN_SIZE:
+        raise HTTPException(status_code=400, detail="File too small (min 20KB)")
+    if not is_valid_file(contents) and not (file.filename or "").lower().endswith(".txt"):
+        raise HTTPException(status_code=415, detail="Unsupported file type. Use PDF, DOCX, or TXT.")
+
+    text = await extract_file_text(file.filename or "", contents)
+    if not text.strip():
+        raise HTTPException(status_code=400, detail="Could not read any text from the file.")
+
+    repo = CvRepository(db)
+    is_first = await repo.count_uploads(user.user_id) == 0
+    parsed = await extract_cv(text)
+    await repo.create_upload(user.user_id, parsed)
+    if is_first:
+        user.onboarding = True
+    return parsed
+
+
+@router.get("", response_model=CvData)
+async def get_cv(
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
     repo = CvRepository(db)
-
-    upload = await repo.create_upload(
-        user.user_id,
-        file_url="",
-        file_name=body.file_name,
-        extracted_text=body.extracted_text[:MAX_TEXT_LENGTH],
-    )
-
-    for s in body.sections:
-        await repo.upsert_section(
-            user.user_id,
-            s.section,
-            content_en=s.content_en or "",
-            content_es=s.content_es or "",
-        )
-
-    return {"ok": True, "upload_id": str(upload.id)}
+    return await repo.get_current_cv(user.user_id)
 
 
-@router.post("/parse", response_model=CvParseResponse)
-async def parse_cv(body: CvParseRequest, user: User = Depends(get_current_user)):
-    result = await parse_cv_text(body.text)
-    return CvParseResponse(**result)
+@router.patch("/edit", response_model=CvData)
+async def edit_cv(
+    body: CvEditRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    if body.field not in CV_FIELDS:
+        raise HTTPException(status_code=400, detail="Invalid CV field.")
+
+    repo = CvRepository(db)
+    upload = await repo.get_latest_upload(user.user_id)
+    if upload is None:
+        raise HTTPException(status_code=404, detail="Upload a CV first.")
+
+    if body.field in TEXT_FIELDS:
+        if not isinstance(body.value, str):
+            raise HTTPException(status_code=400, detail="Text field requires a string value.")
+        value = body.value.strip() or None
+    else:
+        if not isinstance(body.value, list):
+            raise HTTPException(status_code=400, detail="Structured field requires a list value.")
+        item_model = FIELD_MODELS[body.field]
+        try:
+            value = [item_model.model_validate(item).model_dump() for item in body.value]
+        except Exception:
+            raise HTTPException(status_code=400, detail=f"Invalid {body.field} value.")
+
+    await repo.create_edit(user.user_id, upload.upload_id, body.field, value)
+    return await repo.get_current_cv(user.user_id)
 
 
-@router.post("/translate", response_model=CvTranslateResponse)
-async def translate_cv(body: CvTranslateRequest, user: User = Depends(get_current_user)):
-    result = await translate_fields(body.fields, body.target_lang)
-    return CvTranslateResponse(fields=result)
+@router.post("/translate", response_model=CvData)
+async def translate(
+    body: CvTranslateRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    repo = CvRepository(db)
+    current = await repo.get_current_cv(user.user_id)
+    if not any(current.model_dump().values()):
+        raise HTTPException(status_code=400, detail="No CV to translate.")
+
+    translated = await translate_cv(current, body.language)
+    await repo.create_translate(user.user_id, body.language, translated)
+    return translated
 
 
 @router.post("/export/pdf")
