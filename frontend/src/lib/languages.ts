@@ -1,4 +1,4 @@
-export const TRANSLATION_LANGUAGES = [
+export const LANGUAGES = [
   { label: "English", code: "en" },
   { label: "Spanish", code: "es" },
   { label: "French", code: "fr" },
@@ -11,3 +11,5 @@ export const TRANSLATION_LANGUAGES = [
   { label: "Danish", code: "da" },
   { label: "Norwegian", code: "no" },
 ];
+
+export const TRANSLATION_LANGUAGES = LANGUAGES;
