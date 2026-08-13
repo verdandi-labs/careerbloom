@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useSession } from "@/features/auth";
+import { API_BASE } from "@/lib/api";
+import { Chrome, Github, Mail } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   ssr: false,
@@ -78,24 +80,29 @@ function LandingPage() {
           </p>
         </div>
 
-        <div className="flex w-full flex-col gap-3 sm:flex-row">
+        <div className="flex w-full flex-col gap-3">
+          <a
+            href={`${API_BASE}/auth/oauth/google`}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-foreground px-6 py-3.5 text-sm font-bold text-background transition hover:bg-foreground/85"
+          >
+            <Chrome className="h-4 w-4" />
+            Continue with Google
+          </a>
+          <a
+            href={`${API_BASE}/auth/oauth/github`}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary/70 px-6 py-3.5 text-sm font-bold text-secondary-foreground backdrop-blur-sm transition hover:bg-secondary/90"
+          >
+            <Github className="h-4 w-4" />
+            Continue with GitHub
+          </a>
           <button
             onClick={() => navigate({ to: "/auth", search: {} })}
-            className="flex-1 rounded-full bg-foreground px-6 py-3.5 text-sm font-medium text-background transition hover:bg-foreground/85"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary/40 px-6 py-3.5 text-sm font-bold text-secondary-foreground backdrop-blur-sm transition hover:bg-secondary/60"
           >
-            Get started
-          </button>
-          <button
-            onClick={() => navigate({ to: "/auth/login" })}
-            className="flex-1 rounded-full bg-secondary/70 px-6 py-3.5 text-sm font-medium text-secondary-foreground backdrop-blur-sm transition hover:bg-secondary/90"
-          >
-            Welcome back
+            <Mail className="h-4 w-4" />
+            Continue with Email
           </button>
         </div>
-
-        <p className="font-display text-sm font-bold tracking-wide text-green">
-          Helping you grow into what's next
-        </p>
       </div>
     </div>
   );
