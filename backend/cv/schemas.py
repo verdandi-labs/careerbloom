@@ -133,18 +133,8 @@ FIELD_MODELS = {
 TEXT_FIELDS = {"full_name", "title", "self_summary"}
 
 
-class CvSectionsRaw(BaseModel):
-    full_name: str | None = None
-    contact_details: str | None = None
-    self_summary: str | None = None
-    experience: str | None = None
-    skills: str | None = None
-    studies: str | None = None
-    awards: str | None = None
-    publications: str | None = None
-    volunteering: str | None = None
-    projects: str | None = None
-    languages: str | None = None
+class CvRawText(BaseModel):
+    text: str
 
 
 class CvData(BaseModel):

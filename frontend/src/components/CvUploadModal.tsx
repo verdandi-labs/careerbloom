@@ -4,32 +4,8 @@ import { useSession, sessionKeys } from "@/features/auth";
 import { api, apiUpload } from "@/lib/api";
 import { FileText, Loader2, UploadCloud, X } from "lucide-react";
 
-type CvSectionsRaw = {
-  full_name: string | null;
-  contact_details: string | null;
-  self_summary: string | null;
-  experience: string | null;
-  skills: string | null;
-  studies: string | null;
-  awards: string | null;
-  publications: string | null;
-  volunteering: string | null;
-  projects: string | null;
-  languages: string | null;
-};
-
-const SECTION_LABELS: Record<keyof CvSectionsRaw, string> = {
-  full_name: "Full name",
-  contact_details: "Contact details",
-  self_summary: "Summary",
-  experience: "Experience",
-  skills: "Skills",
-  studies: "Studies",
-  awards: "Awards",
-  publications: "Publications",
-  volunteering: "Volunteering",
-  projects: "Projects",
-  languages: "Languages",
+type CvRawText = {
+  text: string;
 };
 
 type Status = "idle" | "uploading" | "review" | "saving" | "error";
@@ -45,7 +21,7 @@ export function CvUploadModal({
 }) {
   const [status, setStatus] = useState<Status>("idle");
   const [fileName, setFileName] = useState<string | null>(null);
-  const [sections, setSections] = useState<CvSectionsRaw | null>(null);
+  const [text, setText] = useState("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -56,7 +32,7 @@ export function CvUploadModal({
     if (!open) {
       setStatus("idle");
       setFileName(null);
-      setSections(null);
+      setText("");
       setErrorMsg(null);
       setDragOver(false);
     }
@@ -78,8 +54,8 @@ export function CvUploadModal({
     setFileName(file.name);
     setStatus("uploading");
     try {
-      const result = await apiUpload<CvSectionsRaw>("/cv/upload", file);
-      setSections(result);
+      const result = await apiUpload<CvRawText>("/cv/upload", file);
+      setText(result.text);
       setStatus("review");
     } catch (err) {
       console.error(err);
@@ -89,11 +65,11 @@ export function CvUploadModal({
   }
 
   async function handleSave() {
-    if (!sections) return;
+    if (!text.trim()) return;
     setErrorMsg(null);
     setStatus("saving");
     try {
-      await api("/cv/save", { method: "POST", json: sections });
+      await api("/cv/save", { method: "POST", json: { text } });
       await qc.invalidateQueries({ queryKey: ["cv"] });
       if (!user?.onboarding) {
         await qc.invalidateQueries({ queryKey: sessionKeys.all });
@@ -106,13 +82,6 @@ export function CvUploadModal({
       setStatus("review");
     }
   }
-
-  const detectedSections = sections
-    ? Object.entries(sections).filter(
-        (entry): entry is [keyof CvSectionsRaw, string] =>
-          typeof entry[1] === "string" && entry[1].trim().length > 0,
-      )
-    : [];
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/30 p-4 backdrop-blur-md">
@@ -194,33 +163,20 @@ export function CvUploadModal({
           </div>
         )}
 
-        {status === "review" && sections && (
+        {status === "review" && (
           <div>
-            <h2 className="font-display text-3xl">Review your CV</h2>
+            <h2 className="font-display text-3xl">Review your CV text</h2>
             <p className="mt-1 text-sm text-foreground/70">
-              We found these sections. Approve to fill your CV builder.
+              Review your CV text before saving. You can remove anything you
+              don't want to share.
             </p>
 
-            <div className="mt-6 max-h-[50vh] space-y-4 overflow-y-auto pr-1">
-              {detectedSections.map(([key, value]) => (
-                <div
-                  key={key}
-                  className="rounded-2xl border border-foreground/10 bg-white/50 p-4"
-                >
-                  <p className="text-xs font-semibold uppercase tracking-wide text-foreground/60">
-                    {SECTION_LABELS[key]}
-                  </p>
-                  <p className="mt-2 whitespace-pre-wrap text-sm text-foreground/90">
-                    {value}
-                  </p>
-                </div>
-              ))}
-              {detectedSections.length === 0 && (
-                <p className="py-6 text-center text-sm text-foreground/60">
-                  We couldn't find any sections in this file.
-                </p>
-              )}
-            </div>
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              rows={20}
+              className="mt-6 w-full resize-y rounded-2xl border border-foreground/10 bg-white/50 p-4 font-mono text-sm text-foreground/90 outline-none focus:border-accent focus:ring-1 focus:ring-accent/30"
+            />
 
             {errorMsg && (
               <p className="mt-4 rounded-2xl bg-destructive/10 px-4 py-2 text-sm text-destructive">
@@ -231,7 +187,7 @@ export function CvUploadModal({
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <button
                 onClick={handleSave}
-                disabled={detectedSections.length === 0}
+                disabled={!text.trim()}
                 className="rounded-2xl bg-secondary px-6 py-3 text-sm font-medium text-secondary-foreground disabled:opacity-50"
               >
                 Save CV
@@ -239,7 +195,7 @@ export function CvUploadModal({
               <button
                 onClick={() => {
                   setStatus("idle");
-                  setSections(null);
+                  setText("");
                   setErrorMsg(null);
                 }}
                 className="rounded-2xl bg-white/60 px-6 py-3 text-sm font-medium text-foreground/70 hover:bg-white"
