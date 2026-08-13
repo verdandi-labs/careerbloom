@@ -1,4 +1,4 @@
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 MAX_EXPORT_STRING = 20_000
 MAX_EXPORT_SECTIONS = 50
@@ -165,7 +165,7 @@ class CvEditRequest(BaseModel):
 
 
 class CvTranslateRequest(BaseModel):
-    language: str
+    language: str = Field(..., min_length=2, max_length=5)
 
 
 class CvExportPdfRequest(BaseModel):

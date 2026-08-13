@@ -10,6 +10,7 @@ from shared.models.user import User
 from cover_letters.repository import CoverLetterRepository
 from cover_letters.schemas import CoverLetterGenerateRequest, CoverLetterResponse
 from cv.service import generate_cover_letter_ai, limiter
+from shared.constants import ALLOWED_LANGUAGES
 
 router = APIRouter(prefix="/cover-letters", tags=["cover-letters"])
 logger = logging.getLogger(__name__)
@@ -23,11 +24,14 @@ async def generate_letter(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_for_current_user),
 ):
+    if body.language not in ALLOWED_LANGUAGES:
+        raise HTTPException(status_code=400, detail=f"Unsupported language. Supported codes: {', '.join(sorted(ALLOWED_LANGUAGES))}")
+
     try:
         text = await generate_cover_letter_ai(
             body.job_title,
             body.company,
-            body.job_description or "",
+            (body.job_description or "")[:5_000],
             body.context or "",
             body.language,
         )

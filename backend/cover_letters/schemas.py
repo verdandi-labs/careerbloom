@@ -1,16 +1,16 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class CoverLetterGenerateRequest(BaseModel):
-    job_title: str
-    company: str
-    job_description: str
+    job_title: str = Field(..., max_length=200)
+    company: str = Field(..., max_length=200)
+    job_description: str | None = Field(None, max_length=5_000)
     context: str | None = None
-    language: str
-    name: str | None = None
+    language: str = Field(..., min_length=2, max_length=5)
+    name: str | None = Field(None, max_length=200)
 
     @field_validator("job_title", "company", "job_description", "context", "name")
     @classmethod

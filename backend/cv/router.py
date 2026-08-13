@@ -19,6 +19,7 @@ from cv.schemas import (
 )
 from cv.service import extract_raw_text, limiter, parse_all_sections, translate_cv
 from database import get_db
+from shared.constants import ALLOWED_LANGUAGES
 from shared.deps import get_current_user
 from shared.models.cv import CV_FIELDS
 from shared.models.user import User
@@ -160,6 +161,9 @@ async def translate(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    if body.language not in ALLOWED_LANGUAGES:
+        raise HTTPException(status_code=400, detail=f"Unsupported language. Supported codes: {', '.join(sorted(ALLOWED_LANGUAGES))}")
+
     repo = CvRepository(db)
     current = await repo.get_current_cv(user.user_id)
     if not any(current.model_dump().values()):
