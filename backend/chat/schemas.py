@@ -11,7 +11,6 @@ class ConversationResponse(BaseModel):
     id: UUID
     title: str
     created_at: datetime
-    updated_at: datetime
 
     model_config = {"from_attributes": True}
 

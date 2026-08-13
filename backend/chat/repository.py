@@ -13,7 +13,7 @@ class ChatRepository:
         result = await self.db.execute(
             select(ChatConversation)
             .where(ChatConversation.user_id == user_id)
-            .order_by(ChatConversation.updated_at.desc())
+            .order_by(ChatConversation.created_at.desc())
         )
         return list(result.scalars().all())
 

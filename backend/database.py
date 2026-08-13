@@ -1,5 +1,4 @@
 import ssl
-from uuid import UUID
 from sqlalchemy import make_url, text
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession, AsyncEngine
 from sqlalchemy.orm import DeclarativeBase
@@ -63,7 +62,7 @@ async def get_db():
             raise
 
 
-async def ensure_schema(db_url: str, user_id: UUID | None = None):
+async def ensure_schema(db_url: str):
     engine = router.get_engine(db_url)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

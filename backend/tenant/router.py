@@ -30,7 +30,7 @@ async def connect_database(
     await db.execute(stmt)
 
     db_url = build_db_url(body.connection_string)
-    await ensure_schema(db_url, user_id=user.user_id)
+    await ensure_schema(db_url)
 
     return TenantStatusResponse(connected=True)
 

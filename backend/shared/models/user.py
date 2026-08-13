@@ -33,7 +33,7 @@ class Session(Base):
     __tablename__ = "sessions"
 
     session_id = Column(UUID, primary_key=True, default=uuid4)
-    user_id = Column(UUID, ForeignKey("users.user_id"), nullable=False)
+    user_id = Column(UUID, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
     token_hash = Column(Text, unique=True, nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     expires_at = Column(DateTime(timezone=True), nullable=False)

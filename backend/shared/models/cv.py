@@ -25,7 +25,7 @@ class CvUpload(Base):
     __tablename__ = "cv_upload"
 
     upload_id = Column(UUID, primary_key=True, default=uuid4)
-    user_id = Column(UUID, ForeignKey("users.user_id"), nullable=False)
+    user_id = Column(UUID, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
     full_name = Column(Text)
     title = Column(Text)
     self_summary = Column(Text)
@@ -46,7 +46,7 @@ class CvEdit(Base):
 
     edit_id = Column(UUID, primary_key=True, default=uuid4)
     upload_id = Column(UUID, ForeignKey("cv_upload.upload_id", ondelete="CASCADE"), nullable=False)
-    user_id = Column(UUID, ForeignKey("users.user_id"), nullable=False)
+    user_id = Column(UUID, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
     full_name = Column(Text)
     title = Column(Text)
     self_summary = Column(Text)
@@ -66,7 +66,7 @@ class CvTranslate(Base):
     __tablename__ = "cv_translate"
 
     translate_id = Column(UUID, primary_key=True, default=uuid4)
-    user_id = Column(UUID, ForeignKey("users.user_id"), nullable=False)
+    user_id = Column(UUID, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
     language = Column(Text, nullable=False)
     full_name = Column(Text)
     title = Column(Text)

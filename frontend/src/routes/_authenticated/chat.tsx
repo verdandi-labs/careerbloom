@@ -25,7 +25,7 @@ export const Route = createFileRoute("/_authenticated/chat")({
   component: ChatLayout,
 });
 
-type Conversation = { id: string; title: string; updated_at: string };
+type Conversation = { id: string; title: string };
 
 function ChatLayout() {
   const navigate = useNavigate();

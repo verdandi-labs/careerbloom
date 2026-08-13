@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, Request, Response
+from sqlalchemy import delete
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.schemas import UserResponse
 from auth.service import delete_session, get_user_email
 from database import get_db
 from shared.deps import SESSION_COOKIE, get_current_user
-from shared.models.user import User
+from shared.models.user import MagicLinkToken, User
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -18,6 +20,19 @@ async def me(user: User = Depends(get_current_user)):
         onboarding=user.onboarding,
         created_at=user.created_at,
     )
+
+
+@router.delete("/account")
+async def delete_account(
+    response: Response,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    if user.email_hash:
+        await db.execute(delete(MagicLinkToken).where(MagicLinkToken.email_hash == user.email_hash))
+    await db.delete(user)
+    response.delete_cookie(SESSION_COOKIE)
+    return {"ok": True}
 
 
 @router.post("/logout")
