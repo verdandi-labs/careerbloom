@@ -2,7 +2,7 @@ import asyncio
 import logging
 from io import BytesIO
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,7 +17,7 @@ from cv.schemas import (
     FIELD_MODELS,
     TEXT_FIELDS,
 )
-from cv.service import detect_sections, parse_sections, translate_cv
+from cv.service import detect_sections, limiter, parse_sections, translate_cv
 from database import get_db
 from shared.deps import get_current_user
 from shared.models.cv import CV_FIELDS
@@ -28,6 +28,13 @@ logger = logging.getLogger(__name__)
 
 MAX_SIZE = 5 * 1024 * 1024
 MIN_SIZE = 20 * 1024
+
+SUSPICIOUS = ["user_id:", "database_url", "BEGIN PRIVATE KEY", "system prompt", "ignore previous"]
+
+
+def _check_suspicious(text: str) -> bool:
+    lower = text.lower()
+    return any(p.lower() in lower for p in SUSPICIOUS)
 
 
 def is_valid_file(contents: bytes) -> bool:
@@ -62,6 +69,7 @@ async def extract_file_text(filename: str, contents: bytes) -> str:
 @router.post("/upload", response_model=CvSectionsRaw)
 async def upload_cv(
     file: UploadFile = File(...),
+    user: User = Depends(get_current_user),
 ):
     contents = await file.read()
     if len(contents) > MAX_SIZE:
@@ -79,7 +87,9 @@ async def upload_cv(
 
 
 @router.post("/save", response_model=CvData)
+@limiter.limit("10/minute")
 async def save_cv(
+    request: Request,
     body: CvSectionsRaw,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -89,6 +99,10 @@ async def save_cv(
     except Exception:
         logger.error("CV save failed", exc_info=True)
         raise HTTPException(status_code=500, detail="Could not parse your CV, please try again")
+
+    if _check_suspicious(parsed.model_dump_json()):
+        logger.warning("Suspicious CV content rejected")
+        raise HTTPException(status_code=400, detail="CV content could not be processed — please check your file and try again")
 
     repo = CvRepository(db)
     is_first = await repo.count_uploads(user.user_id) == 0
@@ -139,7 +153,9 @@ async def edit_cv(
 
 
 @router.post("/translate", response_model=CvData)
+@limiter.limit("5/minute")
 async def translate(
+    request: Request,
     body: CvTranslateRequest,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -154,6 +170,9 @@ async def translate(
     except Exception:
         logger.error("CV translation failed", exc_info=True)
         raise HTTPException(status_code=500, detail="CV translation failed, please try again")
+    if _check_suspicious(translated.model_dump_json()):
+        logger.warning("Suspicious CV translation rejected")
+        raise HTTPException(status_code=400, detail="CV content could not be processed — please check your file and try again")
     await repo.create_translate(user.user_id, body.language, translated)
     return translated
 

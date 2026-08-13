@@ -1,14 +1,45 @@
 import logging
+import re
 from contextlib import asynccontextmanager
 from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
+from slowapi.errors import RateLimitExceeded
+from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from config import get_settings
 from database import Base, router as db_router, global_engine
 
 logger = logging.getLogger("startup")
+
+
+class ScrubFilter(logging.Filter):
+    PATTERNS = [
+        (re.compile(r"Bearer\s+\S+", re.I), "Bearer [REDACTED]"),
+        (re.compile(r"session=[^\s&;]+", re.I), "session=[REDACTED]"),
+        (re.compile(r"token=[^\s&;]+", re.I), "token=[REDACTED]"),
+        (re.compile(r"database_url=[^\s&;]+", re.I), "database_url=[REDACTED]"),
+    ]
+
+    def filter(self, record):
+        msg = str(record.getMessage())
+        for pattern, replacement in self.PATTERNS:
+            msg = pattern.sub(replacement, msg)
+        record.msg = msg
+        record.args = ()
+        return True
+
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'; object-src 'none'"
+        return response
 
 
 async def _create_tables():
@@ -23,6 +54,7 @@ async def _create_tables():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    logging.getLogger().addFilter(ScrubFilter())
     await _create_tables()
     yield
     await db_router.dispose_all()
@@ -40,9 +72,11 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS.split(","),
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Accept", "X-CSRF-Token"],
 )
+
+app.add_middleware(SecurityHeadersMiddleware)
 
 app.add_middleware(
     SessionMiddleware,
@@ -60,6 +94,13 @@ from chat.router import router as chat_router
 from cover_letters.router import router as cover_letters_router
 from tenant.router import router as tenant_router
 from transitions.router import router as transitions_router
+from cv.service import limiter
+
+app.state.limiter = limiter
+app.add_exception_handler(
+    RateLimitExceeded,
+    lambda req, exc: JSONResponse({"detail": "Too many requests, please slow down"}, status_code=429),
+)
 
 app.include_router(auth_router, prefix=settings.API_V1_PREFIX)
 app.include_router(magic_auth_router, prefix=settings.API_V1_PREFIX)

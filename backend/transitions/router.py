@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from shared.crypto import decrypt, decrypt_user_key, encrypt
@@ -64,8 +66,6 @@ async def delete_transition(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_for_current_user),
 ):
-    from uuid import UUID
-
     try:
         parsed = UUID(transition_id)
     except ValueError:

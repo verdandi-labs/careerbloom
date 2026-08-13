@@ -1,6 +1,7 @@
 import json
+import logging
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from shared.deps import get_current_user, get_db_for_current_user
@@ -14,8 +15,10 @@ from chat.schemas import (
     ChatRequest,
 )
 from chat.service import stream_chat
+from cv.service import limiter
 
 router = APIRouter(prefix="/chat", tags=["chat"])
+logger = logging.getLogger(__name__)
 
 
 @router.get("/conversations", response_model=list[ConversationResponse])
@@ -58,7 +61,9 @@ async def list_messages(
 
 
 @router.post("/conversations/{conversation_id}/messages")
+@limiter.limit("30/minute")
 async def send_message(
+    request: Request,
     conversation_id: UUID,
     body: MessageCreate,
     user: User = Depends(get_current_user),
@@ -81,8 +86,9 @@ async def send_message(
                 if chunk.text:
                     full_response += chunk.text
                     yield f"data: {json.dumps({'content': chunk.text})}\n\n"
-        except Exception as e:
-            yield f"data: {json.dumps({'error': str(e)})}\n\n"
+        except Exception:
+            logger.error("Chat stream failed", exc_info=True)
+            yield f"data: {json.dumps({'error': 'Message could not be sent, please try again'})}\n\n"
         yield "data: [DONE]\n\n"
 
         await repo.add_message(user.user_id, conversation_id, "assistant", full_response)

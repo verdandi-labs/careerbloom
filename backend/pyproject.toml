@@ -23,4 +23,5 @@ dependencies = [
     "cryptography>=49.0.0",
     "authlib>=1.7.2",
     "itsdangerous>=2.2.0",
+    "slowapi>=0.1.10",
 ]

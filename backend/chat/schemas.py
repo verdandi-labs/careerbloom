@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from uuid import UUID
 from datetime import datetime
 
@@ -16,7 +16,7 @@ class ConversationResponse(BaseModel):
 
 
 class MessageCreate(BaseModel):
-    content: str
+    content: str = Field(..., max_length=10_000)
 
 
 class MessageResponse(BaseModel):
