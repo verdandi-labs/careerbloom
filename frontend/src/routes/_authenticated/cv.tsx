@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { api } from "@/lib/api";
 import { DEFAULT_TEMPLATE } from "@/lib/cv-templates";
+import { LANGUAGES } from "@/lib/languages";
 import { Download, Languages, Loader2, Plus, Trash2, X } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cv")({
@@ -31,19 +32,7 @@ type CvData = {
   languages: CvRow[] | null;
 };
 
-const TRANSLATION_LANGUAGES = [
-  { label: "English", code: "en" },
-  { label: "Spanish", code: "es" },
-  { label: "French", code: "fr" },
-  { label: "German", code: "de" },
-  { label: "Portuguese", code: "pt" },
-  { label: "Italian", code: "it" },
-  { label: "Dutch", code: "nl" },
-  { label: "Polish", code: "pl" },
-  { label: "Swedish", code: "sv" },
-  { label: "Danish", code: "da" },
-  { label: "Norwegian", code: "no" },
-];
+const TRANSLATION_LANGUAGES = LANGUAGES;
 
 const TEXT_SECTIONS = [
   { key: "full_name", label: "Full name" },
