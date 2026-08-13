@@ -12,11 +12,12 @@ from cv.schemas import (
     CvEditRequest,
     CvExportDocxRequest,
     CvExportPdfRequest,
+    CvSectionsRaw,
     CvTranslateRequest,
     FIELD_MODELS,
     TEXT_FIELDS,
 )
-from cv.service import extract_cv, translate_cv
+from cv.service import detect_sections, parse_sections, translate_cv
 from database import get_db
 from shared.deps import get_current_user
 from shared.models.cv import CV_FIELDS
@@ -58,11 +59,9 @@ async def extract_file_text(filename: str, contents: bytes) -> str:
     raise HTTPException(status_code=415, detail="Unsupported file type. Use PDF, DOCX, or TXT.")
 
 
-@router.post("/upload", response_model=CvData)
+@router.post("/upload", response_model=CvSectionsRaw)
 async def upload_cv(
     file: UploadFile = File(...),
-    user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
 ):
     contents = await file.read()
     if len(contents) > MAX_SIZE:
@@ -76,13 +75,23 @@ async def upload_cv(
     if not text.strip():
         raise HTTPException(status_code=400, detail="Could not read any text from the file.")
 
+    return CvSectionsRaw(**detect_sections(text))
+
+
+@router.post("/save", response_model=CvData)
+async def save_cv(
+    body: CvSectionsRaw,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        parsed = await parse_sections(body)
+    except Exception:
+        logger.error("CV save failed", exc_info=True)
+        raise HTTPException(status_code=500, detail="Could not parse your CV, please try again")
+
     repo = CvRepository(db)
     is_first = await repo.count_uploads(user.user_id) == 0
-    try:
-        parsed = await extract_cv(text)
-    except Exception:
-        logger.error("CV extraction failed", exc_info=True)
-        raise HTTPException(status_code=500, detail="CV extraction failed, please try uploading a cleaner file")
     await repo.create_upload(user.user_id, parsed)
     if is_first:
         user.onboarding = True

@@ -1,10 +1,38 @@
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSession, sessionKeys } from "@/features/auth";
-import { apiUpload } from "@/lib/api";
+import { api, apiUpload } from "@/lib/api";
 import { FileText, Loader2, UploadCloud, X } from "lucide-react";
 
-type Status = "idle" | "uploading" | "error";
+type CvSectionsRaw = {
+  full_name: string | null;
+  contact_details: string | null;
+  self_summary: string | null;
+  experience: string | null;
+  skills: string | null;
+  studies: string | null;
+  awards: string | null;
+  publications: string | null;
+  volunteering: string | null;
+  projects: string | null;
+  languages: string | null;
+};
+
+const SECTION_LABELS: Record<keyof CvSectionsRaw, string> = {
+  full_name: "Full name",
+  contact_details: "Contact details",
+  self_summary: "Summary",
+  experience: "Experience",
+  skills: "Skills",
+  studies: "Studies",
+  awards: "Awards",
+  publications: "Publications",
+  volunteering: "Volunteering",
+  projects: "Projects",
+  languages: "Languages",
+};
+
+type Status = "idle" | "uploading" | "review" | "saving" | "error";
 
 export function CvUploadModal({
   open,
@@ -17,6 +45,7 @@ export function CvUploadModal({
 }) {
   const [status, setStatus] = useState<Status>("idle");
   const [fileName, setFileName] = useState<string | null>(null);
+  const [sections, setSections] = useState<CvSectionsRaw | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -27,6 +56,7 @@ export function CvUploadModal({
     if (!open) {
       setStatus("idle");
       setFileName(null);
+      setSections(null);
       setErrorMsg(null);
       setDragOver(false);
     }
@@ -48,7 +78,22 @@ export function CvUploadModal({
     setFileName(file.name);
     setStatus("uploading");
     try {
-      await apiUpload("/cv/upload", file);
+      const result = await apiUpload<CvSectionsRaw>("/cv/upload", file);
+      setSections(result);
+      setStatus("review");
+    } catch (err) {
+      console.error(err);
+      setErrorMsg(err instanceof Error ? err.message : "Upload failed");
+      setStatus("error");
+    }
+  }
+
+  async function handleSave() {
+    if (!sections) return;
+    setErrorMsg(null);
+    setStatus("saving");
+    try {
+      await api("/cv/save", { method: "POST", json: sections });
       await qc.invalidateQueries({ queryKey: ["cv"] });
       if (!user?.onboarding) {
         await qc.invalidateQueries({ queryKey: sessionKeys.all });
@@ -57,10 +102,17 @@ export function CvUploadModal({
       onClose();
     } catch (err) {
       console.error(err);
-      setErrorMsg(err instanceof Error ? err.message : "Upload failed");
-      setStatus("error");
+      setErrorMsg(err instanceof Error ? err.message : "Save failed");
+      setStatus("review");
     }
   }
+
+  const detectedSections = sections
+    ? Object.entries(sections).filter(
+        (entry): entry is [keyof CvSectionsRaw, string] =>
+          typeof entry[1] === "string" && entry[1].trim().length > 0,
+      )
+    : [];
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/30 p-4 backdrop-blur-md">
@@ -139,6 +191,73 @@ export function CvUploadModal({
                 <span className="truncate">{fileName}</span>
               </p>
             )}
+          </div>
+        )}
+
+        {status === "review" && sections && (
+          <div>
+            <h2 className="font-display text-3xl">Review your CV</h2>
+            <p className="mt-1 text-sm text-foreground/70">
+              We found these sections. Approve to fill your CV builder.
+            </p>
+
+            <div className="mt-6 max-h-[50vh] space-y-4 overflow-y-auto pr-1">
+              {detectedSections.map(([key, value]) => (
+                <div
+                  key={key}
+                  className="rounded-2xl border border-foreground/10 bg-white/50 p-4"
+                >
+                  <p className="text-xs font-semibold uppercase tracking-wide text-foreground/60">
+                    {SECTION_LABELS[key]}
+                  </p>
+                  <p className="mt-2 whitespace-pre-wrap text-sm text-foreground/90">
+                    {value}
+                  </p>
+                </div>
+              ))}
+              {detectedSections.length === 0 && (
+                <p className="py-6 text-center text-sm text-foreground/60">
+                  We couldn't find any sections in this file.
+                </p>
+              )}
+            </div>
+
+            {errorMsg && (
+              <p className="mt-4 rounded-2xl bg-destructive/10 px-4 py-2 text-sm text-destructive">
+                {errorMsg}
+              </p>
+            )}
+
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <button
+                onClick={handleSave}
+                disabled={detectedSections.length === 0}
+                className="rounded-2xl bg-secondary px-6 py-3 text-sm font-medium text-secondary-foreground disabled:opacity-50"
+              >
+                Save CV
+              </button>
+              <button
+                onClick={() => {
+                  setStatus("idle");
+                  setSections(null);
+                  setErrorMsg(null);
+                }}
+                className="rounded-2xl bg-white/60 px-6 py-3 text-sm font-medium text-foreground/70 hover:bg-white"
+              >
+                Choose another file
+              </button>
+            </div>
+          </div>
+        )}
+
+        {status === "saving" && (
+          <div className="py-10 text-center">
+            <div className="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-secondary/40">
+              <Loader2 className="h-7 w-7 animate-spin text-foreground" />
+            </div>
+            <p className="mt-5 font-display text-2xl italic">
+              Saving your CV\u2026
+            </p>
           </div>
         )}
 

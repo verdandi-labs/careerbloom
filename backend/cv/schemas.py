@@ -4,9 +4,7 @@ MAX_EXPORT_STRING = 20_000
 MAX_EXPORT_SECTIONS = 50
 
 
-class _LineItem(BaseModel):
-    line_num: int
-
+class _RawEntry(BaseModel):
     @field_validator("*")
     @classmethod
     def _clean(cls, v):
@@ -15,11 +13,11 @@ class _LineItem(BaseModel):
         return v
 
 
-class ContactDetailItem(_LineItem):
+class ContactDetailRaw(_RawEntry):
     detail: str | None = None
 
 
-class ExperienceItem(_LineItem):
+class ExperienceRaw(_RawEntry):
     company: str | None = None
     city: str | None = None
     start_date: str | None = None
@@ -27,12 +25,12 @@ class ExperienceItem(_LineItem):
     comments: str | None = None
 
 
-class SkillItem(_LineItem):
+class SkillRaw(_RawEntry):
     skill: str | None = None
     comments: str | None = None
 
 
-class StudyItem(_LineItem):
+class StudyRaw(_RawEntry):
     edu_center: str | None = None
     city: str | None = None
     start_date: str | None = None
@@ -40,19 +38,19 @@ class StudyItem(_LineItem):
     comments: str | None = None
 
 
-class AwardItem(_LineItem):
+class AwardRaw(_RawEntry):
     name: str | None = None
     date: str | None = None
     comments: str | None = None
 
 
-class PublicationItem(_LineItem):
+class PublicationRaw(_RawEntry):
     name: str | None = None
     date: str | None = None
     comments: str | None = None
 
 
-class VolunteeringItem(_LineItem):
+class VolunteeringRaw(_RawEntry):
     center: str | None = None
     city: str | None = None
     start_date: str | None = None
@@ -60,17 +58,65 @@ class VolunteeringItem(_LineItem):
     comments: str | None = None
 
 
-class ProjectItem(_LineItem):
+class ProjectRaw(_RawEntry):
     name: str | None = None
     url: str | None = None
     comments: str | None = None
 
 
-class LanguageItem(_LineItem):
+class LanguageRaw(_RawEntry):
     language: str | None = None
     level: str | None = None
     comments: str | None = None
 
+
+class ContactDetailItem(ContactDetailRaw):
+    line_num: int
+
+
+class ExperienceItem(ExperienceRaw):
+    line_num: int
+
+
+class SkillItem(SkillRaw):
+    line_num: int
+
+
+class StudyItem(StudyRaw):
+    line_num: int
+
+
+class AwardItem(AwardRaw):
+    line_num: int
+
+
+class PublicationItem(PublicationRaw):
+    line_num: int
+
+
+class VolunteeringItem(VolunteeringRaw):
+    line_num: int
+
+
+class ProjectItem(ProjectRaw):
+    line_num: int
+
+
+class LanguageItem(LanguageRaw):
+    line_num: int
+
+
+RAW_MODELS = {
+    "contact_details": ContactDetailRaw,
+    "experience": ExperienceRaw,
+    "skills": SkillRaw,
+    "studies": StudyRaw,
+    "awards": AwardRaw,
+    "publications": PublicationRaw,
+    "volunteering": VolunteeringRaw,
+    "projects": ProjectRaw,
+    "languages": LanguageRaw,
+}
 
 FIELD_MODELS = {
     "contact_details": ContactDetailItem,
@@ -85,6 +131,20 @@ FIELD_MODELS = {
 }
 
 TEXT_FIELDS = {"full_name", "title", "self_summary"}
+
+
+class CvSectionsRaw(BaseModel):
+    full_name: str | None = None
+    contact_details: str | None = None
+    self_summary: str | None = None
+    experience: str | None = None
+    skills: str | None = None
+    studies: str | None = None
+    awards: str | None = None
+    publications: str | None = None
+    volunteering: str | None = None
+    projects: str | None = None
+    languages: str | None = None
 
 
 class CvData(BaseModel):
