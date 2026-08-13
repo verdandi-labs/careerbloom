@@ -4,6 +4,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from starlette.middleware.sessions import SessionMiddleware
 from config import get_settings
 from database import Base, router as db_router, global_engine
 
@@ -39,8 +40,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.add_middleware(SessionMiddleware, secret_key=settings.SESSION_SECRET)
+
 from auth.router import router as auth_router
 from auth.magic_router import router as magic_auth_router
+from auth.oauth_router import router as oauth_router
 from cv.router import router as cv_router
 from chat.router import router as chat_router
 from cover_letters.router import router as cover_letters_router
@@ -49,6 +53,7 @@ from transitions.router import router as transitions_router
 
 app.include_router(auth_router, prefix=settings.API_V1_PREFIX)
 app.include_router(magic_auth_router, prefix=settings.API_V1_PREFIX)
+app.include_router(oauth_router, prefix=settings.API_V1_PREFIX)
 app.include_router(cv_router, prefix=settings.API_V1_PREFIX)
 app.include_router(chat_router, prefix=settings.API_V1_PREFIX)
 app.include_router(cover_letters_router, prefix=settings.API_V1_PREFIX)

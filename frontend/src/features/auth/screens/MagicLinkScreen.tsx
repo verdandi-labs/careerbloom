@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { api, errorMessage } from "@/lib/api";
-import { ArrowRight, Check, Loader2, Mail } from "lucide-react";
+import { api, API_BASE, errorMessage } from "@/lib/api";
+import { ArrowRight, Check, Chrome, Github, Loader2, Mail } from "lucide-react";
 
 export function MagicLinkScreen({
   onSent,
@@ -106,6 +106,29 @@ export function MagicLinkScreen({
           <ArrowRight className="h-4 w-4" />
         </button>
       </form>
+
+      <div className="space-y-3">
+        <div className="flex items-center gap-3">
+          <span className="h-px flex-1 bg-white/20" />
+          <span className="text-xs text-green">or</span>
+          <span className="h-px flex-1 bg-white/20" />
+        </div>
+
+        <a
+          href={`${API_BASE}/auth/oauth/google`}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-white/10 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/20"
+        >
+          <Chrome className="h-4 w-4" />
+          Continue with Google
+        </a>
+        <a
+          href={`${API_BASE}/auth/oauth/github`}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-white/10 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/20"
+        >
+          <Github className="h-4 w-4" />
+          Continue with GitHub
+        </a>
+      </div>
 
       <p className="text-center text-xs tracking-wide text-green">
         Helping you grow into what's next

@@ -18,6 +18,12 @@ class Settings(BaseSettings):
     # SendGrid
     SENDGRID_API_KEY: str = ""
 
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+    GITHUB_CLIENT_ID: str = ""
+    GITHUB_CLIENT_SECRET: str = ""
+    SESSION_SECRET: str = ""
+
     # App
     FRONTEND_URL: str = "https://careerbloom-e5ne.onrender.com"
     CORS_ORIGINS: str = "http://localhost:5173,https://careerbloom-e5ne.onrender.com"
