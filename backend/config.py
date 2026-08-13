@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     SESSION_SECRET: str = ""
 
     # App
+    DEBUG: bool = False
     FRONTEND_URL: str = "https://careerbloom-e5ne.onrender.com"
     CORS_ORIGINS: str = "http://localhost:5173,https://careerbloom-e5ne.onrender.com"
     API_V1_PREFIX: str = "/api/v1"

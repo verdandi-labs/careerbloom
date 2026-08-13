@@ -44,7 +44,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.add_middleware(SessionMiddleware, secret_key=settings.SESSION_SECRET)
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=settings.SESSION_SECRET,
+    session_cookie="oauth_state",
+    https_only=not settings.DEBUG,
+    same_site="lax",
+)
 
 from auth.router import router as auth_router
 from auth.magic_router import router as magic_auth_router
