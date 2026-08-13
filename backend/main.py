@@ -1,4 +1,4 @@
-import asyncio
+import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 from fastapi import FastAPI, HTTPException
@@ -8,18 +8,22 @@ from starlette.middleware.sessions import SessionMiddleware
 from config import get_settings
 from database import Base, router as db_router, global_engine
 
+logger = logging.getLogger("startup")
+
 
 async def _create_tables():
     try:
         async with global_engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
-    except Exception:
-        pass
+        logger.info("Database schema verified")
+    except Exception as e:
+        logger.error("create_all failed: %s", e, exc_info=True)
+        raise
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    asyncio.create_task(_create_tables())
+    await _create_tables()
     yield
     await db_router.dispose_all()
 

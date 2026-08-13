@@ -1,3 +1,4 @@
+import logging
 from io import BytesIO
 from uuid import UUID
 
@@ -11,6 +12,7 @@ from cover_letters.schemas import CoverLetterGenerateRequest, CoverLetterRespons
 from cv.service import generate_cover_letter_ai
 
 router = APIRouter(prefix="/cover-letters", tags=["cover-letters"])
+logger = logging.getLogger(__name__)
 
 
 @router.post("/generate", response_model=CoverLetterResponse)
@@ -28,6 +30,7 @@ async def generate_letter(
             body.language,
         )
     except Exception:
+        logger.error("Cover letter generation failed", exc_info=True)
         raise HTTPException(status_code=500, detail="Cover letter generation failed, please try again")
     repo = CoverLetterRepository(db)
     letter = await repo.create(user.user_id, body.name, body.language, text)

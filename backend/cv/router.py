@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from io import BytesIO
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
@@ -22,6 +23,7 @@ from shared.models.cv import CV_FIELDS
 from shared.models.user import User
 
 router = APIRouter(prefix="/cv", tags=["cv"])
+logger = logging.getLogger(__name__)
 
 MAX_SIZE = 5 * 1024 * 1024
 MIN_SIZE = 20 * 1024
@@ -79,6 +81,7 @@ async def upload_cv(
     try:
         parsed = await extract_cv(text)
     except Exception:
+        logger.error("CV extraction failed", exc_info=True)
         raise HTTPException(status_code=500, detail="CV extraction failed, please try uploading a cleaner file")
     await repo.create_upload(user.user_id, parsed)
     if is_first:
@@ -140,6 +143,7 @@ async def translate(
     try:
         translated = await translate_cv(current, body.language)
     except Exception:
+        logger.error("CV translation failed", exc_info=True)
         raise HTTPException(status_code=500, detail="CV translation failed, please try again")
     await repo.create_translate(user.user_id, body.language, translated)
     return translated
