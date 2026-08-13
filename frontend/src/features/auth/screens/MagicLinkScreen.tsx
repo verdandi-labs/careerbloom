@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearch } from "@tanstack/react-router";
 import { api, API_BASE, errorMessage } from "@/lib/api";
 import { ArrowRight, Check, Chrome, Github, Loader2, Mail } from "lucide-react";
 
@@ -7,6 +8,7 @@ export function MagicLinkScreen({
 }: {
   onSent: (email: string) => void;
 }) {
+  const search = useSearch({ from: "/auth" });
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
@@ -64,6 +66,13 @@ export function MagicLinkScreen({
 
   return (
     <div className="space-y-5">
+      {search.error === "email_exists" && (
+        <p className="rounded-xl bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
+          An account with this email already exists. Please sign in with your
+          original method
+        </p>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label

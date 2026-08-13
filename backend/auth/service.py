@@ -41,6 +41,8 @@ async def create_user(
         result = await db.execute(select(User).where(User.email_hash == email_hash))
         existing = result.scalar_one_or_none()
         if existing:
+            if existing.auth_method != auth_method:
+                raise ValueError("email_registered_with_different_provider")
             return existing
 
     user_key = generate_user_key()

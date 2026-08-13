@@ -36,7 +36,7 @@ export const Route = createFileRoute("/auth")({
       },
     ],
   }),
-  validateSearch: z.object({}),
+  validateSearch: z.object({ error: z.string().optional() }),
   component: AuthLayout,
 });
 

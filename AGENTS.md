@@ -21,6 +21,9 @@ Convention: `001_description.sql`, `002_description.sql`, etc.
 - Wait for my approval before writing any code or running any commands.
 - For complex features, ask clarifying questions to narrow the scope before proposing a plan.
 
+## Code style
+- In text within code (strings, UI copy, comments), never add dashes or a trailing period unless explicitly specified
+
 ## Frontend vs backend
 - `frontend/` = Vite + React app (frontend)
 - `backend/` = FastAPI app (backend)

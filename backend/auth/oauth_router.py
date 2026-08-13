@@ -58,7 +58,12 @@ async def _handle_callback(request: Request, db: AsyncSession, provider: str) ->
         return RedirectResponse("/auth")
 
     provider_id = str(user_info.get("sub") if provider == "google" else user_info.get("id"))
-    user = await create_user(db, provider, provider_id, user_info.get("email"))
+    try:
+        user = await create_user(db, provider, provider_id, user_info.get("email"))
+    except ValueError as exc:
+        if str(exc) == "email_registered_with_different_provider":
+            return RedirectResponse("/auth?error=email_exists")
+        raise
     raw_session = await create_session(db, user.user_id)
     await db.commit()
 
