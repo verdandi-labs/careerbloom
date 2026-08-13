@@ -19,13 +19,16 @@ async def generate_letter(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_for_current_user),
 ):
-    text = await generate_cover_letter_ai(
-        body.job_title,
-        body.company,
-        body.job_description or "",
-        body.context or "",
-        body.language,
-    )
+    try:
+        text = await generate_cover_letter_ai(
+            body.job_title,
+            body.company,
+            body.job_description or "",
+            body.context or "",
+            body.language,
+        )
+    except Exception:
+        raise HTTPException(status_code=500, detail="Cover letter generation failed, please try again")
     repo = CoverLetterRepository(db)
     letter = await repo.create(user.user_id, body.name, body.language, text)
     return CoverLetterResponse.model_validate(letter)

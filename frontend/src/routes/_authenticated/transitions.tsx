@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
-import { api, ApiError } from "@/lib/api";
+import { api, ApiError, errorMessage } from "@/lib/api";
 import { Compass, Loader2, Pencil, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/transitions")({
@@ -25,6 +25,7 @@ function TransitionsPage() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [actionErr, setActionErr] = useState("");
 
   const {
     data: current,
@@ -61,6 +62,7 @@ function TransitionsPage() {
     }
     setBusy(true);
     setErr("");
+    setActionErr("");
     try {
       await api("/transitions", {
         method: "POST",
@@ -69,7 +71,7 @@ function TransitionsPage() {
       setText("");
       await qc.invalidateQueries({ queryKey: ["transitions"] });
     } catch (e) {
-      setErr(String(e instanceof Error ? e.message : e));
+      setErr(errorMessage(e, "Couldn't save transition, please try again"));
     } finally {
       setBusy(false);
     }
@@ -77,11 +79,14 @@ function TransitionsPage() {
 
   async function remove(id: string) {
     setDeleting(id);
+    setActionErr("");
     try {
       await api(`/transitions/${id}`, { method: "DELETE" });
       await qc.invalidateQueries({ queryKey: ["transitions"] });
     } catch (e) {
-      console.error(e);
+      setActionErr(
+        errorMessage(e, "Couldn't delete transition, please try again"),
+      );
     } finally {
       setDeleting(null);
     }
@@ -188,6 +193,11 @@ function TransitionsPage() {
         <p className="mt-1 text-sm text-foreground/60">
           Past narratives CareerBloom may still draw from.
         </p>
+        {actionErr && (
+          <p className="mt-3 rounded-2xl bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
+            {actionErr}
+          </p>
+        )}
         {historyPending ? (
           <div className="grid place-items-center py-12">
             <Loader2 className="h-6 w-6 animate-spin text-foreground/50" />

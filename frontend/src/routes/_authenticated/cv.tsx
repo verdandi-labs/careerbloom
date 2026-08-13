@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
-import { api } from "@/lib/api";
+import { api, errorMessage } from "@/lib/api";
 import { DEFAULT_TEMPLATE } from "@/lib/cv-templates";
 import { LANGUAGES } from "@/lib/languages";
 import { Download, Languages, Loader2, Plus, Trash2, X } from "lucide-react";
@@ -253,14 +253,16 @@ function CVPage() {
   const [translateOpen, setTranslateOpen] = useState(false);
   const [translating, setTranslating] = useState(false);
   const [translated, setTranslated] = useState<TranslatedCv | null>(null);
+  const [actionErr, setActionErr] = useState("");
 
   async function save(field: string, value: string | CvRow[] | null) {
     setSaving(true);
+    setActionErr("");
     try {
       await api("/cv/edit", { method: "POST", json: { field, value } });
       await qc.invalidateQueries({ queryKey: ["cv"] });
     } catch (e) {
-      console.error(e);
+      setActionErr(errorMessage(e, "Couldn't save CV, please try again"));
     } finally {
       setSaving(false);
     }
@@ -308,6 +310,7 @@ function CVPage() {
     setTranslateOpen(false);
     if (!lang) return;
     setTranslating(true);
+    setActionErr("");
     try {
       const result = await api<CvData>("/cv/translate", {
         method: "POST",
@@ -315,7 +318,12 @@ function CVPage() {
       });
       setTranslated({ data: result, code: lang.code, label: lang.label });
     } catch (e) {
-      console.error(e);
+      setActionErr(
+        errorMessage(
+          e,
+          "Translation failed, please try uploading a cleaner CV",
+        ),
+      );
     } finally {
       setTranslating(false);
     }
@@ -323,6 +331,7 @@ function CVPage() {
 
   async function exportPdf(source: CvData, code?: string) {
     setExporting(true);
+    setActionErr("");
     try {
       const res = await fetch("/api/v1/cv/export/pdf", {
         method: "POST",
@@ -340,7 +349,7 @@ function CVPage() {
         code ? `careerbloom-cv-${code}.pdf` : "careerbloom-cv.pdf",
       );
     } catch (e) {
-      console.error(e);
+      setActionErr(errorMessage(e, "CV export failed, please try again"));
     } finally {
       setExporting(false);
     }
@@ -348,6 +357,7 @@ function CVPage() {
 
   async function exportDocx(source: CvData, code?: string) {
     setExporting(true);
+    setActionErr("");
     try {
       const res = await fetch("/api/v1/cv/export/docx", {
         method: "POST",
@@ -365,7 +375,7 @@ function CVPage() {
         code ? `careerbloom-cv-${code}.docx` : "careerbloom-cv.docx",
       );
     } catch (e) {
-      console.error(e);
+      setActionErr(errorMessage(e, "CV export failed, please try again"));
     } finally {
       setExporting(false);
     }
@@ -441,6 +451,12 @@ function CVPage() {
           </div>
         </div>
       </header>
+
+      {actionErr && (
+        <p className="rounded-2xl bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
+          {actionErr}
+        </p>
+      )}
 
       <section className="rounded-3xl bg-neutral-100/60 p-4 md:p-8">
         {isPending ? (

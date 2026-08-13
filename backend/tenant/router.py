@@ -19,7 +19,10 @@ async def connect_database(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    valid = await validate_connection(body.connection_string)
+    try:
+        valid = await validate_connection(body.connection_string)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid database connection string")
     if not valid:
         raise HTTPException(status_code=400, detail="Could not connect to the database. Check your connection string.")
 

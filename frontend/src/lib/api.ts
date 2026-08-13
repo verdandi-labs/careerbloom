@@ -13,6 +13,45 @@ class ApiError extends Error {
   }
 }
 
+function parseDetail(body: string, fallback: string): string {
+  if (!body) return fallback;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(body);
+  } catch {
+    return fallback;
+  }
+  if (parsed && typeof parsed === "object") {
+    const detail = (parsed as { detail?: unknown }).detail;
+    if (typeof detail === "string" && detail.trim()) return detail;
+    if (Array.isArray(detail)) {
+      const parts = detail
+        .map((item) => {
+          if (!item || typeof item !== "object") return null;
+          const { loc, msg } = item as { loc?: unknown; msg?: unknown };
+          const field =
+            Array.isArray(loc) && loc.length
+              ? String(loc[loc.length - 1])
+              : null;
+          return field
+            ? `${field}: ${msg}`
+            : typeof msg === "string"
+              ? msg
+              : null;
+        })
+        .filter((part): part is string => Boolean(part));
+      if (parts.length) return parts.join("; ");
+    }
+    const message = (parsed as { message?: unknown }).message;
+    if (typeof message === "string" && message.trim()) return message;
+  }
+  return fallback;
+}
+
+export function errorMessage(e: unknown, fallback: string): string {
+  return e instanceof ApiError ? e.message : fallback;
+}
+
 export async function api<T = unknown>(
   path: string,
   options: ApiOptions = {},
@@ -32,8 +71,11 @@ export async function api<T = unknown>(
   });
 
   if (!res.ok) {
-    const text = await res.text().catch(() => "Unknown error");
-    throw new ApiError(text, res.status);
+    const body = await res.text().catch(() => "");
+    throw new ApiError(
+      parseDetail(body, `Request failed (${res.status})`),
+      res.status,
+    );
   }
 
   return res.json();
@@ -58,8 +100,11 @@ export async function apiStream(
   });
 
   if (!res.ok) {
-    const text = await res.text().catch(() => "Unknown error");
-    throw new ApiError(text, res.status);
+    const body = await res.text().catch(() => "");
+    throw new ApiError(
+      parseDetail(body, `Request failed (${res.status})`),
+      res.status,
+    );
   }
 
   return res.body!;
@@ -79,8 +124,11 @@ export async function apiUpload<T = unknown>(
   });
 
   if (!res.ok) {
-    const text = await res.text().catch(() => "Unknown error");
-    throw new ApiError(text, res.status);
+    const body = await res.text().catch(() => "");
+    throw new ApiError(
+      parseDetail(body, `Request failed (${res.status})`),
+      res.status,
+    );
   }
 
   return res.json();

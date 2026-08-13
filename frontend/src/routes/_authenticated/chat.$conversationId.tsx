@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { api, apiStream } from "@/lib/api";
+import { api, apiStream, errorMessage } from "@/lib/api";
 import { createConversation } from "@/lib/chat";
 import { Send, Sparkles, Check, X, Pencil, Loader2, Plus } from "lucide-react";
 
@@ -47,6 +47,8 @@ function ConversationPage() {
   const navigate = useNavigate();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [loadError, setLoadError] = useState("");
+  const [retryKey, setRetryKey] = useState(0);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [cvText, setCvText] = useState<string>("");
@@ -70,6 +72,7 @@ function ConversationPage() {
   useEffect(() => {
     setLoaded(false);
     setMessages([]);
+    setLoadError("");
     (async () => {
       try {
         const msgs = await api<
@@ -98,12 +101,12 @@ function ConversationPage() {
           });
         }
         setMessages(loaded);
-      } catch {
-        /* ignore */
+      } catch (e) {
+        setLoadError(errorMessage(e, "Couldn't load messages, please refresh"));
       }
       setLoaded(true);
     })();
-  }, [conversationId]);
+  }, [conversationId, retryKey]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -137,6 +140,7 @@ function ConversationPage() {
       const decoder = new TextDecoder();
       let buf = "";
       let assistant = "";
+      let streamFailed = false;
       setMessages((m) => [...m, { role: "assistant", content: "" }]);
 
       while (true) {
@@ -152,6 +156,21 @@ function ConversationPage() {
           if (data === "[DONE]") continue;
           try {
             const json = JSON.parse(data);
+            if (json.error) {
+              streamFailed = true;
+              setMessages((m) => {
+                const copy = [...m];
+                copy[copy.length - 1] = {
+                  role: "assistant",
+                  content: errorMessage(
+                    json.error,
+                    "Response interrupted, please try sending that again",
+                  ),
+                };
+                return copy;
+              });
+              continue;
+            }
             if (json.content) {
               assistant += json.content;
               setMessages((m) => {
@@ -168,6 +187,8 @@ function ConversationPage() {
           }
         }
       }
+
+      if (streamFailed) return;
 
       const sugg = parseSuggestion(assistant);
       const finalMsg: Msg = sugg
@@ -186,7 +207,10 @@ function ConversationPage() {
     } catch (e) {
       setMessages((m) => [
         ...m,
-        { role: "assistant", content: `Connection hiccup: ${String(e)}` },
+        {
+          role: "assistant",
+          content: errorMessage(e, "Couldn't send message, please try again"),
+        },
       ]);
     } finally {
       setLoading(false);
@@ -232,6 +256,17 @@ function ConversationPage() {
         {!loaded && (
           <div className="grid place-items-center py-10 text-xs text-foreground/50">
             <Loader2 className="h-4 w-4 animate-spin" />
+          </div>
+        )}
+        {loaded && loadError && (
+          <div className="flex flex-col items-center gap-3 py-10 text-center">
+            <p className="text-sm text-foreground/70">{loadError}</p>
+            <button
+              onClick={() => setRetryKey((k) => k + 1)}
+              className="rounded-full bg-white/75 px-4 py-2 text-xs hover:bg-white"
+            >
+              Try again
+            </button>
           </div>
         )}
         {messages.map((m, i) => (

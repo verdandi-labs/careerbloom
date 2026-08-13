@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
-import { api } from "@/lib/api";
+import { api, errorMessage } from "@/lib/api";
 import { LANGUAGES } from "@/lib/languages";
 import {
   Download,
@@ -54,6 +54,7 @@ function CoverLettersPage() {
   const [err, setErr] = useState("");
   const [deleting, setDeleting] = useState<string | null>(null);
   const [exporting, setExporting] = useState<string | null>(null);
+  const [actionErr, setActionErr] = useState("");
 
   async function generate() {
     if (!jobTitle.trim() || !company.trim()) {
@@ -62,6 +63,7 @@ function CoverLettersPage() {
     }
     setBusy(true);
     setErr("");
+    setActionErr("");
     try {
       const name = `${jobTitle.trim()} at ${company.trim()}`;
       await api("/cover-letters/generate", {
@@ -76,7 +78,9 @@ function CoverLettersPage() {
       });
       await qc.invalidateQueries({ queryKey: ["cover-letters"] });
     } catch (e) {
-      setErr(String(e instanceof Error ? e.message : e));
+      setErr(
+        errorMessage(e, "Cover letter generation failed, please try again"),
+      );
     } finally {
       setBusy(false);
     }
@@ -84,11 +88,14 @@ function CoverLettersPage() {
 
   async function deleteLetter(id: string) {
     setDeleting(id);
+    setActionErr("");
     try {
       await api(`/cover-letters/${id}`, { method: "DELETE" });
       await qc.invalidateQueries({ queryKey: ["cover-letters"] });
     } catch (e) {
-      console.error(e);
+      setActionErr(
+        errorMessage(e, "Couldn't delete cover letter, please try again"),
+      );
     } finally {
       setDeleting(null);
     }
@@ -96,6 +103,7 @@ function CoverLettersPage() {
 
   async function exportPdf(letter: Letter) {
     setExporting(letter.letter_id);
+    setActionErr("");
     try {
       const blob = await fetch(
         `/api/v1/cover-letters/${letter.letter_id}/export/pdf`,
@@ -103,7 +111,7 @@ function CoverLettersPage() {
       ).then((r) => r.blob());
       await downloadBlob(blob, `${letter.name ?? "cover-letter"}.pdf`);
     } catch (e) {
-      console.error(e);
+      setActionErr(errorMessage(e, "Export failed, please try again"));
     } finally {
       setExporting(null);
     }
@@ -212,6 +220,11 @@ function CoverLettersPage() {
       </section>
 
       <h2 className="mt-10 font-display text-2xl">Saved letters</h2>
+      {actionErr && (
+        <p className="mt-3 rounded-2xl bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
+          {actionErr}
+        </p>
+      )}
 
       {isPending ? (
         <div className="grid place-items-center py-16">

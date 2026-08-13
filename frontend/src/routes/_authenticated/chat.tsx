@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { api } from "@/lib/api";
+import { api, errorMessage } from "@/lib/api";
 import { createConversation } from "@/lib/chat";
 import {
   MessageCircleHeart,
@@ -36,13 +36,21 @@ function ChatLayout() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [draftTitle, setDraftTitle] = useState("");
+  const [listError, setListError] = useState("");
 
   const load = useCallback(async () => {
-    const data = await api<Conversation[]>("/chat/conversations");
-    const all = data ?? [];
-    const pinned = all.filter((c) => c.title === "Career Direction");
-    const rest = all.filter((c) => c.title !== "Career Direction");
-    setConvs([...pinned, ...rest]);
+    setListError("");
+    try {
+      const data = await api<Conversation[]>("/chat/conversations");
+      const all = data ?? [];
+      const pinned = all.filter((c) => c.title === "Career Direction");
+      const rest = all.filter((c) => c.title !== "Career Direction");
+      setConvs([...pinned, ...rest]);
+    } catch (e) {
+      setListError(
+        errorMessage(e, "Couldn't load conversations, please refresh"),
+      );
+    }
   }, []);
 
   useEffect(() => {
@@ -53,14 +61,21 @@ function ChatLayout() {
     if (activeId) return;
     if (pathname !== "/chat") return;
     (async () => {
-      const data = await api<Conversation[]>("/chat/conversations");
-      const id = data?.[0]?.id ?? (await createConversation());
-      if (id)
-        navigate({
-          to: "/chat/$conversationId",
-          params: { conversationId: id },
-          replace: true,
-        });
+      setListError("");
+      try {
+        const data = await api<Conversation[]>("/chat/conversations");
+        const id = data?.[0]?.id ?? (await createConversation());
+        if (id)
+          navigate({
+            to: "/chat/$conversationId",
+            params: { conversationId: id },
+            replace: true,
+          });
+      } catch (e) {
+        setListError(
+          errorMessage(e, "Couldn't load conversations, please refresh"),
+        );
+      }
     })();
   }, [activeId, pathname, navigate]);
 
@@ -113,6 +128,11 @@ function ChatLayout() {
           <p className="px-2 pb-2 text-[10px] uppercase tracking-[0.2em] text-foreground/50">
             History
           </p>
+          {listError && (
+            <p className="mb-2 rounded-xl bg-destructive/10 px-3 py-2 text-xs text-destructive">
+              {listError}
+            </p>
+          )}
           <div className="flex-1 space-y-1 overflow-y-auto pr-1">
             {convs.length === 0 && (
               <p className="px-2 py-4 text-xs italic text-foreground/50">

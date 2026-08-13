@@ -76,7 +76,10 @@ async def upload_cv(
 
     repo = CvRepository(db)
     is_first = await repo.count_uploads(user.user_id) == 0
-    parsed = await extract_cv(text)
+    try:
+        parsed = await extract_cv(text)
+    except Exception:
+        raise HTTPException(status_code=500, detail="CV extraction failed, please try uploading a cleaner file")
     await repo.create_upload(user.user_id, parsed)
     if is_first:
         user.onboarding = True
@@ -104,7 +107,7 @@ async def edit_cv(
     repo = CvRepository(db)
     upload = await repo.get_latest_upload(user.user_id)
     if upload is None:
-        raise HTTPException(status_code=404, detail="Upload a CV first.")
+        raise HTTPException(status_code=404, detail="Please upload a CV before continuing")
 
     if body.field in TEXT_FIELDS:
         if not isinstance(body.value, str):
@@ -132,9 +135,12 @@ async def translate(
     repo = CvRepository(db)
     current = await repo.get_current_cv(user.user_id)
     if not any(current.model_dump().values()):
-        raise HTTPException(status_code=400, detail="No CV to translate.")
+        raise HTTPException(status_code=400, detail="Please upload a CV before translating")
 
-    translated = await translate_cv(current, body.language)
+    try:
+        translated = await translate_cv(current, body.language)
+    except Exception:
+        raise HTTPException(status_code=500, detail="CV translation failed, please try again")
     await repo.create_translate(user.user_id, body.language, translated)
     return translated
 

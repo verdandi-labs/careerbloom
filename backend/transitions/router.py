@@ -53,7 +53,7 @@ async def get_current_transition(
     repo = TransitionRepository(db)
     transition = await repo.get_latest(user.user_id)
     if not transition:
-        raise HTTPException(status_code=404, detail="No transition found")
+        raise HTTPException(status_code=404, detail="Transition not found")
     transition.transition = _plaintext(user, transition.transition)
     return TransitionResponse.model_validate(transition)
 

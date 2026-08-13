@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { api } from "@/lib/api";
+import { api, errorMessage } from "@/lib/api";
 import { ArrowRight, Check, Loader2, Mail } from "lucide-react";
 
 export function MagicLinkScreenReturning() {
@@ -25,7 +25,7 @@ export function MagicLinkScreenReturning() {
       setSent(true);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Failed to send magic link",
+        errorMessage(err, "Failed to send magic link, please try again"),
       );
     } finally {
       setSending(false);
