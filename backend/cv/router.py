@@ -54,10 +54,24 @@ async def extract_file_text(filename: str, contents: bytes) -> str:
 
     if contents[:4] == b"PK\x03\x04":
         from docx import Document
+        from docx.table import Table
+        from docx.text.paragraph import Paragraph
 
         def extract_docx() -> str:
             doc = Document(BytesIO(contents))
-            return "\n".join(p.text for p in doc.paragraphs)
+            parts = []
+            for block in doc.element.body:
+                if block.tag.endswith("}p"):
+                    para = Paragraph(block, doc)
+                    if para.text.strip():
+                        parts.append(para.text.strip())
+                elif block.tag.endswith("}tbl"):
+                    table = Table(block, doc)
+                    for row in table.rows:
+                        for cell in row.cells:
+                            if cell.text.strip():
+                                parts.append(cell.text.strip())
+            return "\n".join(parts)
 
         return await asyncio.to_thread(extract_docx)
 
