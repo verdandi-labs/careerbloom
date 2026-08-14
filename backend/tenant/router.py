@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import delete, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
@@ -10,6 +12,7 @@ from shared.models.user import User
 from tenant.schemas import ConnectDbRequest, TenantStatusResponse
 from tenant.service import build_db_url, validate_connection
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/tenant", tags=["tenant"])
 
 
@@ -21,7 +24,8 @@ async def connect_database(
 ):
     try:
         valid = await validate_connection(body.connection_string)
-    except ValueError:
+    except Exception:
+        logger.error("validate_connection failed", exc_info=True)
         raise HTTPException(status_code=400, detail="Invalid database connection string")
     if not valid:
         raise HTTPException(status_code=400, detail="Could not connect to the database. Check your connection string.")
@@ -33,7 +37,13 @@ async def connect_database(
     await db.execute(stmt)
 
     db_url = build_db_url(body.connection_string)
-    await ensure_schema(db_url)
+    try:
+        await ensure_schema(db_url)
+    except Exception:
+        logger.error("ensure_schema failed", exc_info=True)
+        raise HTTPException(
+            status_code=500, detail="Could not connect to the database. Check your connection string."
+        )
 
     return TenantStatusResponse(connected=True)
 
