@@ -8,7 +8,7 @@ Career growth app: build your CV, cover letters, and get AI-powered guidance —
 | -------- | ---- |
 | Frontend | Vite + React 19, TanStack Router + Query, Zustand, Tailwind CSS 4, bun |
 | Backend  | FastAPI, SQLAlchemy (async), PostgreSQL (Neon), uv |
-| Auth     | Email magic links (SendGrid), JWT access + refresh tokens |
+| Auth     | Email magic links (SendGrid), Google + GitHub OAuth, httpOnly session cookies |
 | Deploy   | Docker, Render |
 
 ## Repo layout
@@ -34,12 +34,19 @@ Required env vars:
 | Var | Description |
 | --- | ----------- |
 | `NEON_DATABASE_URL` | PostgreSQL connection string |
-| `JWT_SECRET` | Secret for signing JWTs (no default — app refuses to start without it) |
+| `MASTER_KEY` | Fernet key that wraps per-user encryption keys (no default — app refuses to start without it) |
+| `HMAC_SECRET` | Secret for hashing emails and magic-link tokens |
+| `SESSION_SECRET` | Secret for signing session cookies (no default — app refuses to start without it) |
 | `SENDGRID_API_KEY` | For magic-link emails |
-| `ENCRYPTION_KEY` | For encrypting BYODB connection passwords |
+| `GOOGLE_CLIENT_ID` | For Google sign-in |
+| `GOOGLE_CLIENT_SECRET` | For Google sign-in |
+| `GITHUB_CLIENT_ID` | For GitHub sign-in |
+| `GITHUB_CLIENT_SECRET` | For GitHub sign-in |
 | `GEMINI_API_KEY` | For AI features |
 | `FRONTEND_URL` | Frontend origin (used in magic-link emails) |
 | `CORS_ORIGINS` | Comma-separated allowed origins |
+
+Generate `MASTER_KEY` with `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`.
 
 ### Frontend
 
@@ -63,7 +70,7 @@ Convention: `001_description.sql`, `002_description.sql`, etc.
 
 ## Auth
 
-Magic-link only. Sign in with email → receive a one-time link (valid 15 min) → link exchanges for JWT access/refresh tokens.
+Sign in with a one-time email magic link (valid 15 min) or Google/GitHub OAuth. Sessions are 7-day httpOnly cookies; the raw token is stored only as a hash.
 
 ## Deploy
 
