@@ -5,21 +5,21 @@ import { AppShell } from "@/components/AppShell";
 import { api, ApiError, errorMessage } from "@/lib/api";
 import { Compass, Loader2, Pencil, Trash2 } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/transitions")({
-  head: () => ({ meta: [{ title: "My Transition · careerBloom" }] }),
-  component: TransitionsPage,
+export const Route = createFileRoute("/_authenticated/career-direction")({
+  head: () => ({ meta: [{ title: "My Career Direction · careerBloom" }] }),
+  component: CareerDirectionPage,
 });
 
 const MIN_LENGTH = 20;
 const MAX_LENGTH = 500;
 
-type Transition = {
-  transition_id: string;
-  transition: string;
+type CareerDirection = {
+  career_direction_id: string;
+  summary: string;
   created_at: string;
 };
 
-function TransitionsPage() {
+function CareerDirectionPage() {
   const qc = useQueryClient();
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
@@ -32,46 +32,48 @@ function TransitionsPage() {
     isPending: currentPending,
     error: currentError,
   } = useQuery({
-    queryKey: ["transitions", "current"],
-    queryFn: () => api<Transition>("/transitions/current"),
+    queryKey: ["career-direction", "current"],
+    queryFn: () => api<CareerDirection>("/career-direction/current"),
     retry: false,
   });
   const noCurrent =
     currentError instanceof ApiError && currentError.status === 404;
 
   const { data: history, isPending: historyPending } = useQuery({
-    queryKey: ["transitions"],
-    queryFn: () => api<Transition[]>("/transitions"),
+    queryKey: ["career-direction"],
+    queryFn: () => api<CareerDirection[]>("/career-direction"),
   });
 
   function startEdit() {
     if (!current) return;
-    setText(current.transition);
+    setText(current.summary);
     setErr("");
   }
 
   async function submit() {
     const trimmed = text.trim();
     if (trimmed.length < MIN_LENGTH) {
-      setErr(`Transition must be at least ${MIN_LENGTH} characters.`);
+      setErr(`Career direction must be at least ${MIN_LENGTH} characters.`);
       return;
     }
     if (trimmed.length > MAX_LENGTH) {
-      setErr(`Transition must be at most ${MAX_LENGTH} characters.`);
+      setErr(`Career direction must be at most ${MAX_LENGTH} characters.`);
       return;
     }
     setBusy(true);
     setErr("");
     setActionErr("");
     try {
-      await api("/transitions", {
+      await api("/career-direction", {
         method: "POST",
-        json: { transition: text },
+        json: { summary: text },
       });
       setText("");
-      await qc.invalidateQueries({ queryKey: ["transitions"] });
+      await qc.invalidateQueries({ queryKey: ["career-direction"] });
     } catch (e) {
-      setErr(errorMessage(e, "Couldn't save transition, please try again"));
+      setErr(
+        errorMessage(e, "Couldn't save career direction, please try again"),
+      );
     } finally {
       setBusy(false);
     }
@@ -81,18 +83,17 @@ function TransitionsPage() {
     setDeleting(id);
     setActionErr("");
     try {
-      await api(`/transitions/${id}`, { method: "DELETE" });
-      await qc.invalidateQueries({ queryKey: ["transitions"] });
+      await api(`/career-direction/${id}`, { method: "DELETE" });
+      await qc.invalidateQueries({ queryKey: ["career-direction"] });
     } catch (e) {
       setActionErr(
-        errorMessage(e, "Couldn't delete transition, please try again"),
+        errorMessage(e, "Couldn't delete career direction, please try again"),
       );
     } finally {
       setDeleting(null);
     }
   }
 
-  const remaining = MAX_LENGTH - text.length;
   const overLimit = text.length > MAX_LENGTH;
   const underLimit = text.trim().length < MIN_LENGTH && text.length > 0;
 
@@ -102,7 +103,7 @@ function TransitionsPage() {
         <p className="text-[11px] uppercase tracking-[0.22em] text-foreground/70">
           Where you're headed
         </p>
-        <h1 className="mt-2 font-display text-4xl">My Transition</h1>
+        <h1 className="mt-2 font-display text-4xl">My Career Direction</h1>
         <p className="mt-2 max-w-lg text-sm text-foreground/75">
           Tell CareerBloom what's next for you so it can tailor its advice.
         </p>
@@ -110,7 +111,7 @@ function TransitionsPage() {
 
       <section className="glass p-7">
         <p className="text-[11px] uppercase tracking-[0.22em] text-foreground/55">
-          Current transition
+          Current career direction
         </p>
         {currentPending ? (
           <div className="grid place-items-center py-12">
@@ -119,7 +120,7 @@ function TransitionsPage() {
         ) : current ? (
           <div className="mt-4 flex flex-col gap-4 rounded-3xl bg-white/70 p-6">
             <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/80">
-              {current.transition}
+              {current.summary}
             </p>
             <div className="flex justify-end">
               <button
@@ -139,7 +140,7 @@ function TransitionsPage() {
           </div>
         ) : (
           <div className="mt-4 p-8 text-center text-sm text-red-600">
-            Couldn't load your transition. Try again in a moment.
+            Couldn't load your career direction. Try again in a moment.
           </div>
         )}
       </section>
@@ -147,11 +148,11 @@ function TransitionsPage() {
       <section className="glass p-7 space-y-4">
         <div>
           <p className="text-[11px] uppercase tracking-[0.22em] text-foreground/55">
-            {current ? "Update" : "Set"} your transition
+            {current ? "Update" : "Set"} your career direction
           </p>
           <p className="mt-1 text-sm text-foreground/60">
             {MIN_LENGTH}-{MAX_LENGTH} characters. This becomes the current
-            transition CareerBloom draws from.
+            career direction CareerBloom draws from.
           </p>
         </div>
         <textarea
@@ -162,7 +163,7 @@ function TransitionsPage() {
           }}
           rows={6}
           className={`mt-1 w-full resize-none rounded-2xl bg-white/85 p-4 text-sm outline-none focus:ring-2 focus:ring-secondary ${overLimit ? "ring-2 ring-red-400" : ""}`}
-          placeholder="e.g. I'm a nurse looking to transition into UX design, focusing on healthcare products."
+          placeholder="e.g. I'm a nurse looking to move into UX design, focusing on healthcare products."
         />
         <div className="flex flex-wrap items-center justify-between gap-3">
           <span
@@ -183,13 +184,13 @@ function TransitionsPage() {
             ) : (
               <Compass className="h-4 w-4" />
             )}{" "}
-            {busy ? "Saving…" : "Save transition"}
+            {busy ? "Saving…" : "Save career direction"}
           </button>
         </div>
       </section>
 
       <section>
-        <h2 className="font-display text-2xl">Previous transitions</h2>
+        <h2 className="font-display text-2xl">Previous career directions</h2>
         <p className="mt-1 text-sm text-foreground/60">
           Past narratives CareerBloom may still draw from.
         </p>
@@ -206,12 +207,12 @@ function TransitionsPage() {
           <div className="mt-4 grid gap-4">
             {history.map((t) => (
               <article
-                key={t.transition_id}
+                key={t.career_direction_id}
                 className="glass flex items-start justify-between gap-4 p-6"
               >
                 <div>
                   <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/80">
-                    {t.transition}
+                    {t.summary}
                   </p>
                   <p className="mt-2 text-xs text-foreground/50">
                     {new Date(t.created_at).toLocaleDateString(undefined, {
@@ -222,11 +223,11 @@ function TransitionsPage() {
                   </p>
                 </div>
                 <button
-                  onClick={() => void remove(t.transition_id)}
-                  disabled={deleting === t.transition_id}
+                  onClick={() => void remove(t.career_direction_id)}
+                  disabled={deleting === t.career_direction_id}
                   className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/70 text-foreground/60 hover:bg-white disabled:opacity-50"
                 >
-                  {deleting === t.transition_id ? (
+                  {deleting === t.career_direction_id ? (
                     <Loader2 className="h-3 w-3 animate-spin" />
                   ) : (
                     <Trash2 className="h-3.5 w-3.5" />
@@ -237,7 +238,7 @@ function TransitionsPage() {
           </div>
         ) : (
           <div className="glass mt-4 p-8 text-center text-sm text-foreground/60">
-            No previous transitions yet.
+            No previous career directions yet.
           </div>
         )}
       </section>

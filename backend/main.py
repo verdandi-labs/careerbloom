@@ -93,7 +93,7 @@ from cv.router import router as cv_router
 from chat.router import router as chat_router
 from cover_letters.router import router as cover_letters_router
 from tenant.router import router as tenant_router
-from transitions.router import router as transitions_router
+from career_direction.router import router as career_direction_router
 from cv.service import limiter
 
 app.state.limiter = limiter
@@ -109,7 +109,7 @@ app.include_router(cv_router, prefix=settings.API_V1_PREFIX)
 app.include_router(chat_router, prefix=settings.API_V1_PREFIX)
 app.include_router(cover_letters_router, prefix=settings.API_V1_PREFIX)
 app.include_router(tenant_router, prefix=settings.API_V1_PREFIX)
-app.include_router(transitions_router, prefix=settings.API_V1_PREFIX)
+app.include_router(career_direction_router, prefix=settings.API_V1_PREFIX)
 
 
 @app.get("/health")

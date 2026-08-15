@@ -1,0 +1,6 @@
+ALTER TABLE career_direction RENAME CONSTRAINT transitions_user_id_fkey TO career_direction_user_id_fkey;
+ALTER TABLE career_direction RENAME CONSTRAINT transitions_pkey TO career_direction_pkey;
+ALTER TABLE career_direction RENAME CONSTRAINT transitions_transition_id_not_null TO career_direction_career_direction_id_not_null;
+ALTER TABLE career_direction RENAME CONSTRAINT transitions_user_id_not_null TO career_direction_user_id_not_null;
+ALTER TABLE career_direction RENAME CONSTRAINT transitions_transition_not_null TO career_direction_summary_not_null;
+ALTER TABLE career_direction RENAME CONSTRAINT transitions_created_at_not_null TO career_direction_created_at_not_null;
