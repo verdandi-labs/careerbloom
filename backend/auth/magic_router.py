@@ -40,7 +40,7 @@ async def request_magic_link(request: MagicLinkRequest, db: AsyncSession = Depen
     await db.commit()
     await send_magic_link(request.email, token, settings.FRONTEND_URL, flow=flow)
 
-    return {"message": "Check your email for magic link", "email": request.email}
+    return {"message": "Check your email for magic link"}
 
 
 @router.get("/magic")
