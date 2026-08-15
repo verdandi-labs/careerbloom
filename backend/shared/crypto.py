@@ -1,9 +1,12 @@
 import base64
 import hashlib
 import hmac
+import json
 from functools import lru_cache
 
 from cryptography.fernet import Fernet
+from google.cloud import kms
+from google.oauth2 import service_account
 
 from config import get_settings
 
@@ -11,8 +14,15 @@ settings = get_settings()
 
 
 @lru_cache(maxsize=1)
-def _master_fernet() -> Fernet:
-    return Fernet(settings.MASTER_KEY.encode())
+def _kms_client() -> kms.KeyManagementServiceClient:
+    if settings.GOOGLE_APPLICATION_CREDENTIALS_JSON:
+        info = json.loads(settings.GOOGLE_APPLICATION_CREDENTIALS_JSON)
+        creds = service_account.Credentials.from_service_account_info(
+            info,
+            scopes=["https://www.googleapis.com/auth/cloudkms"],
+        )
+        return kms.KeyManagementServiceClient(credentials=creds)
+    return kms.KeyManagementServiceClient()
 
 
 @lru_cache(maxsize=256)
@@ -38,11 +48,26 @@ def generate_user_key() -> bytes:
 
 
 def encrypt_user_key(user_key: bytes) -> str:
-    return _master_fernet().encrypt(user_key).decode()
+    client = _kms_client()
+    response = client.encrypt(
+        request={
+            "name": settings.GOOGLE_KMS_KEY_NAME,
+            "plaintext": user_key,
+        }
+    )
+    return base64.b64encode(response.ciphertext).decode()
 
 
 def decrypt_user_key(encrypted_key: str) -> bytes:
-    return _master_fernet().decrypt(encrypted_key.encode())
+    client = _kms_client()
+    ciphertext = base64.b64decode(encrypted_key.encode())
+    response = client.decrypt(
+        request={
+            "name": settings.GOOGLE_KMS_KEY_NAME,
+            "ciphertext": ciphertext,
+        }
+    )
+    return response.plaintext
 
 
 def hash_token(token: str) -> str:

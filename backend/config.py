@@ -7,8 +7,11 @@ class Settings(BaseSettings):
     NEON_DATABASE_URL: str = ""
 
     # Crypto
-    MASTER_KEY: str
     HMAC_SECRET: str
+
+    # Google Cloud KMS
+    GOOGLE_KMS_KEY_NAME: str = ""
+    GOOGLE_APPLICATION_CREDENTIALS_JSON: str = ""
 
     # Google AI
     GEMINI_API_KEY: str = ""
