@@ -34,8 +34,9 @@ Required env vars:
 | Var | Description |
 | --- | ----------- |
 | `NEON_DATABASE_URL` | PostgreSQL connection string |
-| `MASTER_KEY` | Fernet key that wraps per-user encryption keys (no default — app refuses to start without it) |
 | `HMAC_SECRET` | Secret for hashing emails and magic-link tokens |
+| `GOOGLE_KMS_KEY_NAME` | KMS crypto key name that wraps per-user encryption keys (no default) |
+| `GOOGLE_APPLICATION_CREDENTIALS_JSON` | Service-account JSON for calling KMS (optional if using ADC) |
 | `SESSION_SECRET` | Secret for signing session cookies (no default — app refuses to start without it) |
 | `SENDGRID_API_KEY` | For magic-link emails |
 | `GOOGLE_CLIENT_ID` | For Google sign-in |
@@ -46,7 +47,7 @@ Required env vars:
 | `FRONTEND_URL` | Frontend origin (used in magic-link emails) |
 | `CORS_ORIGINS` | Comma-separated allowed origins |
 
-Generate `MASTER_KEY` with `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`.
+Generate `GOOGLE_KMS_KEY_NAME` by creating a KMS keyring and crypto key (see `backend/.env.example` for the expected resource name format).
 
 ### Frontend
 
