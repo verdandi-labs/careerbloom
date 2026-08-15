@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Text, func
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Text, func
 from sqlalchemy.dialects.postgresql import UUID
 
 from database import Base
@@ -16,6 +16,7 @@ class User(Base):
     email = Column(Text)
     email_hash = Column(Text, unique=True)
     onboarding = Column(Boolean, nullable=False, default=False)
+    key_version = Column(Integer, nullable=False, server_default="1")
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
 
