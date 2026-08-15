@@ -25,7 +25,7 @@ export const Route = createFileRoute("/_authenticated/chat")({
   component: ChatLayout,
 });
 
-type Conversation = { id: string; title: string };
+type Conversation = { id: string; title: string; is_career_direction: boolean };
 
 function ChatLayout() {
   const navigate = useNavigate();
@@ -43,8 +43,8 @@ function ChatLayout() {
     try {
       const data = await api<Conversation[]>("/chat/conversations");
       const all = data ?? [];
-      const pinned = all.filter((c) => c.title === "Career Direction");
-      const rest = all.filter((c) => c.title !== "Career Direction");
+      const pinned = all.filter((c) => c.is_career_direction);
+      const rest = all.filter((c) => !c.is_career_direction);
       setConvs([...pinned, ...rest]);
     } catch (e) {
       setListError(
@@ -143,7 +143,7 @@ function ChatLayout() {
               const active = c.id === activeId;
               const isEditing = editingId === c.id;
               const isDeleting = deletingId === c.id;
-              const pinned = c.title === "Career Direction";
+              const pinned = c.is_career_direction;
               return (
                 <div
                   key={c.id}

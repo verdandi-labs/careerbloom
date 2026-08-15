@@ -10,6 +10,7 @@ class ConversationCreate(BaseModel):
 class ConversationResponse(BaseModel):
     id: UUID
     title: str
+    is_career_direction: bool
     created_at: datetime
 
     model_config = {"from_attributes": True}

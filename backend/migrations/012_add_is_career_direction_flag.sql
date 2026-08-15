@@ -1,0 +1,1 @@
+ALTER TABLE chat_conversations ADD COLUMN is_career_direction boolean NOT NULL DEFAULT false;

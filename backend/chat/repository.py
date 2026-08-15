@@ -26,10 +26,13 @@ class ChatRepository:
         )
         return result.scalar_one_or_none()
 
-    async def create_conversation(self, user_id: UUID, title: str | None = None) -> ChatConversation:
+    async def create_conversation(
+        self, user_id: UUID, title: str | None = None, is_career_direction: bool = False
+    ) -> ChatConversation:
         conv = ChatConversation(
             user_id=user_id,
             title=title or f"Conversation - {datetime.utcnow().strftime('%b %d, %Y')}",
+            is_career_direction=is_career_direction,
         )
         self.db.add(conv)
         await self.db.flush()
@@ -39,14 +42,14 @@ class ChatRepository:
         result = await self.db.execute(
             select(ChatConversation).where(
                 ChatConversation.user_id == user_id,
-                ChatConversation.title == "Career Direction",
+                ChatConversation.is_career_direction.is_(True),
             )
         )
         existing = result.scalar_one_or_none()
         if existing:
             return existing
 
-        conv = await self.create_conversation(user_id, "Career Direction")
+        conv = await self.create_conversation(user_id, "Career Direction", is_career_direction=True)
         opening = "Hi, I'm Bloom \U0001f338 Let's talk about where you want to go \u2014 no pressure, no perfect answers needed.\n\nWhat does your ideal career look like, even if it feels far away right now? What pulls at you, what lights you up?"
         msg = ChatMessage(
             conversation_id=conv.id,

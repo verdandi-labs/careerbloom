@@ -1,7 +1,5 @@
 import { api } from "@/lib/api";
 
-export const CAREER_DIRECTION_TITLE = "Career Direction";
-
 export async function createConversation(
   title?: string,
 ): Promise<string | null> {
