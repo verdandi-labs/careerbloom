@@ -14,7 +14,7 @@ from chat.schemas import (
     MessageResponse,
     ChatRequest,
 )
-from chat.service import stream_chat
+from chat.service import parse_suggestion, stream_chat
 from cv.service import limiter
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -91,6 +91,9 @@ async def send_message(
             yield f"data: {json.dumps({'error': 'Message could not be sent, please try again'})}\n\n"
         yield "data: [DONE]\n\n"
 
-        await repo.add_message(user.user_id, conversation_id, "assistant", full_response)
+        clean_content, suggestion = parse_suggestion(full_response)
+        await repo.add_message(
+            user.user_id, conversation_id, "assistant", clean_content, suggestion=suggestion
+        )
 
     return StreamingResponse(generate(), media_type="text/event-stream")

@@ -1,11 +1,15 @@
 import json
+import re
 from google import genai
 from google.genai import types
 from config import get_settings
 from shared.prompts import SAFETY_BOUNDARY
+from chat.schemas import ChatSuggestion
 
 settings = get_settings()
 client = genai.Client(api_key=settings.GEMINI_API_KEY)
+
+_SUGGESTION_BLOCK_RE = re.compile(r"```json\s*([\s\S]*?)```")
 
 CHAT_APPLY_RULE = """Never claim to have applied, saved, or directly edited the user's CV or cover letter. You can only propose changes — always return CV rephrasing as a suggestion using the format above, and make clear the user needs to review and approve it. If the user asks you to "just do it" or apply a change directly, still return it as a suggestion for them to confirm, and say so plainly rather than implying it's already done."""
 
@@ -20,6 +24,7 @@ You help people navigate career changes by:
 
 When suggesting a CV rephrasing, return a JSON code block with:
 {"type":"suggestion","section":"...","original":"...","options":["...","...","..."]}
+The section value must be exactly one of "full_name", "title", or "self_summary"
 
 Otherwise respond in conversational markdown. Be warm, concise, and genuine.
 """.strip()
@@ -28,6 +33,29 @@ Otherwise respond in conversational markdown. Be warm, concise, and genuine.
     + "\n\n"
     + CHAT_APPLY_RULE
 )
+
+
+def parse_suggestion(full_response: str) -> tuple[str, dict | None]:
+    """Extract and validate a suggestion block from raw model output.
+    Mirrors the frontend's detection pattern (fenced ```json block, or the
+    whole response if no fence is present) but applies stricter server-side
+    validation via ChatSuggestion before trusting the result — this is
+    intentionally stricter than the frontend's loose shape-check.
+    If a block is detected but fails validation, the raw text is returned
+    untouched (including the visible block) rather than silently discarded,
+    so validation failures stay visible/debuggable instead of hidden."""
+    match = _SUGGESTION_BLOCK_RE.search(full_response)
+    raw_text = match.group(1) if match else full_response
+    try:
+        raw = json.loads(raw_text.strip())
+        suggestion = ChatSuggestion.model_validate(raw)
+    except Exception:
+        return full_response.strip(), None
+    if match:
+        clean = (full_response[:match.start()] + full_response[match.end():]).strip()
+    else:
+        clean = ""
+    return clean, suggestion.model_dump()
 
 
 def stream_chat(messages: list[dict[str, str]], cv_text: str | None = None):
