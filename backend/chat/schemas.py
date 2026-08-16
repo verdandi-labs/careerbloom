@@ -22,6 +22,10 @@ class MessageCreate(BaseModel):
     content: str = Field(..., max_length=10_000)
 
 
+class ApplySuggestionRequest(BaseModel):
+    chosen: str = Field(..., max_length=2000)
+
+
 class MessageResponse(BaseModel):
     id: UUID
     role: str

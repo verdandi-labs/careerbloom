@@ -72,6 +72,26 @@ class ChatRepository:
         )
         return list(result.scalars().all())
 
+    async def get_message(self, user_id: UUID, conversation_id: UUID, message_id: UUID) -> ChatMessage | None:
+        result = await self.db.execute(
+            select(ChatMessage).where(
+                ChatMessage.id == message_id,
+                ChatMessage.conversation_id == conversation_id,
+                ChatMessage.user_id == user_id,
+            )
+        )
+        return result.scalar_one_or_none()
+
+    async def mark_applied(self, message: ChatMessage, applied_text: str) -> ChatMessage:
+        message.applied_text = applied_text
+        await self.db.flush()
+        return message
+
+    async def mark_rejected(self, message: ChatMessage) -> ChatMessage:
+        message.rejected = True
+        await self.db.flush()
+        return message
+
     async def add_message(
         self, user_id: UUID, conversation_id: UUID, role: str, content: str,
         suggestion: dict | None = None, applied_text: str | None = None
