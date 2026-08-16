@@ -1,8 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { api, apiStream, errorMessage } from "@/lib/api";
 import { createConversation } from "@/lib/chat";
-import { Send, Sparkles, Check, X, Pencil, Loader2, Plus } from "lucide-react";
+import { Check, Loader2, Plus, Send, Sparkles, X } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/chat/$conversationId")({
   head: () => ({ meta: [{ title: "Chat · careerBloom" }] }),
@@ -11,36 +12,28 @@ export const Route = createFileRoute("/_authenticated/chat/$conversationId")({
 
 type Suggestion = {
   type: "suggestion";
-  section?: string;
+  section: string;
   original: string;
   options: string[];
 };
+
+type MessagePayload = {
+  id: string;
+  role: string;
+  content: string;
+  suggestion: Suggestion | null;
+  applied_text: string | null;
+  rejected: boolean;
+};
+
 type Msg = {
   id?: string;
   role: "user" | "assistant";
   content: string;
-  suggestion?: Suggestion | null;
-  applied?: string | null;
-  rejected?: boolean;
+  suggestion: Suggestion | null;
+  applied_text: string | null;
+  rejected: boolean;
 };
-
-function parseSuggestion(text: string): Suggestion | null {
-  const match = text.match(/```json\s*([\s\S]*?)```/);
-  const raw = (match ? match[1] : text).trim();
-  try {
-    const obj = JSON.parse(raw);
-    if (
-      obj &&
-      obj.type === "suggestion" &&
-      Array.isArray(obj.options) &&
-      typeof obj.original === "string"
-    )
-      return obj as Suggestion;
-  } catch {
-    /* not a suggestion */
-  }
-  return null;
-}
 
 function ConversationPage() {
   const { conversationId } = Route.useParams();
@@ -51,23 +44,16 @@ function ConversationPage() {
   const [retryKey, setRetryKey] = useState(0);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [cvText, setCvText] = useState<string>("");
-  const [convTitle, setConvTitle] = useState<string>("");
+  const [busy, setBusy] = useState<Set<string>>(() => new Set());
+  const [msgErrs, setMsgErrs] = useState<Record<string, string>>({});
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const data =
-          await api<{ extracted_text: string | null }[]>("/cv/sections");
-        const latest = data?.[0];
-        if (latest?.extracted_text) setCvText(latest.extracted_text);
-      } catch {
-        /* ignore */
-      }
-    })();
-  }, []);
+  const { data: cv } = useQuery({
+    queryKey: ["cv"],
+    queryFn: () => api<Record<string, unknown>>("/cv"),
+  });
+  const cvLoaded = cv ? Object.values(cv).some(Boolean) : false;
 
   useEffect(() => {
     setLoaded(false);
@@ -75,29 +61,25 @@ function ConversationPage() {
     setLoadError("");
     (async () => {
       try {
-        const msgs = await api<
-          Array<{
-            id: string;
-            role: string;
-            content: string;
-            suggestion: Suggestion | null;
-            applied_text: string | null;
-            rejected: boolean;
-          }>
-        >(`/chat/conversations/${conversationId}/messages`);
+        const msgs = await api<MessagePayload[]>(
+          `/chat/conversations/${conversationId}/messages`,
+        );
         const loaded: Msg[] = (msgs ?? []).map((r) => ({
           id: r.id,
           role: r.role as "user" | "assistant",
           content: r.content,
-          suggestion: r.suggestion ?? null,
-          applied: r.applied_text ?? null,
-          rejected: r.rejected ?? false,
+          suggestion: r.suggestion,
+          applied_text: r.applied_text,
+          rejected: r.rejected,
         }));
         if (loaded.length === 0) {
           loaded.push({
             role: "assistant",
             content:
-              "Hi, I'm Bloom \uD83C\uDF38 \u2014 your career companion. Tell me a little about where you are and where you'd like to go.",
+              "Hi, I'm Bloom your career companion. Tell me a little about where you are and where you'd like to go.",
+            suggestion: null,
+            applied_text: null,
+            rejected: false,
           });
         }
         setMessages(loaded);
@@ -118,11 +100,75 @@ function ConversationPage() {
     inputRef.current?.focus();
   }, [loading, conversationId]);
 
+  async function applySuggestion(msg: Msg, chosen: string) {
+    const id = msg.id;
+    if (!id) return;
+    setBusy((prev) => new Set(prev).add(id));
+    setMsgErrs((prev) => ({ ...prev, [id]: "" }));
+    try {
+      const res = await api<MessagePayload>(
+        `/chat/conversations/${conversationId}/messages/${id}/apply`,
+        { method: "POST", json: { chosen } },
+      );
+      setMessages((prev) =>
+        prev.map((x) =>
+          x.id === id
+            ? { ...x, applied_text: res.applied_text, rejected: res.rejected }
+            : x,
+        ),
+      );
+    } catch (e) {
+      setMsgErrs((prev) => ({
+        ...prev,
+        [id]: errorMessage(e, "Couldn't apply suggestion, please try again"),
+      }));
+    } finally {
+      setBusy((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    }
+  }
+
+  async function rejectSuggestion(msg: Msg) {
+    const id = msg.id;
+    if (!id) return;
+    setBusy((prev) => new Set(prev).add(id));
+    setMsgErrs((prev) => ({ ...prev, [id]: "" }));
+    try {
+      const res = await api<MessagePayload>(
+        `/chat/conversations/${conversationId}/messages/${id}/reject`,
+        { method: "POST" },
+      );
+      setMessages((prev) =>
+        prev.map((x) => (x.id === id ? { ...x, rejected: res.rejected } : x)),
+      );
+    } catch (e) {
+      setMsgErrs((prev) => ({
+        ...prev,
+        [id]: errorMessage(e, "Couldn't reject suggestion, please try again"),
+      }));
+    } finally {
+      setBusy((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    }
+  }
+
   async function send() {
     const text = input.trim();
     if (!text || loading) return;
     setInput("");
-    const userMsg: Msg = { role: "user", content: text };
+    const userMsg: Msg = {
+      role: "user",
+      content: text,
+      suggestion: null,
+      applied_text: null,
+      rejected: false,
+    };
     const next: Msg[] = [...messages, userMsg];
     setMessages(next);
     setLoading(true);
@@ -141,7 +187,16 @@ function ConversationPage() {
       let buf = "";
       let assistant = "";
       let streamFailed = false;
-      setMessages((m) => [...m, { role: "assistant", content: "" }]);
+      setMessages((m) => [
+        ...m,
+        {
+          role: "assistant",
+          content: "",
+          suggestion: null,
+          applied_text: null,
+          rejected: false,
+        },
+      ]);
 
       while (true) {
         const { value, done } = await reader.read();
@@ -166,6 +221,9 @@ function ConversationPage() {
                     json.error,
                     "Response interrupted, please try sending that again",
                   ),
+                  suggestion: null,
+                  applied_text: null,
+                  rejected: false,
                 };
                 return copy;
               });
@@ -178,6 +236,9 @@ function ConversationPage() {
                 copy[copy.length - 1] = {
                   role: "assistant",
                   content: assistant,
+                  suggestion: null,
+                  applied_text: null,
+                  rejected: false,
                 };
                 return copy;
               });
@@ -190,26 +251,37 @@ function ConversationPage() {
 
       if (streamFailed) return;
 
-      const sugg = parseSuggestion(assistant);
-      const finalMsg: Msg = sugg
-        ? {
-            role: "assistant",
-            content:
-              "Here's a softer way to phrase that \u2014 pick whichever feels most you:",
-            suggestion: sugg,
-          }
-        : { role: "assistant", content: assistant };
-      setMessages((m) => {
-        const copy = [...m];
-        copy[copy.length - 1] = finalMsg;
-        return copy;
-      });
+      try {
+        const msgs = await api<MessagePayload[]>(
+          `/chat/conversations/${conversationId}/messages`,
+        );
+        const last = msgs?.[msgs.length - 1];
+        if (last?.id) {
+          setMessages((m) => {
+            const copy = [...m];
+            copy[copy.length - 1] = {
+              id: last.id,
+              role: "assistant",
+              content: last.content,
+              suggestion: last.suggestion,
+              applied_text: last.applied_text,
+              rejected: last.rejected,
+            };
+            return copy;
+          });
+        }
+      } catch {
+        /* keep the streamed text as-is */
+      }
     } catch (e) {
       setMessages((m) => [
         ...m,
         {
           role: "assistant",
           content: errorMessage(e, "Couldn't send message, please try again"),
+          suggestion: null,
+          applied_text: null,
+          rejected: false,
         },
       ]);
     } finally {
@@ -231,11 +303,9 @@ function ConversationPage() {
             <Sparkles className="h-4 w-4" />
           </div>
           <div>
-            <h1 className="font-display text-2xl">
-              Bloom \u2014 your AI coach
-            </h1>
+            <h1 className="font-display text-2xl">Bloom your AI coach</h1>
             <p className="text-xs text-foreground/60">
-              {cvText
+              {cvLoaded
                 ? "I've read your CV. Let's make it shine."
                 : "Upload your CV anytime \u2014 I'll learn it."}
             </p>
@@ -271,7 +341,7 @@ function ConversationPage() {
         )}
         {messages.map((m, i) => (
           <div
-            key={i}
+            key={m.id ?? i}
             className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} gap-2`}
           >
             {m.role === "assistant" && (
@@ -288,19 +358,27 @@ function ConversationPage() {
                     (loading && i === messages.length - 1 ? "\u2026" : "")}
                 </div>
               )}
-              {m.suggestion && !m.rejected && !m.applied && (
-                <SuggestionCard
-                  s={m.suggestion}
-                  onApply={() => {}}
-                  onReject={() => {}}
-                />
-              )}
+              {m.role === "assistant" &&
+                m.suggestion &&
+                (m.applied_text ? (
+                  <ConfirmedCard text={m.applied_text} />
+                ) : m.rejected ? (
+                  <DismissedCard />
+                ) : (
+                  <SuggestionCard
+                    s={m.suggestion}
+                    busy={Boolean(m.id && busy.has(m.id))}
+                    error={m.id ? msgErrs[m.id] : undefined}
+                    onApply={(chosen) => void applySuggestion(m, chosen)}
+                    onReject={() => void rejectSuggestion(m)}
+                  />
+                ))}
             </div>
           </div>
         ))}
         {loading && messages[messages.length - 1]?.role === "user" && (
           <div className="flex items-center gap-2 text-xs text-foreground/50">
-            <Loader2 className="h-3 w-3 animate-spin" /> Bloom is thinking\u2026
+            <Loader2 className="h-3 w-3 animate-spin" /> Bloom is thinking…
           </div>
         )}
       </div>
@@ -332,23 +410,46 @@ function ConversationPage() {
   );
 }
 
+function ConfirmedCard({ text }: { text: string }) {
+  return (
+    <div className="rounded-3xl border border-white/60 bg-white/70 p-4 backdrop-blur space-y-2 shadow-[0_8px_24px_-12px_rgba(248,175,166,0.6)]">
+      <p className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.2em] text-accent">
+        <Check className="h-3 w-3" /> Applied to your CV
+      </p>
+      <p className="text-sm text-foreground">{text}</p>
+    </div>
+  );
+}
+
+function DismissedCard() {
+  return (
+    <div className="rounded-3xl border border-white/60 bg-white/70 p-4 backdrop-blur shadow-[0_8px_24px_-12px_rgba(248,175,166,0.6)]">
+      <p className="inline-flex items-center gap-1 text-xs text-foreground/50">
+        <X className="h-3 w-3" /> Suggestion dismissed
+      </p>
+    </div>
+  );
+}
+
 function SuggestionCard({
   s,
   onApply,
   onReject,
+  busy,
+  error,
 }: {
   s: Suggestion;
-  onApply: () => void;
+  onApply: (chosen: string) => void;
   onReject: () => void;
+  busy?: boolean;
+  error?: string;
 }) {
   const [picked, setPicked] = useState<string | null>(null);
   return (
     <div className="rounded-3xl border border-white/60 bg-white/70 p-4 backdrop-blur space-y-3 shadow-[0_8px_24px_-12px_rgba(248,175,166,0.6)]">
-      {s.section && (
-        <p className="text-[10px] uppercase tracking-[0.2em] text-foreground/50">
-          {s.section}
-        </p>
-      )}
+      <p className="text-[10px] uppercase tracking-[0.2em] text-foreground/50">
+        {s.section}
+      </p>
       <p className="text-xs italic text-foreground/50 line-through">
         {s.original}
       </p>
@@ -357,22 +458,25 @@ function SuggestionCard({
           <button
             key={opt}
             onClick={() => setPicked(opt)}
-            className={`rounded-full px-3 py-1.5 text-xs transition ${picked === opt ? "bg-accent text-accent-foreground" : "bg-secondary/40 hover:bg-secondary/70"}`}
+            disabled={busy}
+            className={`rounded-full px-3 py-1.5 text-xs transition disabled:opacity-50 ${picked === opt ? "bg-accent text-accent-foreground" : "bg-secondary/40 hover:bg-secondary/70"}`}
           >
             {opt}
           </button>
         ))}
       </div>
+      {error && <p className="text-xs text-destructive">{error}</p>}
       <div className="flex flex-wrap items-center gap-2 pt-1">
         <button
           onClick={onReject}
-          className="inline-flex items-center gap-1 rounded-full bg-white/80 px-3 py-1.5 text-xs hover:bg-white"
+          disabled={busy}
+          className="inline-flex items-center gap-1 rounded-full bg-white/80 px-3 py-1.5 text-xs hover:bg-white disabled:opacity-50"
         >
           <X className="h-3 w-3" /> Reject
         </button>
         <button
-          disabled={!picked}
-          onClick={onApply}
+          disabled={!picked || busy}
+          onClick={() => picked && onApply(picked)}
           className="ml-auto inline-flex items-center gap-1 rounded-full bg-foreground px-4 py-1.5 text-xs text-background disabled:opacity-40"
         >
           <Check className="h-3 w-3" /> Apply
