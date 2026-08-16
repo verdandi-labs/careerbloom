@@ -162,6 +162,7 @@ function ConversationPage() {
     const text = input.trim();
     if (!text || loading) return;
     setInput("");
+    const preSendCount = messages.filter((m) => m.id).length;
     const userMsg: Msg = {
       role: "user",
       content: text,
@@ -255,6 +256,7 @@ function ConversationPage() {
         const msgs = await api<MessagePayload[]>(
           `/chat/conversations/${conversationId}/messages`,
         );
+        if (!msgs || msgs.length < preSendCount + 2) return;
         const last = msgs?.[msgs.length - 1];
         if (last?.id) {
           setMessages((m) => {

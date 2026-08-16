@@ -94,10 +94,15 @@ async def send_message(
             yield f"data: {json.dumps({'error': 'Message could not be sent, please try again'})}\n\n"
         yield "data: [DONE]\n\n"
 
-        clean_content, suggestion = parse_suggestion(full_response)
-        await repo.add_message(
-            user.user_id, conversation_id, "assistant", clean_content, suggestion=suggestion
-        )
+        try:
+            clean_content, suggestion = parse_suggestion(full_response)
+            await repo.add_message(
+                user.user_id, conversation_id, "assistant", clean_content, suggestion=suggestion
+            )
+            await db.commit()
+        except Exception:
+            await db.rollback()
+            logger.exception(f"post-stream persist failed for conversation {conversation_id}")
 
     return StreamingResponse(generate(), media_type="text/event-stream")
 
