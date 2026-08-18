@@ -15,8 +15,7 @@ class Settings(BaseSettings):
 
     # Google AI
     GEMINI_API_KEY: str = ""
-    GOOGLE_GEMINI_2_5_FLASH_MODEL: str = "gemini-2.5-flash"
-    GOOGLE_GEMINI_3_FLASH_MODEL: str = "gemini-3-flash-preview"
+    GEMINI_MODEL: str = "gemini-3.6-flash"
 
     # SendGrid
     SENDGRID_API_KEY: str = ""

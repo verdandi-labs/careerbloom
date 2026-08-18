@@ -78,7 +78,7 @@ def stream_chat(messages: list[dict[str, str]], cv_text: str | None = None):
     last_message = messages[-1]["content"] if messages else ""
 
     return client.models.generate_content_stream(
-        model=settings.GOOGLE_GEMINI_3_FLASH_MODEL,
+        model=settings.GEMINI_MODEL,
         contents=history + [types.Content(role="user", parts=[types.Part(text=last_message)])],
         config=types.GenerateContentConfig(system_instruction=system),
     )

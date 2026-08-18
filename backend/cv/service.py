@@ -57,7 +57,7 @@ def extract_raw_text(text: str) -> str:
 async def parse_all_sections(text: str) -> CvData:
     prompt = CV_PARSE_PROMPT.replace("__TEXT__", text[:MAX_TEXT_LENGTH]) + "\n\n" + SAFETY_BOUNDARY
     response = await client.aio.models.generate_content(
-        model=settings.GOOGLE_GEMINI_2_5_FLASH_MODEL,
+        model=settings.GEMINI_MODEL,
         contents=prompt,
         config=types.GenerateContentConfig(
             temperature=0.1,
@@ -82,7 +82,7 @@ async def parse_all_sections(text: str) -> CvData:
 
 async def translate_cv(data: CvData, language: str) -> CvData:
     response = await client.aio.models.generate_content(
-        model=settings.GOOGLE_GEMINI_2_5_FLASH_MODEL,
+        model=settings.GEMINI_MODEL,
         contents=TRANSLATE_PROMPT.format(language=language, json=data.model_dump_json()) + "\n\n" + SAFETY_BOUNDARY,
         config=types.GenerateContentConfig(
             temperature=0.2,
@@ -108,7 +108,7 @@ async def generate_cover_letter_ai(job_title: str, company: str, job_description
     prompt = f"{instructions}\n\n{data_block}\n\n{SAFETY_BOUNDARY}"
 
     response = await client.aio.models.generate_content(
-        model=settings.GOOGLE_GEMINI_3_FLASH_MODEL,
+        model=settings.GEMINI_MODEL,
         contents=prompt,
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
