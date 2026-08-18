@@ -2,6 +2,11 @@ import asyncio
 import logging
 from io import BytesIO
 
+import pdfplumber
+from docx import Document
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.shared import Pt, Inches
+from docx2python import docx2python
 from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -44,8 +49,6 @@ def is_valid_file(contents: bytes) -> bool:
 
 async def extract_file_text(filename: str, contents: bytes) -> str:
     if contents[:4] == b"%PDF":
-        import pdfplumber
-
         def extract_pdf() -> str:
             with pdfplumber.open(BytesIO(contents)) as pdf:
                 return "\n".join(page.extract_text() or "" for page in pdf.pages)
@@ -53,25 +56,17 @@ async def extract_file_text(filename: str, contents: bytes) -> str:
         return await asyncio.to_thread(extract_pdf)
 
     if contents[:4] == b"PK\x03\x04":
-        from docx import Document
-        from docx.table import Table
-        from docx.text.paragraph import Paragraph
-
         def extract_docx() -> str:
-            doc = Document(BytesIO(contents))
-            parts = []
-            for block in doc.element.body:
-                if block.tag.endswith("}p"):
-                    para = Paragraph(block, doc)
-                    if para.text.strip():
-                        parts.append(para.text.strip())
-                elif block.tag.endswith("}tbl"):
-                    table = Table(block, doc)
-                    for row in table.rows:
-                        for cell in row.cells:
-                            if cell.text.strip():
-                                parts.append(cell.text.strip())
-            return "\n".join(parts)
+            try:
+                doc = docx2python(BytesIO(contents))
+                try:
+                    return doc.text
+                finally:
+                    doc.close()
+            except Exception as exc:
+                raise HTTPException(
+                    status_code=400, detail="Invalid or corrupted DOCX file"
+                ) from exc
 
         return await asyncio.to_thread(extract_docx)
 
@@ -233,10 +228,6 @@ async def export_pdf(body: CvExportPdfRequest, user: User = Depends(get_current_
 
 @router.post("/export/docx")
 async def export_docx(body: CvExportDocxRequest, user: User = Depends(get_current_user)):
-    from docx import Document
-    from docx.shared import Pt, Inches
-    from docx.enum.text import WD_ALIGN_PARAGRAPH
-
     doc = Document()
     style = doc.styles["Normal"]
     style.font.name = "Calibri"

@@ -92,6 +92,7 @@ dependencies = [
     { name = "asyncpg" },
     { name = "authlib" },
     { name = "cryptography" },
+    { name = "docx2python" },
     { name = "email-validator" },
     { name = "fastapi" },
     { name = "google-cloud-kms" },
@@ -116,6 +117,7 @@ requires-dist = [
     { name = "asyncpg", specifier = ">=0.31.0" },
     { name = "authlib", specifier = ">=1.7.2" },
     { name = "cryptography", specifier = ">=49.0.0" },
+    { name = "docx2python", specifier = ">=3.7.1" },
     { name = "email-validator", specifier = ">=2.3.0" },
     { name = "fastapi", specifier = ">=0.139.2" },
     { name = "google-cloud-kms", specifier = ">=3.16.0" },
@@ -336,6 +338,20 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/8c/8b/57666417c0f90f08bcafa776861060426765fdb422eb10212086fb811d26/dnspython-2.8.0.tar.gz", hash = "sha256:181d3c6996452cb1189c4046c61599b84a5a86e099562ffde77d26984ff26d0f", size = 368251, upload-time = "2025-09-07T18:58:00.022Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ba/5a/18ad964b0086c6e62e2e7500f7edc89e3faa45033c71c1893d34eed2b2de/dnspython-2.8.0-py3-none-any.whl", hash = "sha256:01d9bbc4a2d76bf0db7c1f729812ded6d912bd318d3b1cf81d30c0f845dbf3af", size = 331094, upload-time = "2025-09-07T18:57:58.071Z" },
+]
+
+[[package]]
+name = "docx2python"
+version = "3.7.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "lxml" },
+    { name = "paragraphs" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/59/1d/9855b6ec40461d989680d11335dc3c72d7266e574368a7603d418a0c4cf3/docx2python-3.7.1.tar.gz", hash = "sha256:b208de29075e7bac18ed883a6174cf44d9f1f1b43d7647b95272735d9e1e21c9", size = 43445, upload-time = "2026-08-06T00:35:14.496Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9b/93/28fdfbc28cb6780941d5e30e352cb540ae919c1bdd21916a2f332372ce66/docx2python-3.7.1-py3-none-any.whl", hash = "sha256:b339f08eacd1418b5be3275f402ca4adb2b9e62848cb9c6312d7ec3dca8de28a", size = 51221, upload-time = "2026-08-06T00:35:13.413Z" },
 ]
 
 [[package]]
@@ -732,6 +748,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/7d/fa/3944b40b07da9ce895c0e6303a5ab7d53da063554f534556b134a54d6093/packaging-26.3.tar.gz", hash = "sha256:94edc256424af38762eb31306eed28beb9f0efc50a8837492c9d6fd6004aed79", size = 313412, upload-time = "2026-08-04T18:15:28.737Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/63/34/ba1c580383c9eada3711951fef0795c80b829a078d72188184bcab9dd527/packaging-26.3-py3-none-any.whl", hash = "sha256:d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c", size = 129956, upload-time = "2026-08-04T18:15:27.159Z" },
+]
+
+[[package]]
+name = "paragraphs"
+version = "1.0.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/24/71/2462530f2e70991c1d19c03423a0bc1cdde8e49a415762edaebe7c19f9a3/paragraphs-1.0.1.tar.gz", hash = "sha256:ad393f2e99432740f36c115280aa454c53c8048e6a2cda0b81df4effc8043a60", size = 7045, upload-time = "2024-08-11T18:15:57.551Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/18/79/806f22675c50f9cc827376756186c8601ef52a9cf08d2c7b80964e1daba2/paragraphs-1.0.1-py3-none-any.whl", hash = "sha256:9a189d8dfc6241b5caa9b3ae730ee6ccce53e483d3b45183d13f657f7d0d1b35", size = 5139, upload-time = "2024-08-11T18:15:56.188Z" },
 ]
 
 [[package]]
