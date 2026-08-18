@@ -16,7 +16,6 @@ from cv.schemas import (
     CvData,
     CvEditRequest,
     CvExportDocxRequest,
-    CvExportPdfRequest,
     CvRawText,
     CvTranslateRequest,
     FIELD_MODELS,
@@ -204,42 +203,6 @@ async def translate(
         raise HTTPException(status_code=400, detail="CV content could not be processed — please check your file and try again")
     await repo.create_translate(user.user_id, body.language, translated)
     return translated
-
-
-@router.post("/export/pdf")
-async def export_pdf(body: CvExportPdfRequest, user: User = Depends(get_current_user)):
-    from reportlab.lib.pagesizes import letter
-    from reportlab.lib.units import inch
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-
-    buf = BytesIO()
-    doc = SimpleDocTemplate(buf, pagesize=letter, topMargin=0.75 * inch, bottomMargin=0.75 * inch,
-                            leftMargin=0.75 * inch, rightMargin=0.75 * inch)
-    styles = getSampleStyleSheet()
-    elements = []
-
-    if body.name:
-        elements.append(Paragraph(body.name, ParagraphStyle("Name", parent=styles["Title"], fontSize=20, spaceAfter=12)))
-    if body.language:
-        elements.append(Paragraph(f"Language: {body.language.upper()}", styles["Normal"]))
-        elements.append(Spacer(1, 12))
-
-    for section in body.sections:
-        heading = section.get("heading", "")
-        body_text = section.get("body", "")
-        if not body_text:
-            continue
-        elements.append(Paragraph(f"<b>{heading.upper()}</b>", ParagraphStyle("SectionHead", parent=styles["Heading2"], fontSize=12, spaceAfter=6)))
-        for para in body_text.split("\n\n"):
-            if para.strip():
-                elements.append(Paragraph(para.strip().replace("\n", "<br/>"), styles["Normal"]))
-                elements.append(Spacer(1, 6))
-
-    await asyncio.to_thread(doc.build, elements)
-    buf.seek(0)
-    return StreamingResponse(buf, media_type="application/pdf",
-                             headers={"Content-Disposition": "attachment; filename=careerBloom-cv.pdf"})
 
 
 @router.post("/export/docx")

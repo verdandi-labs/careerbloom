@@ -194,26 +194,6 @@ const listText = (data: CvData, key: ListKey) =>
     .map((r) => LIST_SECTIONS.find((s) => s.key === key)!.text(r))
     .join("\n\n");
 
-const toPdfSections = (
-  data: CvData,
-): Array<{ heading: string; body: string }> => {
-  const out: Array<{ heading: string; body: string }> = [];
-  const push = (heading: string, body: string) => {
-    if (body.trim()) out.push({ heading, body });
-  };
-  push("Summary", data.self_summary ?? "");
-  push("Contact", listText(data, "contact_details"));
-  push("Experience", listText(data, "experience"));
-  push("Education", listText(data, "studies"));
-  push("Skills", listText(data, "skills"));
-  push("Languages", listText(data, "languages"));
-  push("Projects", listText(data, "projects"));
-  push("Volunteering", listText(data, "volunteering"));
-  push("Awards", listText(data, "awards"));
-  push("Publications", listText(data, "publications"));
-  return out;
-};
-
 const toDocxData = (data: CvData): Record<string, string> => ({
   name: data.full_name ?? "",
   title: data.title ?? "",
@@ -329,32 +309,6 @@ function CVPage() {
     }
   }
 
-  async function exportPdf(source: CvData, code?: string) {
-    setExporting(true);
-    setActionErr("");
-    try {
-      const res = await fetch("/api/v1/cv/export/pdf", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: source.full_name ?? undefined,
-          ...(code ? { language: code } : {}),
-          sections: toPdfSections(source),
-        }),
-      });
-      if (!res.ok) throw new Error("Export failed");
-      await downloadBlob(
-        await res.blob(),
-        code ? `careerbloom-cv-${code}.pdf` : "careerbloom-cv.pdf",
-      );
-    } catch (e) {
-      setActionErr(errorMessage(e, "CV export failed, please try again"));
-    } finally {
-      setExporting(false);
-    }
-  }
-
   async function exportDocx(source: CvData, code?: string) {
     setExporting(true);
     setActionErr("");
@@ -424,18 +378,6 @@ function CVPage() {
                 </div>
               )}
             </div>
-            <button
-              onClick={() => cv && void exportPdf(cv)}
-              disabled={exporting || !cv}
-              className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs text-foreground hover:bg-white disabled:opacity-50"
-            >
-              {exporting ? (
-                <Loader2 className="h-3 w-3 animate-spin" />
-              ) : (
-                <Download className="h-3 w-3" />
-              )}{" "}
-              Export PDF
-            </button>
             <button
               onClick={() => cv && void exportDocx(cv)}
               disabled={exporting || !cv}
@@ -737,18 +679,6 @@ function CVPage() {
               })}
             </div>
             <div className="mt-8 flex flex-wrap justify-end gap-2">
-              <button
-                onClick={() => void exportPdf(translated.data, translated.code)}
-                disabled={exporting}
-                className="inline-flex items-center gap-2 rounded-2xl bg-white/70 px-5 py-2.5 text-sm text-foreground hover:bg-white disabled:opacity-50"
-              >
-                {exporting ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Download className="h-4 w-4" />
-                )}{" "}
-                Export PDF
-              </button>
               <button
                 onClick={() =>
                   void exportDocx(translated.data, translated.code)
