@@ -119,15 +119,15 @@ async def save_cv(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    if _check_suspicious(body.text):
+        logger.warning("Suspicious CV content rejected")
+        raise HTTPException(status_code=400, detail="CV content could not be processed — please check your file and try again")
+
     try:
         parsed = await parse_all_sections(body.text)
     except Exception:
         logger.error("CV save failed", exc_info=True)
         raise HTTPException(status_code=500, detail="Could not parse your CV, please try again")
-
-    if _check_suspicious(parsed.model_dump_json()):
-        logger.warning("Suspicious CV content rejected")
-        raise HTTPException(status_code=400, detail="CV content could not be processed — please check your file and try again")
 
     repo = CvRepository(db)
     is_first = await repo.count_uploads(user.user_id) == 0
