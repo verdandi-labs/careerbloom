@@ -2,7 +2,7 @@ import asyncio
 import logging
 from io import BytesIO
 
-import pdfplumber
+import pypdfium2 as pdfium
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt, Inches
@@ -50,8 +50,24 @@ def is_valid_file(contents: bytes) -> bool:
 async def extract_file_text(filename: str, contents: bytes) -> str:
     if contents[:4] == b"%PDF":
         def extract_pdf() -> str:
-            with pdfplumber.open(BytesIO(contents)) as pdf:
-                return "\n".join(page.extract_text() or "" for page in pdf.pages)
+            try:
+                doc = pdfium.PdfDocument(contents)
+                try:
+                    pages_text = []
+                    for page in doc:
+                        textpage = page.get_textpage()
+                        try:
+                            pages_text.append(textpage.get_text_range())
+                        finally:
+                            textpage.close()
+                            page.close()
+                    return "\n\n".join(pages_text)
+                finally:
+                    doc.close()
+            except Exception as exc:
+                raise HTTPException(
+                    status_code=400, detail="Invalid or corrupted PDF file"
+                ) from exc
 
         return await asyncio.to_thread(extract_pdf)
 
