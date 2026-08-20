@@ -8,10 +8,9 @@ class Settings(BaseSettings):
 
     # Crypto
     HMAC_SECRET: str
-
-    # Google Cloud KMS
-    GOOGLE_KMS_KEY_NAME: str = ""
-    GOOGLE_APPLICATION_CREDENTIALS_JSON: str = ""
+    # 32-byte base64-urlsafe Fernet master key that wraps per-user encryption keys
+    # Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+    MASTER_KEY: str
 
     # Google AI
     GEMINI_API_KEY: str = ""

@@ -1,4 +1,4 @@
-# OAuth + KMS manual QA checklist
+# OAuth + crypto manual QA checklist
 
 Run through in a normal browser against a fresh deploy before trusting it. Base app is `https://careerbloom-e5ne.onrender.com/auth`.
 

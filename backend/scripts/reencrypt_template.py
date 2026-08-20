@@ -3,6 +3,10 @@ Re-encryption script template
 Copy this file and adapt it for a specific future re-encryption migration
 Do not run as-is, the placeholder functions raise NotImplementedError
 Fill in _decrypt_old and _encrypt_new for the exact old and new key schemes
+For the 2026 KMS-to-Fernet migration: _decrypt_old used the old google-cloud-kms client
+against the KMS-wrapped ciphertext (backend/shared/crypto.py pre-Fernet), _encrypt_new
+is Fernet(MASTER_KEY).encrypt(plaintext) and the NEW_KEY_VERSION is 2
+The production DB had no legacy rows, so the migration was not run
 Confirm the target table, field, key_version column and new version before running
 Run planned changes against a staging copy before touching a live database
 

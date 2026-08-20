@@ -2,22 +2,18 @@
 
 Two independent rotation scenarios. Read the one that matches what broke, follow the numbered steps, and stop if any step's verify result is wrong.
 
-## Section 1 — Master key rotation (KMS)
+## Section 1 — Master key rotation (Fernet MASTER_KEY)
 
-`encrypt_user_key` / `decrypt_user_key` (backend/shared/crypto.py) pass the KMS key's **resource name**, not a pinned key version. KMS rotates automatically and handles old versions, so the normal workflow is entirely in the console with zero code deploys.
+`encrypt_user_key` / `decrypt_user_key` (backend/shared/crypto.py) wrap each per-user Fernet key with a single `MASTER_KEY` Fernet key from `config.py`. There is no automatic rotation: changing `MASTER_KEY` invalidates every stored `users.encryption_key`, so rotate only via the field re-encryption procedure in Section 2.
 
-1. Open Cloud KMS console → project `careerbloom-500323` → location `europe-west1`
-2. Open keyring `CareerBloom` → crypto key `master-key`
-3. Click **Create new key version**
-4. Click the new version's overflow menu → **Promote to primary**
-
-Verify:
-- New encryptions use the new version automatically (nothing to change in code)
-- Old ciphertexts still decrypt — KMS retains every non-destroyed version
+1. Generate a new `MASTER_KEY` with `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`
+2. Bump `NEW_KEY_VERSION` in the re-encryption script and set `users.key_version` accordingly (migration `009_add_key_version.sql` tracks the scheme version)
+3. Follow Section 2 steps 1-8 to re-encrypt every row before swapping `MASTER_KEY` in the app/Render env vars
+4. Swap `MASTER_KEY` in the env, deploy, verify against a sample of rows
 
 Hard warning:
-- **Destroying a key version that is still in use permanently breaks decryption for every row encrypted under it.** There is no recovery after destroy.
-- Only destroy old versions once you are certain no ciphertext depends on them (for example, after a full user-level field re-encryption from Section 2, or after confirming no rows still reference that version).
+- **Losing or replacing `MASTER_KEY` without first re-encrypting rows permanently breaks decryption for every stored `encryption_key`.** There is no recovery after the key is changed.
+- Keep the old `MASTER_KEY` backed up until no row still decrypts under it (for example, after a full user-level field re-encryption from Section 2).
 
 ## Section 2 — User-level Fernet key rotation / field re-encryption
 

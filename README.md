@@ -35,8 +35,7 @@ Required env vars:
 | --- | ----------- |
 | `NEON_DATABASE_URL` | PostgreSQL connection string |
 | `HMAC_SECRET` | Secret for hashing emails and magic-link tokens |
-| `GOOGLE_KMS_KEY_NAME` | KMS crypto key name that wraps per-user encryption keys (no default) |
-| `GOOGLE_APPLICATION_CREDENTIALS_JSON` | Service-account JSON for calling KMS (optional if using ADC) |
+| `MASTER_KEY` | Fernet master key that wraps per-user encryption keys (32-byte base64-urlsafe, no default) |
 | `SESSION_SECRET` | Secret for signing session cookies (no default — app refuses to start without it) |
 | `SENDGRID_API_KEY` | For magic-link emails |
 | `GOOGLE_CLIENT_ID` | For Google sign-in |
@@ -47,7 +46,10 @@ Required env vars:
 | `FRONTEND_URL` | Frontend origin (used in magic-link emails) |
 | `CORS_ORIGINS` | Comma-separated allowed origins |
 
-Generate `GOOGLE_KMS_KEY_NAME` by creating a KMS keyring and crypto key (see `backend/.env.example` for the expected resource name format).
+Generate the `MASTER_KEY` with:
+```sh
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
 
 ### Frontend
 
@@ -75,4 +77,4 @@ Sign in with a one-time email magic link (valid 15 min) or Google/GitHub OAuth. 
 
 ## Deploy
 
-Single Docker image (Dockerfile) builds the frontend and serves it from FastAPI. Set `CORS_ORIGINS` and `FRONTEND_URL` to the deployed origin in the host's env vars — `.env` files do not ship with the image.
+Single Docker image (Dockerfile) builds the frontend and serves it from FastAPI. Set `CORS_ORIGINS`, `FRONTEND_URL` and `MASTER_KEY` to the deployed values in the host's env vars — `.env` files do not ship with the image.
