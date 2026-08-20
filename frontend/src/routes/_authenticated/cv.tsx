@@ -74,8 +74,8 @@ const range = (
   dateKeys: string[],
   commentKey: string,
 ) => {
-  const main = pick(row, mainKeys).join(" \u2014 ");
-  const dates = pick(row, dateKeys).join(" \u2013 ");
+  const main = pick(row, mainKeys).join("  ");
+  const dates = pick(row, dateKeys).join("  ");
   const comment = str(row[commentKey]);
   return [main, dates, comment].filter(Boolean).join(", ");
 };
@@ -625,7 +625,7 @@ function CVPage() {
           </div>
         )}
         <p className="mt-3 text-center text-[11px] text-foreground/50">
-          {saving ? "Saving\u2026" : ""}
+          {saving ? "Saving" : ""}
         </p>
       </section>
 

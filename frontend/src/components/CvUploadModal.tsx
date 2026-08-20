@@ -97,8 +97,8 @@ export function CvUploadModal({
           <>
             <h2 className="font-display text-3xl">Upload your CV</h2>
             <p className="mt-1 text-sm text-foreground/70">
-              PDF, DOCX, or TXT format, size: 20KB\u20135MB. We'll read your
-              file and fill your CV builder.
+              PDF, DOCX, or TXT format, size: 20KB-5MB. We'll read your file and
+              fill your CV builder.
             </p>
 
             <div
@@ -152,7 +152,7 @@ export function CvUploadModal({
               <Loader2 className="h-7 w-7 animate-spin text-foreground" />
             </div>
             <p className="mt-5 font-display text-2xl italic">
-              Reading your story\u2026
+              Reading your story
             </p>
             {fileName && (
               <p className="mx-auto mt-4 inline-flex max-w-full items-center gap-2 rounded-full bg-white/60 px-3 py-1 text-xs text-foreground/70">
@@ -211,9 +211,7 @@ export function CvUploadModal({
             <div className="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-secondary/40">
               <Loader2 className="h-7 w-7 animate-spin text-foreground" />
             </div>
-            <p className="mt-5 font-display text-2xl italic">
-              Saving your CV\u2026
-            </p>
+            <p className="mt-5 font-display text-2xl italic">Saving your CV</p>
           </div>
         )}
 

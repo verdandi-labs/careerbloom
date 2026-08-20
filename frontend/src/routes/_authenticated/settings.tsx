@@ -85,8 +85,8 @@ function SettingsPage() {
           Delete account
         </h2>
         <p className="text-xs text-foreground/60">
-          This clears your CV, edits, and cover letters. There's no undo \u2014
-          go softly.
+          This clears your CV, edits, and cover letters. There's no undo. go
+          softly.
         </p>
         {!confirmDelete ? (
           <button

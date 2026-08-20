@@ -309,7 +309,7 @@ function ConversationPage() {
             <p className="text-xs text-foreground/60">
               {cvLoaded
                 ? "I've read your CV. Let's make it shine."
-                : "Upload your CV anytime \u2014 I'll learn it."}
+                : "Upload your CV anytime I'll learn it."}
             </p>
           </div>
         </div>
@@ -357,7 +357,7 @@ function ConversationPage() {
                   className={`rounded-3xl px-5 py-3 text-sm leading-relaxed whitespace-pre-wrap ${m.role === "user" ? "rounded-tr-md bg-secondary text-secondary-foreground" : "rounded-tl-md bg-white/75 backdrop-blur"}`}
                 >
                   {m.content ||
-                    (loading && i === messages.length - 1 ? "\u2026" : "")}
+                    (loading && i === messages.length - 1 ? "" : "")}
                 </div>
               )}
               {m.role === "assistant" &&
