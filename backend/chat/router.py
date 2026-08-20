@@ -92,7 +92,7 @@ async def send_message(
         except Exception:
             logger.error("Chat stream failed", exc_info=True)
             yield f"data: {json.dumps({'error': 'Message could not be sent, please try again'})}\n\n"
-        yield "data: [DONE]\n\n"
+            return
 
         try:
             clean_content, suggestion = parse_suggestion(full_response)
@@ -103,6 +103,9 @@ async def send_message(
         except Exception:
             await db.rollback()
             logger.exception(f"post-stream persist failed for conversation {conversation_id}")
+            yield f"data: {json.dumps({'error': 'Message could not be sent, please try again'})}\n\n"
+
+        yield "data: [DONE]\n\n"
 
     return StreamingResponse(generate(), media_type="text/event-stream")
 
