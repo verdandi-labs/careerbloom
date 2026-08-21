@@ -96,7 +96,7 @@ function LandingPage() {
             Continue with GitHub
           </a>
           <button
-            onClick={() => navigate({ to: "/auth", search: {} })}
+            onClick={() => navigate({ to: "/auth/mail", search: {} })}
             className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary/40 px-6 py-3.5 text-sm font-bold text-secondary-foreground backdrop-blur-sm transition hover:bg-secondary/60"
           >
             <Mail className="h-4 w-4" />

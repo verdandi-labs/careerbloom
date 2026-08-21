@@ -4,37 +4,14 @@ import {
   useNavigate,
   useRouterState,
 } from "@tanstack/react-router";
-import { Suspense, lazy, useEffect } from "react";
 import { z } from "zod";
-import { useSession, useAuthUI } from "@/features/auth";
-import { ErrorBoundary } from "@/components/ui/error-boundary";
-import { Loader2 } from "lucide-react";
-
-const MagicLinkScreen = lazy(() =>
-  import("@/features/auth/screens/MagicLinkScreen").then((m) => ({
-    default: m.MagicLinkScreen,
-  })),
-);
-
-function LazyFallback() {
-  return (
-    <div className="flex justify-center py-12">
-      <Loader2 className="h-6 w-6 animate-spin text-foreground/50" />
-    </div>
-  );
-}
+import { API_BASE } from "@/lib/api";
+import { Chrome, Github, Mail } from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
   head: () => ({
-    meta: [
-      { title: "Welcome to CareerBloom!" },
-      {
-        name: "description",
-        content:
-          "Ready for your next career move? Enter your email and we'll send you a secure authentication link",
-      },
-    ],
+    meta: [{ title: "Login · CareerBloom" }],
   }),
   validateSearch: z.object({ error: z.string().optional() }),
   component: AuthLayout,
@@ -55,53 +32,67 @@ function AuthLayout() {
     );
   }
 
-  return <AuthPage />;
+  return <LoginPage />;
 }
 
-function AuthPage() {
-  const { data: user } = useSession();
+const ERROR_MESSAGES: Record<string, string> = {
+  state_mismatch: "Something went wrong, please try again",
+  email_exists: "This email is already registered with a different provider",
+};
+
+function LoginPage() {
+  const { error } = Route.useSearch();
   const navigate = useNavigate();
-  const setAuthEmail = useAuthUI((s) => s.setEmail);
+  const errorMessage = error ? ERROR_MESSAGES[error] : undefined;
 
-  useEffect(() => {
-    if (user) navigate({ to: "/dashboard" });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
-
-  if (!user) {
-    return (
-      <Background>
-        <div className="text-center">
-          <img
-            src="/logo.png"
-            alt="careerBloom"
-            className="mx-auto mb-6 h-10 w-auto"
-          />
-          <h1 className="font-display text-4xl leading-tight md:text-5xl">
-            Welcome to CareerBloom!
-          </h1>
-          <p className="mt-2 text-sm text-foreground/70">
-            Ready for the next step in your career?
+  return (
+    <Background>
+      <div className="text-center">
+        <img
+          src="/logo.png"
+          alt="careerBloom"
+          className="mx-auto mb-6 h-10 w-auto"
+        />
+        <h1 className="font-display text-4xl leading-tight md:text-5xl">
+          Login / Sign up
+        </h1>
+        <p className="mt-2 text-sm text-foreground/70">
+          Ready for the next step in your career?
+        </p>
+      </div>
+      <section className="bg-secondary/30 rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] p-6 md:p-8">
+        {errorMessage && (
+          <p className="mb-4 rounded-xl bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
+            {errorMessage}
           </p>
-          <p className="mx-auto mt-4 max-w-sm text-[12px] leading-relaxed text-center text-foreground/60 md:text-sm">
-            Enter your email and we will send you a secure
-            <br />
-            authentication link (valid for 15 minutes)
-          </p>
+        )}
+        <div className="flex w-full flex-col gap-3">
+          <a
+            href={`${API_BASE}/auth/oauth/google`}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-foreground px-6 py-3.5 text-sm font-bold text-background transition hover:bg-foreground/85"
+          >
+            <Chrome className="h-4 w-4" />
+            Google
+          </a>
+          <a
+            href={`${API_BASE}/auth/oauth/github`}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary/70 px-6 py-3.5 text-sm font-bold text-secondary-foreground backdrop-blur-sm transition hover:bg-secondary/90"
+          >
+            <Github className="h-4 w-4" />
+            GitHub
+          </a>
+          <button
+            onClick={() => navigate({ to: "/auth/mail", search: {} })}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary/40 px-6 py-3.5 text-sm font-bold text-secondary-foreground backdrop-blur-sm transition hover:bg-secondary/60"
+          >
+            <Mail className="h-4 w-4" />
+            Mail
+          </button>
         </div>
-        <section className="bg-secondary/30 rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] p-6 md:p-8">
-          <ErrorBoundary>
-            <Suspense fallback={<LazyFallback />}>
-              <MagicLinkScreen onSent={(email) => setAuthEmail(email)} />
-            </Suspense>
-          </ErrorBoundary>
-        </section>
-        <Footer />
-      </Background>
-    );
-  }
-
-  return null;
+      </section>
+      <Footer />
+    </Background>
+  );
 }
 
 function Background({ children }: { children: React.ReactNode }) {

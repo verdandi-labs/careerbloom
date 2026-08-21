@@ -8,7 +8,7 @@ export function MagicLinkScreen({
 }: {
   onSent: (email: string) => void;
 }) {
-  const search = useSearch({ from: "/auth" });
+  const search = useSearch({ from: "/auth/mail" });
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
