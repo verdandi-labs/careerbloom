@@ -97,18 +97,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { property: "og:image", content: import.meta.env.VITE_OG_IMAGE_URL },
         { name: "twitter:image", content: import.meta.env.VITE_OG_IMAGE_URL },
       ],
-      links: [
-        { rel: "preconnect", href: import.meta.env.VITE_GOOGLE_FONTS_URL },
-        {
-          rel: "preconnect",
-          href: "https://fonts.gstatic.com",
-          crossOrigin: "anonymous",
-        },
-        {
-          rel: "stylesheet",
-          href: import.meta.env.VITE_GOOGLE_FONTS_CSS_URL,
-        },
-      ],
     }),
     component: RootComponent,
     notFoundComponent: NotFoundComponent,
