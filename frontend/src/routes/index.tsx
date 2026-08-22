@@ -241,8 +241,16 @@ function LandingPage() {
       </section>
 
       {/* You don't have to navigate alone */}
-      <section id="philosophy" className="bg-[#fee8e7] px-6 py-24">
-        <div className="mx-auto max-w-6xl">
+      <section id="philosophy" className="relative overflow-hidden px-6 py-24">
+        <div className="absolute inset-0">
+          <img
+            src="/back2.jpg"
+            alt=""
+            className="h-full w-full scale-105 object-cover blur-md"
+          />
+          <div className="absolute inset-0 bg-[#fee8e7]/85" />
+        </div>
+        <div className="relative mx-auto max-w-6xl">
           <p className="mb-5 text-xs tracking-widest text-[#F8AFA6] uppercase">
             Our philosophy
           </p>
