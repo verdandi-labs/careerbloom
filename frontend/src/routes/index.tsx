@@ -99,23 +99,19 @@ function LandingPage() {
           WebkitBackdropFilter: scrolled ? "blur(20px) saturate(180%)" : "none",
         }}
       >
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <div className="flex items-center justify-between px-6 py-2">
           <Logo light={scrolled} />
-          <nav className="hidden items-center gap-4 md:flex">
+          <nav className="hidden items-center gap-2 md:flex">
             {[
               { label: "Home", href: "#", solid: false },
               { label: "Philosophy", href: "#philosophy", solid: false },
               { label: "How it works", href: "#how", solid: false },
               { label: "Get started", href: "#join", solid: true },
-            ].map(({ label, href, solid }) => (
+            ].map(({ label, href }) => (
               <a
                 key={label}
                 href={href}
-                className={`rounded-full border border-white/40 px-4 py-2 text-sm font-medium text-white backdrop-blur-xl transition-colors ${
-                  solid
-                    ? "bg-secondary/55 hover:bg-secondary/75"
-                    : "bg-secondary/30 hover:bg-secondary/50"
-                }`}
+                className="rounded-full border border-[#c97b70] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-white/10"
               >
                 {label}
               </a>
@@ -149,24 +145,23 @@ function LandingPage() {
         </div>
 
         {menuOpen && (
-          <nav className="mx-6 mb-4 flex flex-col gap-2 md:hidden">
+          <nav className="ml-auto mr-4 mb-3 flex w-1/2 flex-col items-end gap-1 rounded-3xl border border-white/40 bg-[#120a08]/20 p-3 backdrop-blur-2xl md:hidden">
             {[
-              { label: "Home", href: "#", solid: false },
-              { label: "Philosophy", href: "#philosophy", solid: false },
-              { label: "How it works", href: "#how", solid: false },
-              { label: "Get started", href: "#join", solid: true },
-            ].map(({ label, href, solid }) => (
+              { label: "Home", href: "#", sage: false },
+              { label: "Philosophy", href: "#philosophy", sage: false },
+              { label: "How it works", href: "#how", sage: false },
+              { label: "Get started", href: "#join", sage: true },
+            ].map(({ label, href, sage }) => (
               <a
                 key={label}
                 href={href}
                 onClick={() => setMenuOpen(false)}
-                className={`rounded-full border border-white/40 px-4 py-2 text-center text-sm font-medium text-white backdrop-blur-xl transition-colors ${
-                  solid
-                    ? "bg-secondary/55 hover:bg-secondary/75"
-                    : "bg-secondary/30 hover:bg-secondary/50"
+                className={`group relative rounded-full px-4 py-2.5 text-sm font-medium transition-colors hover:text-[#F8AFA6] ${
+                  sage ? "text-primary" : "text-white"
                 }`}
               >
                 {label}
+                <span className="absolute right-4 bottom-1.5 left-4 h-px origin-right scale-x-0 bg-sage transition-transform duration-300 group-hover:scale-x-100" />
               </a>
             ))}
           </nav>
@@ -188,7 +183,7 @@ function LandingPage() {
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to bottom, rgba(18,10,8,0.45) 0%, rgba(18,10,8,0.6) 60%, #120a08 100%)",
+                "linear-gradient(to bottom, rgba(18,10,8,0.3) 0%, rgba(18,10,8,0.45) 60%, #120a08 100%)",
             }}
           />
         </div>
@@ -207,7 +202,7 @@ function LandingPage() {
               opportunity
             </h1>
 
-            <p className="mt-7 max-w-xl text-sm leading-relaxed text-[#b89f99] md:text-base">
+            <p className="mt-7 max-w-xl text-sm leading-relaxed text-white md:text-base">
               Career transitions are exciting, but they can also challenge your
               confidence and make you lose sight of the value your previous
               experience holds
@@ -314,14 +309,22 @@ function LandingPage() {
       </section>
 
       {/* AI stages */}
-      <section id="how" className="bg-[#120a08] px-6 py-24">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-16 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+      <section id="how" className="relative overflow-hidden px-6 py-24">
+        <div className="absolute inset-0">
+          <img
+            src="/back2.jpg"
+            alt=""
+            className="h-full w-full scale-105 object-cover blur-md"
+          />
+          <div className="absolute inset-0 bg-[#fee8e7]/55" />
+        </div>
+        <div className="relative mx-auto max-w-6xl">
+          <div className="mb-8 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="mb-4 text-xs tracking-widest text-[#F8AFA6] uppercase">
+              <p className="mb-4 text-xs tracking-widest text-[#e89d94] uppercase">
                 Every stage, covered
               </p>
-              <h2 className="font-playfair max-w-lg text-2xl leading-tight font-bold text-white md:text-3xl">
+              <h2 className="font-playfair max-w-lg text-2xl leading-tight font-bold text-[#1c1410] md:text-3xl">
                 Think of it as a supportive framework that brings together
                 structure, insight, and tools to reduce friction
               </h2>
@@ -329,20 +332,21 @@ function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {" "}
             {STAGES.map((s) => (
               <article
                 key={s.title}
-                className={`glass relative p-6 ${s.incoming ? "opacity-70" : ""}`}
+                className={`glass-strong relative p-6 ${s.incoming ? "opacity-70" : ""}`}
               >
                 {s.incoming && (
                   <span className="absolute top-4 right-4 rounded-full bg-secondary/60 px-2.5 py-0.5 text-[10px] font-medium text-[#1c1410] uppercase tracking-wide">
                     Coming soon
                   </span>
                 )}
-                <p className="font-playfair text-xl font-semibold text-[#1c1410]">
+                <p className="font-playfair text-xl font-semibold text-[#F8AFA6]">
                   {s.title}
                 </p>
-                <p className="mt-2 text-sm leading-relaxed text-foreground/70">
+                <p className="mt-2 text-sm leading-relaxed text-[#4a403c]">
                   {s.desc}
                 </p>
               </article>
