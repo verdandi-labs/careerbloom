@@ -111,7 +111,7 @@ function LandingPage() {
               <a
                 key={label}
                 href={href}
-                className="rounded-full bg-sage/50 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-md transition-colors hover:bg-sage/70"
+                className="inline-flex min-h-11 items-center rounded-full bg-sage/50 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-md transition-colors hover:bg-sage/70"
               >
                 {label}
               </a>
@@ -156,7 +156,7 @@ function LandingPage() {
                 key={label}
                 href={href}
                 onClick={() => setMenuOpen(false)}
-                className={`group relative rounded-full px-4 py-2.5 text-sm font-medium transition-colors hover:text-[#F8AFA6] ${
+                className={`group relative inline-flex min-h-11 items-center rounded-full px-4 py-2.5 text-sm font-medium transition-colors hover:text-[#F8AFA6] ${
                   sage ? "text-primary" : "text-white"
                 }`}
               >

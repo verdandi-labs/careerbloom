@@ -397,7 +397,7 @@ function ConversationPage() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           disabled={loading}
-          className="flex-1 bg-transparent text-sm outline-none placeholder:text-foreground/40 disabled:opacity-60"
+          className="flex-1 bg-transparent text-base outline-none placeholder:text-foreground/40 disabled:opacity-60"
           placeholder="Tell me about yourself..."
         />
         <button
@@ -461,7 +461,7 @@ function SuggestionCard({
             key={opt}
             onClick={() => setPicked(opt)}
             disabled={busy}
-            className={`rounded-full px-3 py-1.5 text-xs transition disabled:opacity-50 ${picked === opt ? "bg-accent text-accent-foreground" : "bg-secondary/40 hover:bg-secondary/70"}`}
+            className={`inline-flex min-h-11 items-center rounded-full px-3 text-xs transition disabled:opacity-50 ${picked === opt ? "bg-accent text-accent-foreground" : "bg-secondary/40 hover:bg-secondary/70"}`}
           >
             {opt}
           </button>
@@ -472,14 +472,14 @@ function SuggestionCard({
         <button
           onClick={onReject}
           disabled={busy}
-          className="inline-flex items-center gap-1 rounded-full bg-white/80 px-3 py-1.5 text-xs hover:bg-white disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-1 rounded-full bg-white/80 px-3 text-xs hover:bg-white disabled:opacity-50"
         >
           <X className="h-3 w-3" /> Reject
         </button>
         <button
           disabled={!picked || busy}
           onClick={() => picked && onApply(picked)}
-          className="ml-auto inline-flex items-center gap-1 rounded-full bg-foreground px-4 py-1.5 text-xs text-background disabled:opacity-40"
+          className="ml-auto inline-flex min-h-11 items-center gap-1 rounded-full bg-foreground px-4 text-xs text-background disabled:opacity-40"
         >
           <Check className="h-3 w-3" /> Apply
         </button>

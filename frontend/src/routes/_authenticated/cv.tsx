@@ -429,7 +429,7 @@ function CVPage() {
                               value: e.target.value,
                             })
                           }
-                          className="w-full rounded-xl bg-white/70 px-3 py-2 text-sm outline-none focus:bg-white"
+                          className="w-full rounded-xl bg-white/70 px-3 py-2 text-base outline-none focus:bg-white"
                         />
                       ) : (
                         <input
@@ -442,7 +442,7 @@ function CVPage() {
                               value: e.target.value,
                             })
                           }
-                          className="w-full rounded-xl bg-white/70 px-3 py-2 text-sm outline-none focus:bg-white"
+                          className="w-full rounded-xl bg-white/70 px-3 py-2 text-base outline-none focus:bg-white"
                         />
                       )}
                       <div className="mt-3 flex justify-end gap-2">
@@ -532,7 +532,7 @@ function CVPage() {
                         </button>
                         <button
                           onClick={() => void deleteRow(s, row.line_num)}
-                          className="mr-2 grid h-8 w-8 place-items-center rounded-xl text-foreground/50 hover:bg-destructive/10 hover:text-destructive"
+                          className="mr-1 grid h-11 w-11 place-items-center rounded-xl text-foreground/50 hover:bg-destructive/10 hover:text-destructive"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
@@ -566,7 +566,7 @@ function CVPage() {
                                     },
                                   })
                                 }
-                                className="w-full rounded-xl bg-white/70 px-3 py-2 text-sm outline-none focus:bg-white"
+                                className="w-full rounded-xl bg-white/70 px-3 py-2 text-base outline-none focus:bg-white"
                               />
                             </label>
                           ) : (
@@ -593,7 +593,7 @@ function CVPage() {
                                     },
                                   })
                                 }
-                                className="w-full rounded-xl bg-white/70 px-3 py-2 text-sm outline-none focus:bg-white"
+                                className="w-full rounded-xl bg-white/70 px-3 py-2 text-base outline-none focus:bg-white"
                               />
                             </label>
                           ),
@@ -634,7 +634,7 @@ function CVPage() {
           <div className="glass-strong relative max-h-[90vh] w-full max-w-2xl overflow-y-auto p-8">
             <button
               onClick={() => setTranslated(null)}
-              className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full bg-white/60 text-foreground hover:bg-white"
+              className="absolute right-2 top-2 grid h-11 w-11 place-items-center rounded-full bg-white/60 text-foreground hover:bg-white"
             >
               <X className="h-4 w-4" />
             </button>
