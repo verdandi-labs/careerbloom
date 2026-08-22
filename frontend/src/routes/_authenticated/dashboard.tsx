@@ -39,7 +39,6 @@ function Dashboard() {
   const navigate = useNavigate();
   const { data: user } = useSession();
   const [checked, setChecked] = useState(false);
-  const [displayName, setDisplayName] = useState("there");
 
   useEffect(() => {
     if (!user) return;
@@ -47,7 +46,6 @@ function Dashboard() {
       navigate({ to: "/onboarding" });
       return;
     }
-    setDisplayName(user.email || "there");
     setChecked(true);
   }, [user, navigate]);
 
@@ -74,9 +72,8 @@ function Dashboard() {
             Monday · June 22
           </p>
           <h1 className="mt-3 max-w-lg font-display text-[44px] leading-[1.02] md:text-[56px]">
-            Welcome back, {displayName}.{" "}
-            <span className="italic">Let's keep</span>{" "}
-            <span className="font-bold">blooming</span>.
+            Welcome back. <span className="italic">Let's keep</span>{" "}
+            <span className="font-bold">blooming</span>
           </h1>
           <p className="mt-4 max-w-md text-sm leading-relaxed text-foreground/70 md:text-base">
             Your story is taking shape beautifully. A few small touches today
