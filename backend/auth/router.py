@@ -22,6 +22,18 @@ async def me(user: User = Depends(get_current_user)):
     )
 
 
+@router.post("/complete-onboarding", response_model=UserResponse)
+async def complete_onboarding(user: User = Depends(get_current_user)):
+    user.onboarding = True
+    return UserResponse(
+        user_id=user.user_id,
+        email=get_user_email(user),
+        auth_method=user.auth_method,
+        onboarding=user.onboarding,
+        created_at=user.created_at,
+    )
+
+
 @router.delete("/account")
 async def delete_account(
     response: Response,

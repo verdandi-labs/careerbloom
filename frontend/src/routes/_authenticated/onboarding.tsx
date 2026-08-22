@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useSession, sessionKeys } from "@/features/auth";
+import { useSession, sessionKeys, completeOnboarding } from "@/features/auth";
 import { getOrCreateCareerDirection } from "@/lib/chat";
 import { CvUploadModal } from "@/components/CvUploadModal";
 import { Compass, Sparkles, Loader2 } from "lucide-react";
@@ -36,7 +36,8 @@ function Onboarding() {
 
   async function complete() {
     setSaving(true);
-    await qc.invalidateQueries({ queryKey: sessionKeys.all });
+    const updated = await completeOnboarding();
+    qc.setQueryData(sessionKeys.all, updated);
     navigate({ to: "/dashboard" });
   }
 

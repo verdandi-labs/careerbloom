@@ -8,3 +8,7 @@ export function fetchMe(): Promise<User> {
 export function requestMagicLink(email: string): Promise<void> {
   return api("/auth/magic-link", { method: "POST", json: { email } });
 }
+
+export function completeOnboarding(): Promise<User> {
+  return api<User>("/auth/complete-onboarding", { method: "POST" });
+}
