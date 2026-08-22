@@ -243,30 +243,30 @@ function LandingPage() {
       {/* You don't have to navigate alone */}
       <section id="philosophy" className="bg-[#fee8e7] px-6 py-24">
         <div className="mx-auto max-w-6xl">
-            <p className="mb-5 text-xs tracking-widest text-[#F8AFA6] uppercase">
-              Our philosophy
-            </p>
-            <h2 className="font-playfair mb-8 text-4xl leading-tight font-bold text-[#1c1410] md:text-5xl">
-              You don't have to navigate this transition alone
-            </h2>
-            <p className="mb-5 text-base leading-relaxed text-[#111]">
-              CareerBloom was designed to reconnect you with your strengths, so
-              you can share your experience with confidence and authenticity.
-            </p>
-            <p className="mb-5 text-base leading-relaxed text-[#111]">
-              Career transitions are exciting, but they can also challenge your
-              confidence and make you lose sight of the value your previous
-              experience holds
-            </p>
-            <p className="mb-5 text-base leading-relaxed text-[#111]">
-              It's not about becoming someone new for the job market. It's
-              about finding the words for who you already are and trusting
-              that you are enough
-            </p>
-            <h3 className="font-playfair text-3xl leading-tight font-bold text-sage md:text-4xl">
-              We don't make you employable; we help you recognize that you
-              already are
-            </h3>
+          <p className="mb-5 text-xs tracking-widest text-[#F8AFA6] uppercase">
+            Our philosophy
+          </p>
+          <h2 className="font-playfair mb-8 text-4xl leading-tight font-bold text-[#1c1410] md:text-5xl">
+            You don't have to navigate this transition alone
+          </h2>
+          <p className="mb-5 text-base leading-relaxed text-[#111]">
+            CareerBloom was designed to reconnect you with your strengths, so
+            you can share your experience with confidence and authenticity.
+          </p>
+          <p className="mb-5 text-base leading-relaxed text-[#111]">
+            Career transitions are exciting, but they can also challenge your
+            confidence and make you lose sight of the value your previous
+            experience holds
+          </p>
+          <p className="mb-5 text-base leading-relaxed text-[#111]">
+            It's not about becoming someone new for the job market. It's about
+            finding the words for who you already are and trusting that you are
+            enough
+          </p>
+          <h3 className="font-playfair text-3xl leading-tight font-bold text-sage md:text-4xl">
+            We don't make you employable; we help you recognize that you already
+            are
+          </h3>
         </div>
       </section>
 
