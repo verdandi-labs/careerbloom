@@ -328,7 +328,10 @@ function LandingPage() {
       </section>
 
       {/* Join / Auth */}
-      <section id="join" className="relative overflow-hidden bg-[#1a0f0c]">
+      <section
+        id="join"
+        className="relative flex min-h-screen supports-[height:100dvh]:min-h-dvh flex-col overflow-hidden bg-[#1a0f0c]"
+      >
         <div className="absolute inset-0">
           <img
             src="/blossom.jpg"
@@ -338,7 +341,7 @@ function LandingPage() {
           <div className="absolute inset-0 bg-[#1a0f0c]/92" />
         </div>
 
-        <div className="relative z-10 mx-auto max-w-2xl px-6 py-24 text-center">
+        <div className="relative z-10 mx-auto flex max-w-2xl flex-1 flex-col justify-center px-6 py-24 text-center">
           <h2 className="font-playfair mb-6 text-4xl leading-tight font-bold text-white md:text-5xl">
             We don't make you employable.
             <br />
