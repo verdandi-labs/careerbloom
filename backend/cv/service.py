@@ -3,12 +3,9 @@ import json
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
-from config import get_settings
 from cv.schemas import CvData, FIELD_MODELS, RAW_MODELS, TEXT_FIELDS
 from shared.prompts import SAFETY_BOUNDARY, wrap_untrusted
 from shared.zen_client import AllModelsFailedError, chat_completion
-
-settings = get_settings()
 
 limiter = Limiter(key_func=get_remote_address)
 

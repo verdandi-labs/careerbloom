@@ -11,8 +11,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from config import get_settings
 from database import Base, router as db_router, global_engine
-from shared import zen_client
-from shared.zen_client import ZenClientError, get_available_models
+from shared.zen_client import ZenClientError, get_available_models, get_cache_status
 
 logger = logging.getLogger("startup")
 
@@ -134,12 +133,13 @@ async def health():
 
 @app.get("/health/models")
 async def health_models():
-    if not zen_client._cached_models:
+    status = get_cache_status()
+    if not status["models"]:
         raise HTTPException(status_code=503, detail="Model cache empty")
     return {
-        "models": zen_client._cached_models,
+        "models": status["models"],
         "cached_at": datetime.fromtimestamp(
-            zen_client._cache_timestamp, tz=timezone.utc
+            status["cached_at"], tz=timezone.utc
         ).isoformat(),
         "ttl_hours": get_settings().ZEN_MODEL_REFRESH_HOURS,
     }

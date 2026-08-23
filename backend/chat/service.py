@@ -2,12 +2,9 @@ import json
 import re
 from collections.abc import AsyncIterator
 
-from config import get_settings
 from shared.prompts import SAFETY_BOUNDARY
 from shared.zen_client import stream_chat_completion
 from chat.schemas import ChatSuggestion
-
-settings = get_settings()
 
 _SUGGESTION_BLOCK_RE = re.compile(r"```json\s*([\s\S]*?)```")
 

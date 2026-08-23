@@ -45,13 +45,26 @@ async def get_available_models() -> list[str]:
         raise ZenClientError("Could not load Zen models and no cache available") from None
 
 
+def get_cache_status() -> dict:
+    return {
+        "models": _cached_models,
+        "cached_at": _cache_timestamp,
+    }
+
+
+def _build_candidates(user_model: str | None, available: list[str]) -> list[str]:
+    if user_model:
+        return [user_model] + available
+    return available
+
+
 async def chat_completion(
     messages: list[dict],
     user_model: str | None = None,
     temperature: float = 0.0,
 ) -> str:
     settings = get_settings()
-    candidates = ([user_model] if user_model else []) + await get_available_models()
+    candidates = _build_candidates(user_model, await get_available_models())
 
     async with httpx.AsyncClient(timeout=120) as client:
         for candidate in candidates:
@@ -90,7 +103,7 @@ async def stream_chat_completion(
     user_model: str | None = None,
 ) -> AsyncIterator[str]:
     settings = get_settings()
-    candidates = ([user_model] if user_model else []) + await get_available_models()
+    candidates = _build_candidates(user_model, await get_available_models())
 
     for candidate in candidates:
         try:
