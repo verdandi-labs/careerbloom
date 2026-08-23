@@ -82,13 +82,14 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Upload className="h-3.5 w-3.5" />
               Upload CV
             </button>
-            <div className="grid h-11 w-11 place-items-center">
-              <img
-                src="/avatar.png"
-                alt="Your avatar"
-                className="h-9 w-9 rounded-full object-cover ring-2 ring-white/60"
-              />
-            </div>
+            <Link
+              to="/settings"
+              aria-label="Settings"
+              title="Settings"
+              className="grid h-11 w-11 place-items-center rounded-full bg-white/60 text-foreground transition-colors hover:bg-white"
+            >
+              <Settings className="h-4 w-4" />
+            </Link>
             <button
               onClick={handleSignOut}
               title="Sign out"
