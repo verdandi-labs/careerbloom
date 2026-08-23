@@ -174,8 +174,7 @@ export function CvUploadModal({
             <textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
-              rows={20}
-              className="mt-6 w-full resize-y rounded-2xl border border-foreground/10 bg-white/50 p-4 font-mono text-base text-foreground/90 outline-none focus:border-accent focus:ring-1 focus:ring-accent/30"
+              className="mt-6 block h-[420px] w-full resize-none overflow-y-auto rounded-2xl border border-foreground/10 bg-white/50 p-4 font-mono text-base text-foreground/90 outline-none [scrollbar-width:none] focus:border-accent focus:ring-1 focus:ring-accent/30 [&::-webkit-scrollbar]:hidden"
             />
 
             {errorMsg && (
