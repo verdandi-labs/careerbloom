@@ -46,6 +46,7 @@ pip-wheel-metadata/
 .pytype/
 .pyre/
 .ruff_cache/
+*.tsbuildinfo
 
 # Testing
 .pytest_cache/
