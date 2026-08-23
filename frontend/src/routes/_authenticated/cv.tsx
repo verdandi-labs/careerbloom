@@ -5,7 +5,16 @@ import { AppShell } from "@/components/AppShell";
 import { api, errorMessage } from "@/lib/api";
 import { DEFAULT_TEMPLATE } from "@/lib/cv-templates";
 import { LANGUAGES } from "@/lib/languages";
-import { Download, Languages, Loader2, Plus, Trash2, X } from "lucide-react";
+import {
+  Download,
+  FileUp,
+  Languages,
+  Loader2,
+  Plus,
+  Trash2,
+  X,
+} from "lucide-react";
+import { CvUploadModal } from "@/components/CvUploadModal";
 
 export const Route = createFileRoute("/_authenticated/cv")({
   head: () => ({ meta: [{ title: "CV Builder · careerBloom" }] }),
@@ -231,6 +240,7 @@ function CVPage() {
   const [saving, setSaving] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [translateOpen, setTranslateOpen] = useState(false);
+  const [uploadOpen, setUploadOpen] = useState(false);
   const [translating, setTranslating] = useState(false);
   const [translated, setTranslated] = useState<TranslatedCv | null>(null);
   const [actionErr, setActionErr] = useState("");
@@ -351,6 +361,12 @@ function CVPage() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setUploadOpen(true)}
+              className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs text-foreground hover:bg-white"
+            >
+              <FileUp className="h-3 w-3" /> Upload CV
+            </button>
             <div className="relative">
               <button
                 onClick={() => setTranslateOpen((v) => !v)}
@@ -697,6 +713,7 @@ function CVPage() {
           </div>
         </div>
       )}
+      <CvUploadModal open={uploadOpen} onClose={() => setUploadOpen(false)} />
     </AppShell>
   );
 }
