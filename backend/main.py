@@ -68,8 +68,7 @@ async def lifespan(app: FastAPI):
         models = await get_available_models()
         logger.info(f"Zen models loaded: {models}")
     except ZenClientError as e:
-        logger.error(f"Zen model warmup failed: {e}")
-        raise
+        logger.error(f"Zen model warmup failed, continuing without cache: {e}")
     yield
     await db_router.dispose_all()
 

@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import time
@@ -8,6 +9,8 @@ import httpx
 from config import get_settings
 
 logger = logging.getLogger(__name__)
+
+DEFAULT_ZEN_MODEL = "big-pickle"
 
 _cached_models: list[str] = []
 _cache_timestamp: float = 0
@@ -52,10 +55,20 @@ def get_cache_status() -> dict:
     }
 
 
+def _fresh_cached_models() -> list[str]:
+    """Return cached models only if the cache is fresh; never fetches."""
+    settings = get_settings()
+    if time.time() - _cache_timestamp < settings.ZEN_MODEL_REFRESH_HOURS * 3600:
+        return _cached_models
+    asyncio.create_task(get_available_models())
+    return []
+
+
 def _build_candidates(user_model: str | None, available: list[str]) -> list[str]:
-    if user_model:
-        return [user_model] + available
-    return available
+    candidates = ([user_model] if user_model else []) + available
+    if not candidates:
+        candidates = [DEFAULT_ZEN_MODEL]
+    return candidates
 
 
 async def chat_completion(
@@ -64,10 +77,11 @@ async def chat_completion(
     temperature: float = 0.0,
 ) -> str:
     settings = get_settings()
-    candidates = _build_candidates(user_model, await get_available_models())
+    candidates = _build_candidates(user_model, _fresh_cached_models())
 
     async with httpx.AsyncClient(timeout=120) as client:
         for candidate in candidates:
+            logger.info(f"Zen chat_completion using model {candidate}")
             try:
                 response = await client.post(
                     f"{settings.ZEN_BASE_URL}/chat/completions",
@@ -103,9 +117,10 @@ async def stream_chat_completion(
     user_model: str | None = None,
 ) -> AsyncIterator[str]:
     settings = get_settings()
-    candidates = _build_candidates(user_model, await get_available_models())
+    candidates = _build_candidates(user_model, _fresh_cached_models())
 
     for candidate in candidates:
+        logger.info(f"Zen stream_chat_completion using model {candidate}")
         try:
             async with httpx.AsyncClient(
                 timeout=httpx.Timeout(300.0, connect=10.0)
