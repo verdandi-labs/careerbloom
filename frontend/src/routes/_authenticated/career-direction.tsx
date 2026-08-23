@@ -162,7 +162,7 @@ function CareerDirectionPage() {
             setErr("");
           }}
           rows={6}
-          className={`mt-1 w-full resize-none rounded-2xl bg-white/85 p-4 text-sm outline-none focus:ring-2 focus:ring-secondary ${overLimit ? "ring-2 ring-red-400" : ""}`}
+          className={`mt-1 w-full resize-none rounded-2xl bg-white/85 p-4 text-base outline-none focus:ring-2 focus:ring-secondary ${overLimit ? "ring-2 ring-red-400" : ""}`}
           placeholder="e.g. I'm a nurse looking to move into UX design, focusing on healthcare products."
         />
         <div className="flex flex-wrap items-center justify-between gap-3">

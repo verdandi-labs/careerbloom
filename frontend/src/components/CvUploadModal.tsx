@@ -88,7 +88,7 @@ export function CvUploadModal({
       <div className="glass-strong relative w-full max-w-2xl p-8">
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full bg-white/60 text-foreground hover:bg-white"
+          className="absolute right-2 top-2 grid h-11 w-11 place-items-center rounded-full bg-white/60 text-foreground hover:bg-white"
         >
           <X className="h-4 w-4" />
         </button>
@@ -175,7 +175,7 @@ export function CvUploadModal({
               value={text}
               onChange={(e) => setText(e.target.value)}
               rows={20}
-              className="mt-6 w-full resize-y rounded-2xl border border-foreground/10 bg-white/50 p-4 font-mono text-sm text-foreground/90 outline-none focus:border-accent focus:ring-1 focus:ring-accent/30"
+              className="mt-6 w-full resize-y rounded-2xl border border-foreground/10 bg-white/50 p-4 font-mono text-base text-foreground/90 outline-none focus:border-accent focus:ring-1 focus:ring-accent/30"
             />
 
             {errorMsg && (

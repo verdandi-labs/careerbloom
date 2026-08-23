@@ -18,6 +18,7 @@ import {
   Check,
   X,
   Pin,
+  History,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/chat")({
@@ -37,6 +38,7 @@ function ChatLayout() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [draftTitle, setDraftTitle] = useState("");
   const [listError, setListError] = useState("");
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const load = useCallback(async () => {
     setListError("");
@@ -117,8 +119,25 @@ function ChatLayout() {
 
   return (
     <AppShell>
-      <div className="grid h-[calc(100vh-9rem)] gap-4 md:grid-cols-[280px_1fr]">
-        <aside className="glass flex flex-col p-4">
+      <div className="relative flex h-[calc(100vh-9rem)] min-h-0 supports-[height:100dvh]:h-[calc(100dvh-9rem)] gap-4 md:grid md:grid-cols-[280px_1fr]">
+        {drawerOpen && (
+          <button
+            aria-label="Close conversation list"
+            onClick={() => setDrawerOpen(false)}
+            className="fixed inset-0 z-20 bg-foreground/30 backdrop-blur-sm md:hidden"
+          />
+        )}
+        <aside
+          className={`glass fixed inset-y-2 left-2 z-30 flex w-[min(280px,calc(100vw-4rem))] flex-col p-4 transition-transform duration-200 md:static md:inset-auto md:z-auto md:w-auto md:translate-x-0 ${
+            drawerOpen ? "translate-x-0" : "-translate-x-[110%]"
+          }`}
+        >
+          <button
+            onClick={() => setDrawerOpen(false)}
+            className="absolute right-2 top-2 grid h-11 w-11 place-items-center rounded-full text-foreground/60 hover:bg-white/60 md:hidden"
+          >
+            <X className="h-4 w-4" />
+          </button>
           <button
             onClick={handleNew}
             className="mb-3 inline-flex items-center justify-center gap-2 rounded-full bg-foreground px-4 py-2 text-xs uppercase tracking-wider text-background transition hover:scale-[1.01]"
@@ -159,7 +178,7 @@ function ChatLayout() {
                           if (e.key === "Enter") saveTitle(c.id);
                           if (e.key === "Escape") setEditingId(null);
                         }}
-                        className="flex-1 rounded-lg bg-white/90 px-2 py-1 text-xs outline-none"
+                        className="flex-1 rounded-lg bg-white/90 px-2 py-1 text-base outline-none"
                       />
                       <button
                         onClick={() => saveTitle(c.id)}
@@ -197,6 +216,7 @@ function ChatLayout() {
                       <Link
                         to="/chat/$conversationId"
                         params={{ conversationId: c.id }}
+                        onClick={() => setDrawerOpen(false)}
                         className="flex flex-1 items-center gap-2 truncate text-xs"
                         title={c.title}
                       >
@@ -240,7 +260,15 @@ function ChatLayout() {
           </div>
         </aside>
 
-        <Outlet />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="mb-2 inline-flex w-fit items-center gap-2 rounded-full bg-white/70 px-4 py-1.5 text-xs text-foreground/80 backdrop-blur hover:bg-white md:hidden"
+          >
+            <History className="h-3.5 w-3.5" /> History
+          </button>
+          <Outlet />
+        </div>
       </div>
     </AppShell>
   );

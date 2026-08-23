@@ -148,7 +148,7 @@ function CoverLettersPage() {
             <input
               value={jobTitle}
               onChange={(e) => setJobTitle(e.target.value)}
-              className="mt-1 w-full rounded-2xl bg-white/85 px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-secondary"
+              className="mt-1 w-full rounded-2xl bg-white/85 px-4 py-3 text-base text-foreground outline-none focus:ring-2 focus:ring-secondary"
               placeholder="e.g. Senior Product Designer"
             />
           </label>
@@ -157,7 +157,7 @@ function CoverLettersPage() {
             <input
               value={company}
               onChange={(e) => setCompany(e.target.value)}
-              className="mt-1 w-full rounded-2xl bg-white/85 px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-secondary"
+              className="mt-1 w-full rounded-2xl bg-white/85 px-4 py-3 text-base text-foreground outline-none focus:ring-2 focus:ring-secondary"
               placeholder="e.g. Figma"
             />
           </label>
@@ -171,7 +171,7 @@ function CoverLettersPage() {
             value={jobDesc}
             onChange={(e) => setJobDesc(e.target.value)}
             rows={6}
-            className="mt-1 w-full resize-none rounded-2xl bg-white/85 p-4 text-sm outline-none focus:ring-2 focus:ring-secondary"
+            className="mt-1 w-full resize-none rounded-2xl bg-white/85 p-4 text-base outline-none focus:ring-2 focus:ring-secondary"
             placeholder="Paste the description here…"
           />
         </label>

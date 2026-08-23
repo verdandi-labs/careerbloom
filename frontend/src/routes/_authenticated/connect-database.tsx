@@ -101,7 +101,7 @@ function ConnectDatabasePage() {
             value={connString}
             onChange={(e) => setConnString(e.target.value)}
             placeholder="postgresql://user:password@host:5432/dbname"
-            className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-accent"
+            className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-base outline-none focus:border-accent"
           />
 
           {error && (

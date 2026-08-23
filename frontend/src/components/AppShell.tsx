@@ -55,7 +55,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Link
                   key={item.to}
                   to={item.to}
-                  className={`rounded-full px-4 py-2 text-xs uppercase tracking-[0.18em] transition-colors ${
+                  className={`inline-flex min-h-11 items-center rounded-full px-4 py-2 text-xs uppercase tracking-[0.18em] transition-colors ${
                     active
                       ? "bg-accent text-accent-foreground"
                       : "text-foreground/80 hover:text-foreground"
@@ -70,20 +70,29 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => setUploadOpen(true)}
+              aria-label="Upload CV"
+              className="grid h-11 w-11 place-items-center rounded-full bg-foreground text-background transition-transform hover:scale-[1.02] sm:hidden"
+            >
+              <Upload className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setUploadOpen(true)}
               className="hidden items-center gap-2 rounded-full bg-foreground px-4 py-2 text-xs font-medium uppercase tracking-wider text-background transition-transform hover:scale-[1.02] sm:flex"
             >
               <Upload className="h-3.5 w-3.5" />
               Upload CV
             </button>
-            <img
-              src="/avatar.png"
-              alt="Your avatar"
-              className="h-9 w-9 rounded-full object-cover ring-2 ring-white/60"
-            />
+            <div className="grid h-11 w-11 place-items-center">
+              <img
+                src="/avatar.png"
+                alt="Your avatar"
+                className="h-9 w-9 rounded-full object-cover ring-2 ring-white/60"
+              />
+            </div>
             <button
               onClick={handleSignOut}
               title="Sign out"
-              className="grid h-9 w-9 place-items-center rounded-full bg-white/60 text-foreground transition-colors hover:bg-white"
+              className="grid h-11 w-11 place-items-center rounded-full bg-white/60 text-foreground transition-colors hover:bg-white"
             >
               <LogOut className="h-4 w-4" />
             </button>
@@ -95,7 +104,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </main>
       </div>
 
-      <nav className="glass-strong fixed inset-x-4 bottom-4 z-20 flex items-center justify-around p-2 md:hidden">
+      <nav className="glass-strong fixed inset-x-4 bottom-4 z-20 flex items-stretch justify-around p-2 max-[374px]:p-2.5 md:hidden">
         {nav.map((item) => {
           const active =
             item.to === "/dashboard"
@@ -106,14 +115,16 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Link
               key={item.to}
               to={item.to}
-              className={`flex flex-1 flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[10px] ${
+              className={`flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 rounded-2xl px-0.5 py-1 text-[11px] leading-tight [hyphens:auto] max-[374px]:px-0 ${
                 active
                   ? "bg-accent text-accent-foreground"
                   : "text-foreground/70"
               }`}
             >
-              <Icon className="h-4 w-4" />
-              {item.label}
+              <Icon className="h-4 w-4 shrink-0" />
+              <span className="text-center [overflow-wrap:anywhere]">
+                {item.label}
+              </span>
             </Link>
           );
         })}
