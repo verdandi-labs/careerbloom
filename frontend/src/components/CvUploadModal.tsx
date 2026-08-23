@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSession, sessionKeys } from "@/features/auth";
 import { API_BASE, apiUpload } from "@/lib/api";
@@ -21,11 +22,9 @@ const SAVE_STAGES: Array<{ key: SaveStage; label: string }> = [
 export function CvUploadModal({
   open,
   onClose,
-  onDone,
 }: {
   open: boolean;
   onClose: () => void;
-  onDone?: () => void;
 }) {
   const [status, setStatus] = useState<Status>("idle");
   const [fileName, setFileName] = useState<string | null>(null);
@@ -35,6 +34,7 @@ export function CvUploadModal({
   const [saveStage, setSaveStage] = useState<SaveStage>("opening");
   const inputRef = useRef<HTMLInputElement>(null);
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const { data: user } = useSession();
 
   useEffect(() => {
@@ -113,8 +113,8 @@ export function CvUploadModal({
       if (!user?.onboarding) {
         await qc.invalidateQueries({ queryKey: sessionKeys.all });
       }
-      onDone?.();
       onClose();
+      navigate({ to: "/cv" });
     } catch (err) {
       console.error(err);
       setErrorMsg(err instanceof Error ? err.message : "Save failed");
