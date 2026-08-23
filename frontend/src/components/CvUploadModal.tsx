@@ -1,14 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSession, sessionKeys } from "@/features/auth";
-import { api, apiUpload } from "@/lib/api";
-import { FileText, Loader2, UploadCloud, X } from "lucide-react";
+import { API_BASE, apiUpload } from "@/lib/api";
+import { Check, FileText, Loader2, UploadCloud, X } from "lucide-react";
 
 type CvRawText = {
   text: string;
 };
 
 type Status = "idle" | "uploading" | "review" | "saving" | "error";
+
+type SaveStage = "opening" | "reading" | "almost";
+
+const SAVE_STAGES: Array<{ key: SaveStage; label: string }> = [
+  { key: "opening", label: "Opening your CV" },
+  { key: "reading", label: "Reading your story" },
+  { key: "almost", label: "Almost there" },
+];
 
 export function CvUploadModal({
   open,
@@ -24,6 +32,7 @@ export function CvUploadModal({
   const [text, setText] = useState("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [saveStage, setSaveStage] = useState<SaveStage>("opening");
   const inputRef = useRef<HTMLInputElement>(null);
   const qc = useQueryClient();
   const { data: user } = useSession();
@@ -67,9 +76,39 @@ export function CvUploadModal({
   async function handleSave() {
     if (!text.trim()) return;
     setErrorMsg(null);
+    setSaveStage("opening");
     setStatus("saving");
     try {
-      await api("/cv/save", { method: "POST", json: { text } });
+      const res = await fetch(`${API_BASE}/cv/save`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ text }),
+      });
+      if (!res.ok || !res.body) {
+        throw new Error(`Request failed (${res.status})`);
+      }
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let finished = false;
+      while (!finished) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith("data:")) continue;
+          const payload = JSON.parse(trimmed.slice(5).trim());
+          if (payload.stage) setSaveStage(payload.stage);
+          if (payload.error) throw new Error(payload.error);
+          if (payload.done) finished = true;
+        }
+      }
+      if (!finished)
+        throw new Error("Could not parse your CV, please try again");
       await qc.invalidateQueries({ queryKey: ["cv"] });
       if (!user?.onboarding) {
         await qc.invalidateQueries({ queryKey: sessionKeys.all });
@@ -208,10 +247,31 @@ export function CvUploadModal({
 
         {status === "saving" && (
           <div className="py-10 text-center">
-            <div className="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-secondary/40">
-              <Loader2 className="h-7 w-7 animate-spin text-foreground" />
+            <p className="font-display text-2xl italic">Saving your CV</p>
+            <div className="mx-auto mt-6 flex w-fit flex-col gap-3">
+              {SAVE_STAGES.map((stage, i) => {
+                const currentIndex = SAVE_STAGES.findIndex(
+                  (s) => s.key === saveStage,
+                );
+                const done = i < currentIndex;
+                const active = i === currentIndex;
+                return (
+                  <div
+                    key={stage.key}
+                    className={`flex items-center gap-3 text-sm ${done ? "text-foreground/50" : active ? "text-foreground" : "text-foreground/35"}`}
+                  >
+                    {done ? (
+                      <Check className="h-4 w-4 text-green" />
+                    ) : active ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-foreground" />
+                    ) : (
+                      <span className="h-4 w-4 rounded-full border border-foreground/20" />
+                    )}
+                    {stage.label}
+                  </div>
+                );
+              })}
             </div>
-            <p className="mt-5 font-display text-2xl italic">Saving your CV</p>
           </div>
         )}
 

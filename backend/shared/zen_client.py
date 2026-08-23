@@ -10,7 +10,7 @@ from config import get_settings
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_ZEN_MODEL = "big-pickle"
+DEFAULT_ZEN_MODEL = "x-preview-f-free"
 
 _cached_models: list[str] = []
 _cache_timestamp: float = 0
@@ -65,10 +65,17 @@ def _fresh_cached_models() -> list[str]:
 
 
 def _build_candidates(user_model: str | None, available: list[str]) -> list[str]:
-    candidates = ([user_model] if user_model else []) + available
-    if not candidates:
-        candidates = [DEFAULT_ZEN_MODEL]
+    candidates: list[str] = [DEFAULT_ZEN_MODEL]
+    if user_model:
+        candidates.insert(0, user_model)
+    for model in available:
+        if model not in candidates:
+            candidates.append(model)
     return candidates
+
+
+def _is_transient_model_failure(status: int, body: str) -> bool:
+    return status == 503 or (status == 400 and "unavailable" in body.lower())
 
 
 async def chat_completion(
@@ -104,11 +111,20 @@ async def chat_completion(
                     f"Zen model {candidate} unavailable ({response.status_code}), trying next"
                 )
                 continue
+            if _is_transient_model_failure(response.status_code, response.text):
+                logger.warning(
+                    f"Zen model {candidate} unavailable ({response.status_code}), trying next"
+                )
+                continue
             if not response.is_success:
                 raise ZenClientError(f"Zen error {response.status_code}: {response.text}")
 
             return response.json()["choices"][0]["message"]["content"]
 
+    if len(candidates) <= 1:
+        raise ZenClientError(
+            "All candidates are exhausted: model cache is empty and the default model failed"
+        )
     raise AllModelsFailedError("All Zen models failed")
 
 
@@ -143,8 +159,15 @@ async def stream_chat_completion(
                             f"Zen model {candidate} unavailable ({response.status_code}), trying next"
                         )
                         continue
+                    body = ""
                     if not response.is_success:
                         body = (await response.aread()).decode(errors="replace")
+                    if _is_transient_model_failure(response.status_code, body):
+                        logger.warning(
+                            f"Zen model {candidate} unavailable ({response.status_code}), trying next"
+                        )
+                        continue
+                    if not response.is_success:
                         raise ZenClientError(f"Zen error {response.status_code}: {body}")
 
                     async for line in response.aiter_lines():
@@ -161,4 +184,8 @@ async def stream_chat_completion(
             logger.warning(f"Zen model {candidate} stream dropped, trying next")
             continue
 
+    if len(candidates) <= 1:
+        raise ZenClientError(
+            "All candidates are exhausted: model cache is empty and the default model failed"
+        )
     raise AllModelsFailedError("All Zen models failed")

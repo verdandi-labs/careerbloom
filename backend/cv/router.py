@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 from io import BytesIO
 
@@ -111,7 +112,7 @@ async def upload_cv(
     return CvRawText(text=extract_raw_text(text))
 
 
-@router.post("/save", response_model=CvData)
+@router.post("/save")
 @limiter.limit("10/minute")
 async def save_cv(
     request: Request,
@@ -123,18 +124,28 @@ async def save_cv(
         logger.warning("Suspicious CV content rejected")
         raise HTTPException(status_code=400, detail="CV content could not be processed — please check your file and try again")
 
-    try:
-        parsed = await parse_all_sections(body.text)
-    except Exception:
-        logger.error("CV save failed", exc_info=True)
-        raise HTTPException(status_code=500, detail="Could not parse your CV, please try again")
+    def _sse(payload: dict) -> str:
+        return f"data: {json.dumps(payload)}\n\n"
 
-    repo = CvRepository(db)
-    is_first = await repo.count_uploads(user.user_id) == 0
-    await repo.create_upload(user.user_id, parsed)
-    if is_first:
-        user.onboarding = True
-    return parsed
+    async def generate():
+        try:
+            yield _sse({"stage": "opening"})
+            yield _sse({"stage": "reading"})
+            parsed = await parse_all_sections(body.text)
+            yield _sse({"stage": "almost"})
+
+            repo = CvRepository(db)
+            is_first = await repo.count_uploads(user.user_id) == 0
+            await repo.create_upload(user.user_id, parsed)
+            if is_first:
+                user.onboarding = True
+
+            yield _sse({"done": True})
+        except Exception:
+            logger.error("CV save failed", exc_info=True)
+            yield _sse({"error": "Could not parse your CV, please try again"})
+
+    return StreamingResponse(generate(), media_type="text/event-stream")
 
 
 @router.get("", response_model=CvData)
