@@ -1,17 +1,14 @@
 import json
 
-from google import genai
-from google.genai import types
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
 from config import get_settings
 from cv.schemas import CvData, FIELD_MODELS, RAW_MODELS, TEXT_FIELDS
 from shared.prompts import SAFETY_BOUNDARY, wrap_untrusted
+from shared.zen_client import AllModelsFailedError, chat_completion
 
 settings = get_settings()
-
-client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
 limiter = Limiter(key_func=get_remote_address)
 
@@ -56,15 +53,11 @@ def extract_raw_text(text: str) -> str:
 
 async def parse_all_sections(text: str) -> CvData:
     prompt = CV_PARSE_PROMPT.replace("__TEXT__", text[:MAX_TEXT_LENGTH]) + "\n\n" + SAFETY_BOUNDARY
-    response = await client.aio.models.generate_content(
-        model=settings.GEMINI_MODEL,
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            temperature=0.1,
-            response_mime_type="application/json",
-        ),
+    raw = await chat_completion(
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.1,
     )
-    data = json.loads(response.text)
+    data = json.loads(raw)
     values: dict[str, object] = {}
     for field in TEXT_FIELDS:
         value = data.get(field)
@@ -81,15 +74,18 @@ async def parse_all_sections(text: str) -> CvData:
 
 
 async def translate_cv(data: CvData, language: str) -> CvData:
-    response = await client.aio.models.generate_content(
-        model=settings.GEMINI_MODEL,
-        contents=TRANSLATE_PROMPT.format(language=language, json=data.model_dump_json()) + "\n\n" + SAFETY_BOUNDARY,
-        config=types.GenerateContentConfig(
-            temperature=0.2,
-            response_mime_type="application/json",
-        ),
+    raw = await chat_completion(
+        messages=[
+            {
+                "role": "user",
+                "content": TRANSLATE_PROMPT.format(language=language, json=data.model_dump_json())
+                + "\n\n"
+                + SAFETY_BOUNDARY,
+            }
+        ],
+        temperature=0.2,
     )
-    return CvData.model_validate(json.loads(response.text))
+    return CvData.model_validate(json.loads(raw))
 
 
 async def generate_cover_letter_ai(job_title: str, company: str, job_description: str, cv_text: str, language: str) -> str:
@@ -107,14 +103,14 @@ async def generate_cover_letter_ai(job_title: str, company: str, job_description
     )
     prompt = f"{instructions}\n\n{data_block}\n\n{SAFETY_BOUNDARY}"
 
-    response = await client.aio.models.generate_content(
-        model=settings.GEMINI_MODEL,
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-        ),
-    )
-    content = json.loads(response.text).get("content")
+    try:
+        raw = await chat_completion(
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.0,
+        )
+    except AllModelsFailedError:
+        raise ValueError("AI service temporarily unavailable. Please try again.")
+    content = json.loads(raw).get("content")
     if not content or not content.strip():
         raise ValueError("Empty cover letter generated")
     return content.strip()

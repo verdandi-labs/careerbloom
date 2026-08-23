@@ -85,10 +85,10 @@ async def send_message(
     async def generate():
         full_response = ""
         try:
-            for chunk in stream_chat(messages):
-                if chunk.text:
-                    full_response += chunk.text
-                    yield f"data: {json.dumps({'content': chunk.text})}\n\n"
+            async for chunk in stream_chat(messages):
+                if chunk:
+                    full_response += chunk
+                    yield f"data: {json.dumps({'content': chunk})}\n\n"
         except Exception:
             logger.error("Chat stream failed", exc_info=True)
             yield f"data: {json.dumps({'error': 'Message could not be sent, please try again'})}\n\n"

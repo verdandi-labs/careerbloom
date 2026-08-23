@@ -12,9 +12,10 @@ class Settings(BaseSettings):
     # Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
     MASTER_KEY: str
 
-    # Google AI
-    GEMINI_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-2.5-flash"
+    # OpenCode Zen
+    ZEN_API_KEY: str = ""
+    ZEN_BASE_URL: str = "https://opencode.ai/zen/v1"
+    ZEN_MODEL_REFRESH_HOURS: int = 6
 
     # SendGrid
     SENDGRID_API_KEY: str = ""

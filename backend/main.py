@@ -1,6 +1,7 @@
 import logging
 import re
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,6 +11,8 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from config import get_settings
 from database import Base, router as db_router, global_engine
+from shared import zen_client
+from shared.zen_client import ZenClientError, get_available_models
 
 logger = logging.getLogger("startup")
 
@@ -62,6 +65,12 @@ async def _create_tables():
 async def lifespan(app: FastAPI):
     logging.getLogger().addFilter(ScrubFilter())
     await _create_tables()
+    try:
+        models = await get_available_models()
+        logger.info(f"Zen models loaded: {models}")
+    except ZenClientError as e:
+        logger.error(f"Zen model warmup failed: {e}")
+        raise
     yield
     await db_router.dispose_all()
 
@@ -121,6 +130,19 @@ app.include_router(career_direction_router, prefix=settings.API_V1_PREFIX)
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
+
+@app.get("/health/models")
+async def health_models():
+    if not zen_client._cached_models:
+        raise HTTPException(status_code=503, detail="Model cache empty")
+    return {
+        "models": zen_client._cached_models,
+        "cached_at": datetime.fromtimestamp(
+            zen_client._cache_timestamp, tz=timezone.utc
+        ).isoformat(),
+        "ttl_hours": get_settings().ZEN_MODEL_REFRESH_HOURS,
+    }
 
 frontend_dist = Path(__file__).resolve().parent / "frontend" / "dist"
 if not frontend_dist.exists():
