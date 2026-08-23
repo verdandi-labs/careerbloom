@@ -25,7 +25,7 @@ from cv.schemas import (
 from cv.service import extract_raw_text, limiter, parse_all_sections, translate_cv
 from database import get_db
 from shared.constants import ALLOWED_LANGUAGES
-from shared.deps import get_current_user
+from shared.deps import get_current_user, rotated_session_headers
 from shared.models.cv import CV_FIELDS
 from shared.models.user import User
 
@@ -145,7 +145,11 @@ async def save_cv(
             logger.error("CV save failed", exc_info=True)
             yield _sse({"error": "Could not parse your CV, please try again"})
 
-    return StreamingResponse(generate(), media_type="text/event-stream")
+    return StreamingResponse(
+        generate(),
+        media_type="text/event-stream",
+        headers=rotated_session_headers(request),
+    )
 
 
 @router.get("", response_model=CvData)
