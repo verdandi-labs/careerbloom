@@ -53,7 +53,11 @@ async def get_current_user(
 def rotated_session_headers(request: Request) -> dict[str, str]:
     """Headers carrying the freshly rotated session cookie. Needed when
     returning a custom Response (e.g. StreamingResponse), which bypasses
-    FastAPI's dependency-header merging."""
+    FastAPI's dependency-header merging.
+    The import is function-local to avoid a circular import between the
+    shared and auth packages."""
+    from auth.service import SESSION_TTL_DAYS
+
     raw = getattr(request.state, "session_refresh_cookie", None)
     if not raw:
         return {}
