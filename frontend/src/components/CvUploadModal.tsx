@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { useSession, sessionKeys } from "@/features/auth";
+import { useSession } from "@/features/auth";
 import { API_BASE, apiUpload } from "@/lib/api";
 import { Check, FileText, Loader2, UploadCloud, X } from "lucide-react";
 
@@ -109,9 +109,16 @@ export function CvUploadModal({
       }
       if (!finished)
         throw new Error("Could not parse your CV, please try again");
+
+      // Ping /auth/me so the plain JSON response commits the rotated session
+      // cookie through FastAPI's normal header-merge path before we refetch.
+      // Without this, GET /cv fires with a token that isn't committed yet
+      // (the streaming response commits lazily at stream teardown).
+      await fetch(`${API_BASE}/auth/me`, { credentials: "include" });
+
       await qc.invalidateQueries({ queryKey: ["cv"] });
       if (!user?.onboarding) {
-        await qc.invalidateQueries({ queryKey: sessionKeys.all });
+        await qc.invalidateQueries({ queryKey: ["session"] });
       }
       onClose();
       navigate({ to: "/cv" });

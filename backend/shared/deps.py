@@ -38,7 +38,6 @@ async def get_current_user(
 
     new_raw = await create_session(db, user.user_id)
     await db.execute(delete(SessionRow).where(SessionRow.session_id == session.session_id))
-    await db.commit()
     response.set_cookie(
         SESSION_COOKIE,
         new_raw,
