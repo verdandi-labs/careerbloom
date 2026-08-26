@@ -10,7 +10,7 @@ from config import get_settings
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_ZEN_MODEL = "x-preview-f-free"
+DEFAULT_ZEN_MODEL = "mimo-v2.5-free"
 
 _cached_models: list[str] = []
 _cache_timestamp: float = 0
