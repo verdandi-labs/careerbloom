@@ -49,8 +49,9 @@ Only return the translated JSON object.
 
 
 def extract_raw_text(text: str) -> str:
-    # Strip docx2python image placeholders e.g. ----media/image4.png----
-    text = re.sub(r"----media/[^-]+----", "", text)
+    # Strip docx2python placeholders (images, alt text, footnotes,
+    # endnotes, failed checkboxes)
+    text = re.sub(r"----[^-]+----(>[^<]*<)?", "", text)
     # Collapse runs of blank lines left behind by removed placeholders
     text = re.sub(r"\n{3,}", "\n\n", text)
     return text[:MAX_TEXT_LENGTH].strip()
