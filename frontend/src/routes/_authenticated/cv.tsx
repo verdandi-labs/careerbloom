@@ -414,9 +414,10 @@ function CVPage() {
               )}{" "}
               Export DOCX
             </button>
+            <div className="w-px self-stretch bg-foreground/15" />
             <button
               onClick={() => navigate({ to: "/cv-preview" })}
-              className="ml-4 inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2 text-sm text-background"
+              className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background"
             >
               Preview & Export
             </button>
