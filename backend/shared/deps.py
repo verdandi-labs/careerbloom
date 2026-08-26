@@ -46,7 +46,27 @@ async def get_current_user(
         samesite="lax",
         max_age=SESSION_TTL_DAYS * 24 * 60 * 60,
     )
+    request.state.session_refresh_cookie = new_raw
     return user
+
+
+def rotated_session_headers(request: Request) -> dict[str, str]:
+    """Headers carrying the freshly rotated session cookie. Needed when
+    returning a custom Response (e.g. StreamingResponse), which bypasses
+    FastAPI's dependency-header merging.
+    The import is function-local to avoid a circular import between the
+    shared and auth packages."""
+    from auth.service import SESSION_TTL_DAYS
+
+    raw = getattr(request.state, "session_refresh_cookie", None)
+    if not raw:
+        return {}
+    return {
+        "Set-Cookie": (
+            f"{SESSION_COOKIE}={raw}; httponly; secure; samesite=lax; "
+            f"max-age={SESSION_TTL_DAYS * 24 * 60 * 60}; path=/"
+        )
+    }
 async def get_db_for_current_user(user: User = Depends(get_current_user)):
     async for session in get_db():
         yield session

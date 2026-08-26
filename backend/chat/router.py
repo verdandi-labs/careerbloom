@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
-from shared.deps import get_current_user, get_db_for_current_user
+from shared.deps import get_current_user, get_db_for_current_user, rotated_session_headers
 from shared.models.user import User
 from chat.repository import ChatRepository
 from chat.schemas import (
@@ -85,10 +85,10 @@ async def send_message(
     async def generate():
         full_response = ""
         try:
-            for chunk in stream_chat(messages):
-                if chunk.text:
-                    full_response += chunk.text
-                    yield f"data: {json.dumps({'content': chunk.text})}\n\n"
+            async for chunk in stream_chat(messages):
+                if chunk:
+                    full_response += chunk
+                    yield f"data: {json.dumps({'content': chunk})}\n\n"
         except Exception:
             logger.error("Chat stream failed", exc_info=True)
             yield f"data: {json.dumps({'error': 'Message could not be sent, please try again'})}\n\n"
@@ -107,7 +107,11 @@ async def send_message(
 
         yield "data: [DONE]\n\n"
 
-    return StreamingResponse(generate(), media_type="text/event-stream")
+    return StreamingResponse(
+        generate(),
+        media_type="text/event-stream",
+        headers=rotated_session_headers(request),
+    )
 
 
 @router.post("/conversations/{conversation_id}/messages/{message_id}/apply", response_model=MessageResponse)
