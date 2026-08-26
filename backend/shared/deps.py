@@ -64,7 +64,7 @@ def rotated_session_headers(request: Request) -> dict[str, str]:
     return {
         "Set-Cookie": (
             f"{SESSION_COOKIE}={raw}; httponly; secure; samesite=lax; "
-            f"max-age={SESSION_TTL_DAYS * 24 * 60 * 60}"
+            f"max-age={SESSION_TTL_DAYS * 24 * 60 * 60}; path=/"
         )
     }
 async def get_db_for_current_user(user: User = Depends(get_current_user)):
