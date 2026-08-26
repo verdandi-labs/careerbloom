@@ -114,7 +114,13 @@ export function CvUploadModal({
       // cookie through FastAPI's normal header-merge path before we refetch.
       // Without this, GET /cv fires with a token that isn't committed yet
       // (the streaming response commits lazily at stream teardown).
-      await fetch(`${API_BASE}/auth/me`, { credentials: "include" });
+      const pingMe = await fetch(`${API_BASE}/auth/me`, {
+        credentials: "include",
+      });
+      if (!pingMe.ok) {
+        await new Promise((r) => setTimeout(r, 150));
+        await fetch(`${API_BASE}/auth/me`, { credentials: "include" });
+      }
 
       await qc.invalidateQueries({ queryKey: ["cv"] });
       if (!user?.onboarding) {
