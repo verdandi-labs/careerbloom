@@ -83,7 +83,17 @@ def extract_json(raw: str) -> dict:
 async def parse_all_sections(text: str) -> CvData:
     prompt = CV_PARSE_PROMPT.replace("__TEXT__", text[:MAX_TEXT_LENGTH]) + "\n\n" + SAFETY_BOUNDARY
     raw = await chat_completion(
-        messages=[{"role": "user", "content": prompt}],
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You are a CV parser. Respond ONLY with a single "
+                    "valid JSON object. No markdown fences, no explanation, "
+                    "no preamble. Output must start with { and end with }."
+                ),
+            },
+            {"role": "user", "content": prompt},
+        ],
         temperature=0.1,
     )
     data = extract_json(raw)
@@ -106,11 +116,22 @@ async def translate_cv(data: CvData, language: str) -> CvData:
     raw = await chat_completion(
         messages=[
             {
+                "role": "system",
+                "content": (
+                    "You are a CV translator. Respond ONLY with a single "
+                    "valid JSON object. No markdown fences, no explanation, "
+                    "no preamble. Output must start with { and end with }."
+                ),
+            },
+            {
                 "role": "user",
-                "content": TRANSLATE_PROMPT.format(language=language, json=data.model_dump_json())
+                "content": TRANSLATE_PROMPT.format(
+                    language=language,
+                    json=data.model_dump_json(),
+                )
                 + "\n\n"
                 + SAFETY_BOUNDARY,
-            }
+            },
         ],
         temperature=0.2,
     )

@@ -100,6 +100,7 @@ async def chat_completion(
                         "model": candidate,
                         "messages": messages,
                         "temperature": temperature,
+                        "max_tokens": 4096,
                     },
                 )
             except httpx.HTTPError as e:
