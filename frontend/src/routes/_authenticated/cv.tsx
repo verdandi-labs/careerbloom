@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
@@ -231,6 +231,7 @@ async function downloadBlob(blob: Blob, filename: string) {
 }
 
 function CVPage() {
+  const navigate = useNavigate();
   const qc = useQueryClient();
   const {
     data: cv,
@@ -372,7 +373,7 @@ function CVPage() {
               onClick={() => setUploadOpen(true)}
               className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs text-foreground hover:bg-white"
             >
-              <FileUp className="h-3 w-3" /> Upload CV
+              <FileUp className="h-3 w-3" /> Upload new CV
             </button>
             <div className="relative">
               <button
@@ -412,6 +413,12 @@ function CVPage() {
                 <Download className="h-3 w-3" />
               )}{" "}
               Export DOCX
+            </button>
+            <button
+              onClick={() => navigate({ to: "/cv-preview" })}
+              className="ml-4 inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2 text-sm text-background"
+            >
+              Preview & Export
             </button>
           </div>
         </div>
