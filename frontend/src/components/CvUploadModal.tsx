@@ -110,10 +110,8 @@ export function CvUploadModal({
       if (!finished)
         throw new Error("Could not parse your CV, please try again");
 
-      // Ping /auth/me so the plain JSON response commits the rotated session
-      // cookie through FastAPI's normal header-merge path before we refetch.
-      // Without this, GET /cv fires with a token that isn't committed yet
-      // (the streaming response commits lazily at stream teardown).
+      // Commit rotated session cookie via plain JSON endpoint before
+      // firing authenticated requests
       const pingMe = await fetch(`${API_BASE}/auth/me`, {
         credentials: "include",
       });
@@ -122,12 +120,17 @@ export function CvUploadModal({
         await fetch(`${API_BASE}/auth/me`, { credentials: "include" });
       }
 
-      await qc.invalidateQueries({ queryKey: ["cv"] });
-      if (!user?.onboarding) {
-        await qc.invalidateQueries({ queryKey: ["session"] });
-      }
+      // Navigate first — let the CV page trigger its own fresh fetch
+      // rather than refetching here while still in modal context
       onClose();
       navigate({ to: "/cv" });
+
+      // Invalidate after navigation so the CV page's mounted query
+      // picks up the fresh data
+      qc.invalidateQueries({ queryKey: ["cv"] });
+      if (!user?.onboarding) {
+        qc.invalidateQueries({ queryKey: ["session"] });
+      }
     } catch (err) {
       console.error(err);
       setErrorMsg(err instanceof Error ? err.message : "Save failed");

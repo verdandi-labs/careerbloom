@@ -232,9 +232,16 @@ async function downloadBlob(blob: Blob, filename: string) {
 
 function CVPage() {
   const qc = useQueryClient();
-  const { data: cv, isPending } = useQuery({
+  const {
+    data: cv,
+    isPending,
+    isError,
+    refetch,
+  } = useQuery({
     queryKey: ["cv"],
     queryFn: () => api<CvData>("/cv"),
+    retry: 2,
+    retryDelay: 500,
   });
   const [draft, setDraft] = useState<Draft>(null);
   const [saving, setSaving] = useState(false);
@@ -420,6 +427,18 @@ function CVPage() {
         {isPending ? (
           <div className="grid place-items-center py-20">
             <Loader2 className="h-6 w-6 animate-spin text-foreground/50" />
+          </div>
+        ) : isError ? (
+          <div className="grid place-items-center py-20 gap-4">
+            <p className="text-sm text-muted-foreground">
+              Could not load your CV. Please try again.
+            </p>
+            <button
+              onClick={() => refetch()}
+              className="text-sm underline text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Retry
+            </button>
           </div>
         ) : (
           <div className="space-y-10">
