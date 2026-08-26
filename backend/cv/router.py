@@ -6,7 +6,7 @@ from io import BytesIO
 import pypdfium2 as pdfium
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.shared import Pt, Inches
+from docx.shared import Pt, Inches, RGBColor
 from docx2python import docx2python
 from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 from fastapi.responses import StreamingResponse
@@ -222,6 +222,15 @@ async def translate(
 
 @router.post("/export/docx")
 async def export_docx(body: CvExportDocxRequest, user: User = Depends(get_current_user)):
+    TEMPLATE_ACCENTS = {
+        "editorial": "B96A4B",
+        "classic": "5C5C5C",
+        "editorialBig": "3D3D3D",
+        "geometric": "B47A5C",
+        "soft": "E8C5D0",
+    }
+    accent = TEMPLATE_ACCENTS.get(body.template, "B96A4B")
+
     doc = Document()
     style = doc.styles["Normal"]
     style.font.name = "Calibri"
@@ -234,6 +243,7 @@ async def export_docx(body: CvExportDocxRequest, user: User = Depends(get_curren
         run = p.add_run(data["name"])
         run.bold = True
         run.font.size = Pt(18)
+        run.font.color.rgb = RGBColor.from_string(accent)
 
     if data.get("title"):
         p = doc.add_paragraph()
@@ -247,7 +257,8 @@ async def export_docx(body: CvExportDocxRequest, user: User = Depends(get_curren
         if isinstance(section_data, dict):
             section_data = section_data.get("en", "") or section_data.get("es", "")
         if section_data:
-            doc.add_heading(section_key.replace("_", " ").title(), level=2)
+            heading_para = doc.add_heading(section_key.replace("_", " ").title(), level=2)
+            heading_para.runs[0].font.color.rgb = RGBColor.from_string(accent)
             for para in section_data.split("\n\n"):
                 if para.strip():
                     doc.add_paragraph(para.strip())
