@@ -84,7 +84,7 @@ async def chat_completion(
     temperature: float = 0.0,
 ) -> str:
     settings = get_settings()
-    candidates = _build_candidates(user_model, _fresh_cached_models())
+    candidates = _build_candidates(user_model, await get_available_models())
 
     async with httpx.AsyncClient(timeout=120) as client:
         for candidate in candidates:
@@ -134,59 +134,59 @@ async def stream_chat_completion(
     user_model: str | None = None,
 ) -> AsyncIterator[str]:
     settings = get_settings()
-    candidates = _build_candidates(user_model, _fresh_cached_models())
+    available = await get_available_models()
 
-    for candidate in candidates:
-        logger.info(f"Zen stream_chat_completion using model {candidate}")
-        try:
-            async with httpx.AsyncClient(
-                timeout=httpx.Timeout(300.0, connect=10.0)
-            ) as client:
-                async with client.stream(
-                    "POST",
-                    f"{settings.ZEN_BASE_URL}/chat/completions",
-                    headers={
-                        "Authorization": f"Bearer {settings.ZEN_API_KEY}",
-                        "Content-Type": "application/json",
-                    },
-                    json={
-                        "model": candidate,
-                        "messages": messages,
-                        "stream": True,
-                    },
-                ) as response:
-                    if response.status_code in (429, 503):
-                        logger.warning(
-                            f"Zen model {candidate} unavailable ({response.status_code}), trying next"
-                        )
-                        continue
-                    body = ""
-                    if not response.is_success:
-                        body = (await response.aread()).decode(errors="replace")
-                    if _is_transient_model_failure(response.status_code, body):
-                        logger.warning(
-                            f"Zen model {candidate} unavailable ({response.status_code}), trying next"
-                        )
-                        continue
-                    if not response.is_success:
-                        raise ZenClientError(f"Zen error {response.status_code}: {body}")
-
-                    async for line in response.aiter_lines():
-                        line = line.strip()
-                        if not line.startswith("data:"):
+    for attempt in range(2):
+        candidates = _build_candidates(user_model, available)
+        for candidate in candidates:
+            logger.info(f"Zen stream_chat_completion using model {candidate}")
+            try:
+                async with httpx.AsyncClient(
+                    timeout=httpx.Timeout(300.0, connect=10.0)
+                ) as client:
+                    async with client.stream(
+                        "POST",
+                        f"{settings.ZEN_BASE_URL}/chat/completions",
+                        headers={
+                            "Authorization": f"Bearer {settings.ZEN_API_KEY}",
+                            "Content-Type": "application/json",
+                        },
+                        json={
+                            "model": candidate,
+                            "messages": messages,
+                            "stream": True,
+                        },
+                    ) as response:
+                        if response.status_code in (400, 429, 503):
+                            logger.warning(
+                                f"Zen model {candidate} not available, trying another"
+                            )
                             continue
-                        payload = line[len("data:"):].strip()
-                        if payload == "[DONE]":
-                            yield "[DONE]"
-                            return
-                        chunk = json.loads(payload)
-                        yield chunk["choices"][0]["delta"].get("content", "")
-        except (httpx.RemoteProtocolError, httpx.ReadError):
-            logger.warning(f"Zen model {candidate} stream dropped, trying next")
-            continue
+                        body = ""
+                        if not response.is_success:
+                            body = (await response.aread()).decode(errors="replace")
+                        if not response.is_success:
+                            raise ZenClientError(f"Zen error {response.status_code}: {body}")
 
-    if len(candidates) <= 1:
-        raise ZenClientError(
-            "All candidates are exhausted: model cache is empty and the default model failed"
-        )
+                        async for line in response.aiter_lines():
+                            line = line.strip()
+                            if not line.startswith("data:"):
+                                continue
+                            payload = line[len("data:"):].strip()
+                            if payload == "[DONE]":
+                                yield "[DONE]"
+                                return
+                            chunk = json.loads(payload)
+                            if not chunk.get("choices"):
+                                continue
+                            content = chunk["choices"][0]["delta"].get("content", "")
+                            if content:
+                                yield content
+            except (httpx.RemoteProtocolError, httpx.ReadError):
+                logger.warning(f"Zen model {candidate} not available, trying another")
+                continue
+        if attempt == 0:
+            logger.warning("All models failed, retrying in 15 seconds...")
+            await asyncio.sleep(1)
+
     raise AllModelsFailedError("All Zen models failed")
