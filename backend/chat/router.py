@@ -49,6 +49,26 @@ async def get_career_direction(user: User = Depends(get_current_user), db: Async
     return ConversationResponse.model_validate(conv)
 
 
+@router.post("/cover-letter-conversations", response_model=ConversationResponse)
+async def create_cover_letter_conversation(
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db_for_current_user),
+):
+    repo = ChatRepository(db)
+    conv = await repo.get_or_create_cover_letter_conversation(user.user_id)
+    return ConversationResponse.model_validate(conv)
+
+
+@router.get("/cover-letter-conversations", response_model=list[ConversationResponse])
+async def list_cover_letter_conversations(
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db_for_current_user),
+):
+    repo = ChatRepository(db)
+    convs = await repo.list_cover_letter_conversations(user.user_id)
+    return [ConversationResponse.model_validate(c) for c in convs]
+
+
 @router.get("/conversations/{conversation_id}/messages", response_model=list[MessageResponse])
 async def list_messages(
     conversation_id: UUID,
@@ -77,6 +97,15 @@ async def send_message(
     if not conv:
         raise HTTPException(status_code=404, detail="Conversation not found")
 
+    cv_text = None
+    if conv.is_cover_letter:
+        try:
+            cv_data = await CvRepository(db).get_current_cv(user.user_id)
+            if any(cv_data.model_dump().values()):
+                cv_text = cv_data.model_dump_json()
+        except Exception:
+            logger.exception("Failed to load CV context for cover letter conversation")
+
     await repo.add_message(user.user_id, conversation_id, "user", body.content)
 
     history = await repo.get_messages(user.user_id, conversation_id)
@@ -85,7 +114,7 @@ async def send_message(
     async def generate():
         full_response = ""
         try:
-            async for chunk in stream_chat(messages):
+            async for chunk in stream_chat(messages, cv_text):
                 if chunk:
                     full_response += chunk
                     yield f"data: {json.dumps({'content': chunk})}\n\n"
