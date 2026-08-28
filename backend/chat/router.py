@@ -114,7 +114,7 @@ async def send_message(
     async def generate():
         full_response = ""
         try:
-            async for chunk in stream_chat(messages, cv_text):
+            async for chunk in stream_chat(messages, cv_text, cover_letter=conv.is_cover_letter):
                 if chunk:
                     full_response += chunk
                     yield f"data: {json.dumps({'content': chunk})}\n\n"

@@ -8,7 +8,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from shared.deps import get_current_user, get_db_for_current_user
 from shared.models.user import User
 from cover_letters.repository import CoverLetterRepository
-from cover_letters.schemas import CoverLetterGenerateRequest, CoverLetterResponse
+from cover_letters.schemas import (
+    CoverLetterGenerateRequest,
+    CoverLetterResponse,
+    SaveCoverLetterRequest,
+)
 from cv.service import generate_cover_letter_ai, limiter
 from shared.constants import ALLOWED_LANGUAGES
 
@@ -40,6 +44,17 @@ async def generate_letter(
         raise HTTPException(status_code=500, detail="Cover letter generation failed, please try again")
     repo = CoverLetterRepository(db)
     letter = await repo.create(user.user_id, body.name, body.language, text)
+    return CoverLetterResponse.model_validate(letter)
+
+
+@router.post("/save", response_model=CoverLetterResponse)
+async def save_letter(
+    body: SaveCoverLetterRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db_for_current_user),
+):
+    repo = CoverLetterRepository(db)
+    letter = await repo.create(user.user_id, body.name, body.language, body.text)
     return CoverLetterResponse.model_validate(letter)
 
 

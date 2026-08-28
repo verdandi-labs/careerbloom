@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field, field_validator
+from typing import Literal
 from uuid import UUID
 from datetime import datetime
 
@@ -41,6 +42,23 @@ class MessageResponse(BaseModel):
 class ChatRequest(BaseModel):
     messages: list[dict[str, str]]
     cv_text: str | None = None
+
+
+class CoverLetterSuggestion(BaseModel):
+    type: Literal["cover_letter"]
+    options: list[str]
+
+    @field_validator("options")
+    @classmethod
+    def _three_options(cls, v: list[str]) -> list[str]:
+        if len(v) != 3:
+            raise ValueError("must have exactly 3 options")
+        for opt in v:
+            if not opt.strip():
+                raise ValueError("options must not be empty")
+            if len(opt) > 5000:
+                raise ValueError("option too long")
+        return v
 
 
 class ChatSuggestion(BaseModel):

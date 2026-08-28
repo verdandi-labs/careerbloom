@@ -18,6 +18,12 @@ class CoverLetterGenerateRequest(BaseModel):
         return v.strip() or None if v else None
 
 
+class SaveCoverLetterRequest(BaseModel):
+    text: str = Field(..., max_length=10000)
+    language: str = Field(..., min_length=2, max_length=5)
+    name: str | None = Field(None, max_length=200)
+
+
 class CoverLetterResponse(BaseModel):
     letter_id: UUID
     name: str | None
