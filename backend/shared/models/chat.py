@@ -12,6 +12,7 @@ class ChatConversation(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
     title = Column(Text, nullable=False, server_default="New conversation")
     is_career_direction = Column(Boolean, nullable=False, server_default="false")
+    is_cover_letter = Column(Boolean, nullable=False, server_default="false")
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
 

@@ -1,0 +1,1 @@
+ALTER TABLE chat_conversations ADD COLUMN IF NOT EXISTS is_cover_letter BOOLEAN NOT NULL DEFAULT FALSE;
