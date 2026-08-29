@@ -10,10 +10,12 @@ export function CoverLetterSuggestionCard({
   suggestion,
   onSave,
   onDislike,
+  savedCount,
 }: {
   suggestion: CoverLetterSuggestion;
   onSave: (text: string, name: string) => Promise<boolean>;
-  onDislike: () => void | Promise<void>;
+  onDislike: () => Promise<void>;
+  savedCount: number;
 }) {
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
   const [editedText, setEditedText] = useState("");
@@ -23,6 +25,9 @@ export function CoverLetterSuggestionCard({
   const [done, setDone] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
   const [err, setErr] = useState("");
+  const [confirmEvictionFor, setConfirmEvictionFor] = useState<number | null>(
+    null,
+  );
 
   const pendingText =
     nameInputFor === null
@@ -30,6 +35,14 @@ export function CoverLetterSuggestionCard({
       : editingIdx === nameInputFor
         ? editedText
         : suggestion.options[nameInputFor];
+
+  function handleSaveClick(i: number) {
+    if (savedCount >= 4) {
+      setConfirmEvictionFor(i);
+    } else {
+      setNameInputFor(i);
+    }
+  }
 
   async function confirmSave() {
     if (nameInputFor === null) return;
@@ -63,7 +76,7 @@ export function CoverLetterSuggestionCard({
       setNameInputFor(null);
       setEditingIdx(null);
     } catch {
-      setErr("Couldn't send that, please try again");
+      setErr("Something went wrong, please try again.");
     } finally {
       setBusy(null);
     }
@@ -108,7 +121,7 @@ export function CoverLetterSuggestionCard({
                   <button
                     onClick={() => {
                       setEditingIdx(null);
-                      setNameInputFor(i);
+                      handleSaveClick(i);
                     }}
                     disabled={done || busy !== null}
                     className="inline-flex min-h-9 items-center gap-1 rounded-full bg-foreground px-3 text-xs text-background disabled:opacity-40"
@@ -126,10 +139,7 @@ export function CoverLetterSuggestionCard({
               ) : (
                 <>
                   <button
-                    onClick={() => {
-                      setName(name);
-                      setNameInputFor(i);
-                    }}
+                    onClick={() => handleSaveClick(i)}
                     disabled={done || busy !== null}
                     className="inline-flex min-h-9 items-center gap-1 rounded-full bg-foreground px-3 text-xs text-background disabled:opacity-40"
                   >
@@ -151,6 +161,34 @@ export function CoverLetterSuggestionCard({
           </div>
         ))}
       </div>
+
+      {confirmEvictionFor !== null && (
+        <div className="space-y-2 rounded-2xl border border-amber-200 bg-amber-50 p-3">
+          <p className="text-sm text-amber-800">
+            You already have 4 saved letters. Saving this one will remove your
+            oldest letter.
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => {
+                setConfirmEvictionFor(null);
+                setNameInputFor(confirmEvictionFor);
+              }}
+              disabled={busy !== null}
+              className="inline-flex min-h-9 items-center gap-1 rounded-full bg-foreground px-3 text-xs text-background disabled:opacity-40"
+            >
+              Continue
+            </button>
+            <button
+              onClick={() => setConfirmEvictionFor(null)}
+              disabled={busy !== null}
+              className="inline-flex min-h-9 items-center gap-1 rounded-full bg-white/80 px-3 text-xs hover:bg-white disabled:opacity-40"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       {nameInputFor !== null && (
         <div className="space-y-2 rounded-2xl bg-white/60 p-3">

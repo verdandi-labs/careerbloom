@@ -85,6 +85,7 @@ function CoverLettersPage() {
   const qc = useQueryClient();
   const [activeId, setActiveId] = useState<string | null>(null);
   const [fresh, setFresh] = useState(false);
+  const [language, setLanguage] = useState(LANGUAGES[0].code);
 
   const { data: letters, isPending } = useQuery({
     queryKey: ["cover-letters"],
@@ -104,7 +105,7 @@ function CoverLettersPage() {
     setCreating(true);
     setActionErr("");
     try {
-      const id = await createCoverLetterConversation();
+      const id = await createCoverLetterConversation(language);
       if (id) {
         setFresh(true);
         setActiveId(id);
@@ -121,6 +122,9 @@ function CoverLettersPage() {
   function resume(c: ConversationSummary) {
     setFresh(false);
     setActiveId(c.id);
+    if (c.language && LANGUAGES.some((l) => l.code === c.language)) {
+      setLanguage(c.language);
+    }
   }
 
   function back() {
@@ -149,7 +153,7 @@ function CoverLettersPage() {
     setActionErr("");
     try {
       const blob = await fetch(
-        `/api/v1/cover-letters/${letter.letter_id}/export/pdf`,
+        `${API_BASE}/cover-letters/${letter.letter_id}/export/pdf`,
         { method: "POST", credentials: "include" },
       ).then((r) => r.blob());
       await downloadBlob(blob, `${letter.name ?? "cover-letter"}.pdf`);
@@ -167,6 +171,9 @@ function CoverLettersPage() {
           conversationId={activeId}
           fresh={fresh}
           onBack={back}
+          language={language}
+          onLanguageChange={setLanguage}
+          savedCount={letters?.length ?? 0}
         />
       ) : (
         <>
@@ -314,10 +321,16 @@ function ConversationView({
   conversationId,
   fresh,
   onBack,
+  language,
+  onLanguageChange,
+  savedCount,
 }: {
   conversationId: string;
   fresh: boolean;
   onBack: () => void;
+  language: string;
+  onLanguageChange: (lang: string) => void;
+  savedCount: number;
 }) {
   const qc = useQueryClient();
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -328,7 +341,6 @@ function ConversationView({
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [listErr, setListErr] = useState("");
-  const [language, setLanguage] = useState(LANGUAGES[0].code);
   const [langOpen, setLangOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -345,7 +357,10 @@ function ConversationView({
         const loadedMsgs: Msg[] = (msgs ?? []).map((r) => ({
           id: r.id,
           role: r.role as "user" | "assistant",
-          content: r.content,
+          content:
+            r.role === "user"
+              ? r.content.replace(/^\[Language:[^\]]+\]\n?/, "")
+              : r.content,
           suggestion: r.suggestion,
           applied_text: r.applied_text,
           rejected: r.rejected,
@@ -410,13 +425,9 @@ function ConversationView({
     }
   }
 
-  async function sendText(text: string) {
+  async function sendText(text: string): Promise<void> {
     const clean = text.trim();
     if (!clean || loading) return;
-    const annotate = fresh && !messages.some((m) => m.id);
-    const payload = annotate
-      ? `[Language: ${languageLabel(language)}]\n${clean}`
-      : clean;
     setInput("");
     const preSendCount = messages.filter((m) => m.id).length;
     const userMsg: Msg = {
@@ -432,7 +443,7 @@ function ConversationView({
     try {
       const stream = await apiStream(
         `/chat/conversations/${conversationId}/messages`,
-        { method: "POST", json: { content: payload } },
+        { method: "POST", json: { content: clean } },
       );
 
       const reader = stream.getReader();
@@ -502,7 +513,9 @@ function ConversationView({
         }
       }
 
-      if (streamFailed) return;
+      if (streamFailed) {
+        throw new Error("Stream failed");
+      }
 
       try {
         const msgs = await api<MessagePayload[]>(
@@ -538,6 +551,7 @@ function ConversationView({
           rejected: false,
         },
       ]);
+      throw e;
     } finally {
       setLoading(false);
     }
@@ -583,7 +597,7 @@ function ConversationView({
                 <button
                   key={l.code}
                   onClick={() => {
-                    setLanguage(l.code);
+                    onLanguageChange(l.code);
                     setLangOpen(false);
                   }}
                   className={`rounded-xl px-3 py-1.5 text-left text-sm hover:bg-white ${language === l.code ? "bg-white/70 text-foreground" : "text-foreground/80"}`}
@@ -646,9 +660,19 @@ function ConversationView({
                     suggestion={m.suggestion}
                     onSave={saveLetter}
                     onDislike={() =>
-                      void sendText("I don't like any of these options.")
+                      sendText("I don't like any of these options.")
                     }
+                    savedCount={savedCount}
                   />
+                )}
+              {m.role === "assistant" &&
+                m.suggestion &&
+                m.suggestion.type !== "cover_letter" && (
+                  <div className="rounded-3xl border border-white/60 bg-white/70 p-4 backdrop-blur shadow-[0_8px_24px_-12px_rgba(248,175,166,0.6)]">
+                    <p className="text-sm text-foreground/70">
+                      Bloom returned an unexpected response. Please try again.
+                    </p>
+                  </div>
                 )}
             </div>
             {m.id && (

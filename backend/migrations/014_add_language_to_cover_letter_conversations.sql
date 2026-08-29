@@ -1,0 +1,1 @@
+ALTER TABLE chat_conversations ADD COLUMN IF NOT EXISTS language VARCHAR(10) DEFAULT NULL;

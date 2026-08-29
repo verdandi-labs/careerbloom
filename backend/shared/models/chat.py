@@ -13,6 +13,7 @@ class ChatConversation(Base):
     title = Column(Text, nullable=False, server_default="New conversation")
     is_career_direction = Column(Boolean, nullable=False, server_default="false")
     is_cover_letter = Column(Boolean, nullable=False, server_default="false")
+    language = Column(Text, nullable=True, server_default=None)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
 

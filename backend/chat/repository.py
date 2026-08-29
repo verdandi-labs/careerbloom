@@ -40,12 +40,14 @@ class ChatRepository:
         await self.db.flush()
         return conv
 
-    async def get_or_create_cover_letter_conversation(self, user_id: UUID) -> ChatConversation:
+    async def get_or_create_cover_letter_conversation(self, user_id: UUID, language: str = "en") -> ChatConversation:
         conv = await self.create_conversation(
             user_id,
             f"Cover Letter - {datetime.utcnow().strftime('%b %d, %Y')}",
             is_cover_letter=True,
         )
+        conv.language = language
+        await self.db.flush()
         return conv
 
     async def list_cover_letter_conversations(self, user_id: UUID) -> list[ChatConversation]:

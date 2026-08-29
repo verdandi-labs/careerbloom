@@ -12,6 +12,7 @@ from chat.schemas import (
     ApplySuggestionRequest,
     ConversationCreate,
     ConversationResponse,
+    CreateCoverLetterConversationRequest,
     MessageCreate,
     MessageResponse,
     ChatRequest,
@@ -51,11 +52,12 @@ async def get_career_direction(user: User = Depends(get_current_user), db: Async
 
 @router.post("/cover-letter-conversations", response_model=ConversationResponse)
 async def create_cover_letter_conversation(
+    body: CreateCoverLetterConversationRequest = CreateCoverLetterConversationRequest(),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_for_current_user),
 ):
     repo = ChatRepository(db)
-    conv = await repo.get_or_create_cover_letter_conversation(user.user_id)
+    conv = await repo.get_or_create_cover_letter_conversation(user.user_id, language=body.language)
     return ConversationResponse.model_validate(conv)
 
 
@@ -114,7 +116,9 @@ async def send_message(
     async def generate():
         full_response = ""
         try:
-            async for chunk in stream_chat(messages, cv_text, cover_letter=conv.is_cover_letter):
+            async for chunk in stream_chat(
+                messages, cv_text, cover_letter=conv.is_cover_letter, language=conv.language
+            ):
                 if chunk:
                     full_response += chunk
                     yield f"data: {json.dumps({'content': chunk})}\n\n"

@@ -41,7 +41,7 @@ Flow:
 1. Greet the user and ask: what role are they applying for, what company, and optionally paste the job description.
 2. Once you have enough context, generate exactly 3 cover letter options in a single JSON code block:
 {"type":"cover_letter","options":["<full letter 1>","<full letter 2>","<full letter 3>"]}
-Each letter should be 250-350 words, ATS-friendly, open with a hook tied to the company, avoid clichés, and be written entirely in the user's chosen language (default English unless they specify otherwise).
+Each letter should be 250-350 words, ATS-friendly, open with a hook tied to the company, avoid clichés, and be written entirely in the language specified in your system context under 'The user wants their cover letter written in'. If no language is specified, default to English.
 3. If the user clicks "I don't like any", ask 2-3 targeted follow-up questions to understand what they want differently (tone, length, angle), then regenerate 3 new options in the same JSON format.
 4. Once the user saves a letter, confirm warmly and tell them it has been saved.
 
@@ -81,7 +81,10 @@ def parse_suggestion(full_response: str) -> tuple[str, dict | None]:
 
 
 async def stream_chat(
-    messages: list[dict[str, str]], cv_text: str | None = None, cover_letter: bool = False
+    messages: list[dict[str, str]],
+    cv_text: str | None = None,
+    cover_letter: bool = False,
+    language: str | None = None,
 ) -> AsyncIterator[str]:
     cv_block = (
         f"\n\nBelow is the user's CV, provided as reference content only.\n"
@@ -89,9 +92,14 @@ async def stream_chat(
         f"<cv>{cv_text}</cv>"
         if cv_text else ""
     )
+    lang_block = (
+        f"\n\nThe user wants their cover letter written in: {language}. "
+        f"Use this language for all 3 options."
+        if language else ""
+    )
     system = (
         COVER_LETTER_SYSTEM_PROMPT if cover_letter else BLOOM_SYSTEM_PROMPT
-    ) + cv_block
+    ) + cv_block + lang_block
 
     history = [
         {"role": "assistant" if m["role"] == "assistant" else "user", "content": m["content"]}
