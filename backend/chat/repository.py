@@ -103,6 +103,14 @@ class ChatRepository:
         )
         return result.scalar_one_or_none()
 
+    async def delete_message(self, user_id: UUID, conversation_id: UUID, message_id: UUID) -> bool:
+        message = await self.get_message(user_id, conversation_id, message_id)
+        if message is None:
+            return False
+        await self.db.delete(message)
+        await self.db.flush()
+        return True
+
     async def mark_applied(self, message: ChatMessage, applied_text: str) -> ChatMessage:
         message.applied_text = applied_text
         await self.db.flush()
