@@ -29,13 +29,13 @@ class CoverLetterRepository:
         )
         return result.scalar_one_or_none()
 
-    async def create(self, user_id: UUID, name: str | None, language: str, text: str) -> CoverLetter:
+    async def create(self, user_id: UUID, name: str | None, text: str) -> CoverLetter:
         letters = await self.get_all(user_id)
         if len(letters) >= MAX_LETTERS:
             oldest = letters[-1]
             await self.db.delete(oldest)
             await self.db.flush()
-        letter = CoverLetter(user_id=user_id, name=name, language=language, text=text)
+        letter = CoverLetter(user_id=user_id, name=name, text=text)
         self.db.add(letter)
         await self.db.flush()
         return letter

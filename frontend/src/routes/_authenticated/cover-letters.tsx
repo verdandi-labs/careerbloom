@@ -12,7 +12,6 @@ import {
   listCoverLetterConversations,
   type ConversationSummary,
 } from "@/lib/chat";
-import { LANGUAGES } from "@/lib/languages";
 import {
   ArrowLeft,
   Download,
@@ -60,16 +59,12 @@ type Msg = {
 type Letter = {
   letter_id: string;
   name: string | null;
-  language: string;
   text: string;
   created_at: string;
 };
 
 const GREETING =
   "Hi! I'm Bloom 🌸 Let's work on your cover letter. What role are you applying for, and which company?";
-
-const languageLabel = (code: string) =>
-  LANGUAGES.find((l) => l.code === code)?.label ?? code;
 
 async function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -222,7 +217,6 @@ function CoverLettersPage() {
                           {l.name ?? "Cover letter"}
                         </h3>
                         <p className="text-xs text-foreground/60">
-                          {languageLabel(l.language)} ·{" "}
                           {new Date(l.created_at).toLocaleDateString(
                             undefined,
                             {
@@ -345,10 +339,7 @@ function ConversationView({
         const loadedMsgs: Msg[] = (msgs ?? []).map((r) => ({
           id: r.id,
           role: r.role as "user" | "assistant",
-          content:
-            r.role === "user"
-              ? r.content.replace(/^\[Language:[^\]]+\]\n?/, "")
-              : r.content,
+          content: r.content,
           suggestion: r.suggestion,
           applied_text: r.applied_text,
           rejected: r.rejected,
@@ -404,7 +395,7 @@ function ConversationView({
     try {
       await api("/cover-letters/save", {
         method: "POST",
-        json: { text, language: "en", name: name || null },
+        json: { text, name: name || null },
       });
       await qc.invalidateQueries({ queryKey: ["cover-letters"] });
       return true;

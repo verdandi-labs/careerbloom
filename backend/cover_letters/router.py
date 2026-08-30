@@ -14,7 +14,6 @@ from cover_letters.schemas import (
     SaveCoverLetterRequest,
 )
 from cv.service import generate_cover_letter_ai, limiter
-from shared.constants import ALLOWED_LANGUAGES
 
 router = APIRouter(prefix="/cover-letters", tags=["cover-letters"])
 logger = logging.getLogger(__name__)
@@ -28,22 +27,19 @@ async def generate_letter(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_for_current_user),
 ):
-    if body.language not in ALLOWED_LANGUAGES:
-        raise HTTPException(status_code=400, detail=f"Unsupported language. Supported codes: {', '.join(sorted(ALLOWED_LANGUAGES))}")
-
     try:
         text = await generate_cover_letter_ai(
             body.job_title,
             body.company,
             (body.job_description or "")[:5_000],
             body.context or "",
-            body.language,
+            "en",
         )
     except Exception:
         logger.error("Cover letter generation failed", exc_info=True)
         raise HTTPException(status_code=500, detail="Cover letter generation failed, please try again")
     repo = CoverLetterRepository(db)
-    letter = await repo.create(user.user_id, body.name, body.language, text)
+    letter = await repo.create(user.user_id, body.name, text)
     return CoverLetterResponse.model_validate(letter)
 
 
@@ -54,7 +50,7 @@ async def save_letter(
     db: AsyncSession = Depends(get_db_for_current_user),
 ):
     repo = CoverLetterRepository(db)
-    letter = await repo.create(user.user_id, body.name, body.language, body.text)
+    letter = await repo.create(user.user_id, body.name, body.text)
     return CoverLetterResponse.model_validate(letter)
 
 
@@ -130,11 +126,6 @@ async def export_letter_pdf(
                 ),
             )
         )
-    if letter_model.language:
-        elements.append(
-            Paragraph(f"Language: {letter_model.language.upper()}", styles["Normal"])
-        )
-        elements.append(Spacer(1, 14))
 
     for para in letter_model.text.split("\n\n"):
         if para.strip():
