@@ -142,7 +142,8 @@ async def chat_completion(
                 )
                 continue
             if not response.is_success:
-                raise ZenClientError(f"Zen error {response.status_code}: {response.text}")
+                logger.warning(f"Zen model {candidate} error {response.status_code}, trying next")
+                continue
 
             return response.json()["choices"][0]["message"]["content"]
 
