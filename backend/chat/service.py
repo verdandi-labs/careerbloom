@@ -3,7 +3,7 @@ import re
 from collections.abc import AsyncIterator
 
 from shared.prompts import SAFETY_BOUNDARY
-from shared.zen_client import stream_chat_completion
+from shared.ai_client import stream_chat_completion
 from chat.schemas import ChatSuggestion
 
 _SUGGESTION_BLOCK_RE = re.compile(r"```json\s*([\s\S]*?)```")

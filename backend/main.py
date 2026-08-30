@@ -11,7 +11,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from config import get_settings
 from database import Base, router as db_router, global_engine
-from shared.zen_client import ZenClientError, get_available_models, get_cache_status
+from shared.ai_client import ZenClientError, get_available_models, get_cache_status
 
 logger = logging.getLogger("startup")
 

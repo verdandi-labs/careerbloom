@@ -126,6 +126,29 @@ async def chat_completion(
         raise ZenClientError(
             "All candidates are exhausted: model cache is empty and the default model failed"
         )
+    settings = get_settings()
+    if settings.OPENAI_API_KEY:
+        logger.info("Zen exhausted, falling back to OpenAI")
+        try:
+            async with httpx.AsyncClient(timeout=120) as client:
+                response = await client.post(
+                    f"{settings.OPENAI_BASE_URL}/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
+                        "Content-Type": "application/json",
+                    },
+                    json={
+                        "model": settings.OPENAI_MODEL,
+                        "messages": messages,
+                        "temperature": temperature,
+                        "max_tokens": 4096,
+                    },
+                )
+                if response.is_success:
+                    return response.json()["choices"][0]["message"]["content"]
+                logger.warning(f"OpenAI fallback failed: {response.status_code} {response.text}")
+        except Exception as e:
+            logger.warning(f"OpenAI fallback error: {e}")
     raise AllModelsFailedError("All Zen models failed")
 
 
@@ -188,5 +211,49 @@ async def stream_chat_completion(
         if attempt == 0:
             logger.warning("All models failed, retrying in 15 seconds...")
             await asyncio.sleep(1)
+
+    settings = get_settings()
+    if settings.OPENAI_API_KEY:
+        logger.info("Zen exhausted, falling back to OpenAI stream")
+        try:
+            async with httpx.AsyncClient(
+                timeout=httpx.Timeout(300.0, connect=10.0)
+            ) as client:
+                async with client.stream(
+                    "POST",
+                    f"{settings.OPENAI_BASE_URL}/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
+                        "Content-Type": "application/json",
+                    },
+                    json={
+                        "model": settings.OPENAI_MODEL,
+                        "messages": messages,
+                        "stream": True,
+                    },
+                ) as response:
+                    if not response.is_success:
+                        body = (await response.aread()).decode(errors="replace")
+                        logger.warning(f"OpenAI stream fallback failed: {response.status_code} {body}")
+                    else:
+                        async for line in response.aiter_lines():
+                            line = line.strip()
+                            if not line.startswith("data:"):
+                                continue
+                            payload = line[len("data:"):].strip()
+                            if payload == "[DONE]":
+                                yield "[DONE]"
+                                return
+                            try:
+                                chunk = json.loads(payload)
+                                if not chunk.get("choices"):
+                                    continue
+                                content = chunk["choices"][0]["delta"].get("content", "")
+                                if content:
+                                    yield content
+                            except json.JSONDecodeError:
+                                continue
+        except Exception as e:
+            logger.warning(f"OpenAI stream fallback error: {e}")
 
     raise AllModelsFailedError("All Zen models failed")
