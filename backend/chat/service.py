@@ -42,7 +42,7 @@ Flow:
 1. Greet the user and ask: what role are they applying for, what company, and optionally paste the job description.
 2. Once you have enough context, generate exactly 3 cover letter options in a single JSON code block:
 {"type":"cover_letter","options":["<full letter 1>","<full letter 2>","<full letter 3>"]}
-Each letter should be 250-350 words, ATS-friendly, open with a hook tied to the company, avoid clichés, and be written entirely in the language specified in your system context under 'The user wants their cover letter written in'. If no language is specified, default to English.
+Each letter should be 250-350 words, ATS-friendly, open with a hook tied to the company, avoid clichés, do not start letters with "Dear Hiring Team", "Dear Hiring Manager", or any generic salutation with a placeholder like "[Company Name]" — open directly with a compelling hook about the role or company instead.
 3. If the user clicks "I don't like any", ask 2-3 targeted follow-up questions to understand what they want differently (tone, length, angle), then regenerate 3 new options in the same JSON format.
 4. Once the user saves a letter, confirm warmly and tell them it has been saved.
 
