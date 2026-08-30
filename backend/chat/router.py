@@ -98,13 +98,12 @@ async def send_message(
         raise HTTPException(status_code=404, detail="Conversation not found")
 
     cv_text = None
-    if conv.is_cover_letter:
-        try:
-            cv_data = await CvRepository(db).get_current_cv(user.user_id)
-            if any(cv_data.model_dump().values()):
-                cv_text = cv_data.model_dump_json()
-        except Exception:
-            logger.exception("Failed to load CV context for cover letter conversation")
+    try:
+        cv_data = await CvRepository(db).get_current_cv(user.user_id)
+        if any(cv_data.model_dump().values()):
+            cv_text = cv_data.model_dump_json()
+    except Exception:
+        logger.exception("Failed to load CV context for conversation")
 
     await repo.add_message(user.user_id, conversation_id, "user", body.content)
 
