@@ -33,7 +33,6 @@ async def generate_letter(
             body.company,
             (body.job_description or "")[:5_000],
             body.context or "",
-            "en",
         )
     except Exception:
         logger.error("Cover letter generation failed", exc_info=True)

@@ -143,10 +143,9 @@ async def translate_cv(data: CvData, language: str) -> CvData:
     return CvData.model_validate(extract_json(raw))
 
 
-async def generate_cover_letter_ai(job_title: str, company: str, job_description: str, cv_text: str, language: str) -> str:
+async def generate_cover_letter_ai(job_title: str, company: str, job_description: str, cv_text: str) -> str:
     instructions = (
         "Write a warm, ATS-friendly cover letter for the position below.\n"
-        f"Write the letter entirely in {language}.\n"
         "250-350 words. Open with a hook tied to the company. Avoid cliches.\n"
         "Return JSON with exactly one key: content."
     )
