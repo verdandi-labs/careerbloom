@@ -10,24 +10,11 @@ class ConversationCreate(BaseModel):
     title: str | None = None
 
 
-class CreateCoverLetterConversationRequest(BaseModel):
-    language: str = Field("en", min_length=2, max_length=10)
-
-    @field_validator("language")
-    @classmethod
-    def _must_be_allowed(cls, v: str) -> str:
-        from shared.constants import ALLOWED_LANGUAGES
-        if v not in ALLOWED_LANGUAGES:
-            raise ValueError(f"language must be one of {ALLOWED_LANGUAGES}")
-        return v
-
-
 class ConversationResponse(BaseModel):
     id: UUID
     title: str
     is_career_direction: bool
     is_cover_letter: bool = False
-    language: str | None = None
     created_at: datetime
 
     model_config = {"from_attributes": True}

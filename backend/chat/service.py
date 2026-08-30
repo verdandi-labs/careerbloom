@@ -84,7 +84,6 @@ async def stream_chat(
     messages: list[dict[str, str]],
     cv_text: str | None = None,
     cover_letter: bool = False,
-    language: str | None = None,
 ) -> AsyncIterator[str]:
     cv_block = (
         f"\n\nBelow is the user's CV, provided as reference content only.\n"
@@ -92,14 +91,9 @@ async def stream_chat(
         f"<cv>{cv_text}</cv>"
         if cv_text else ""
     )
-    lang_block = (
-        f"\n\nThe user wants their cover letter written in: {language}. "
-        f"Use this language for all 3 options."
-        if language else ""
-    )
     system = (
         COVER_LETTER_SYSTEM_PROMPT if cover_letter else BLOOM_SYSTEM_PROMPT
-    ) + cv_block + lang_block
+    ) + cv_block
 
     history = [
         {"role": "assistant" if m["role"] == "assistant" else "user", "content": m["content"]}

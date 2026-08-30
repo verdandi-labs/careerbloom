@@ -4,7 +4,6 @@ export type ConversationSummary = {
   id: string;
   title: string;
   is_cover_letter: boolean;
-  language: string | null;
   created_at: string;
 };
 
@@ -18,12 +17,9 @@ export async function createConversation(
   return data?.id ?? null;
 }
 
-export async function createCoverLetterConversation(
-  language: string,
-): Promise<string | null> {
+export async function createCoverLetterConversation(): Promise<string | null> {
   const data = await api<{ id: string }>("/chat/cover-letter-conversations", {
     method: "POST",
-    json: { language },
   });
   return data?.id ?? null;
 }

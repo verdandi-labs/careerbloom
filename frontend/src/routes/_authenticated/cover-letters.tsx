@@ -17,7 +17,6 @@ import {
   ArrowLeft,
   Download,
   FileText,
-  Languages,
   Loader2,
   Mail,
   Plus,
@@ -85,7 +84,6 @@ function CoverLettersPage() {
   const qc = useQueryClient();
   const [activeId, setActiveId] = useState<string | null>(null);
   const [fresh, setFresh] = useState(false);
-  const [language, setLanguage] = useState(LANGUAGES[0].code);
 
   const { data: letters, isPending } = useQuery({
     queryKey: ["cover-letters"],
@@ -105,7 +103,7 @@ function CoverLettersPage() {
     setCreating(true);
     setActionErr("");
     try {
-      const id = await createCoverLetterConversation(language);
+      const id = await createCoverLetterConversation();
       if (id) {
         setFresh(true);
         setActiveId(id);
@@ -122,9 +120,6 @@ function CoverLettersPage() {
   function resume(c: ConversationSummary) {
     setFresh(false);
     setActiveId(c.id);
-    if (c.language && LANGUAGES.some((l) => l.code === c.language)) {
-      setLanguage(c.language);
-    }
   }
 
   function back() {
@@ -171,8 +166,6 @@ function CoverLettersPage() {
           conversationId={activeId}
           fresh={fresh}
           onBack={back}
-          language={language}
-          onLanguageChange={setLanguage}
           savedCount={letters?.length ?? 0}
         />
       ) : (
@@ -321,15 +314,11 @@ function ConversationView({
   conversationId,
   fresh,
   onBack,
-  language,
-  onLanguageChange,
   savedCount,
 }: {
   conversationId: string;
   fresh: boolean;
   onBack: () => void;
-  language: string;
-  onLanguageChange: (lang: string) => void;
   savedCount: number;
 }) {
   const qc = useQueryClient();
@@ -341,7 +330,6 @@ function ConversationView({
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [listErr, setListErr] = useState("");
-  const [langOpen, setLangOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -416,7 +404,7 @@ function ConversationView({
     try {
       await api("/cover-letters/save", {
         method: "POST",
-        json: { text, language, name: name || null },
+        json: { text, language: "en", name: name || null },
       });
       await qc.invalidateQueries({ queryKey: ["cover-letters"] });
       return true;
@@ -561,8 +549,6 @@ function ConversationView({
     void sendText(input);
   }
 
-  const lang = LANGUAGES.find((l) => l.code === language) ?? LANGUAGES[0];
-
   return (
     <section className="glass flex min-h-0 flex-col p-6">
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/40 pb-4">
@@ -579,34 +565,7 @@ function ConversationView({
           </div>
           <div>
             <h1 className="font-display text-2xl">Cover Letters</h1>
-            <p className="text-xs text-foreground/60">
-              {lang.label} cover letter in progress
-            </p>
           </div>
-        </div>
-        <div className="relative">
-          <button
-            onClick={() => setLangOpen((v) => !v)}
-            className="inline-flex items-center gap-2 rounded-full bg-white/85 px-4 py-2 text-sm text-foreground hover:bg-white"
-          >
-            <Languages className="h-3.5 w-3.5" /> {lang.label}
-          </button>
-          {langOpen && (
-            <div className="glass-strong absolute right-0 top-full z-30 mt-2 grid w-44 gap-1 p-2">
-              {LANGUAGES.map((l) => (
-                <button
-                  key={l.code}
-                  onClick={() => {
-                    onLanguageChange(l.code);
-                    setLangOpen(false);
-                  }}
-                  className={`rounded-xl px-3 py-1.5 text-left text-sm hover:bg-white ${language === l.code ? "bg-white/70 text-foreground" : "text-foreground/80"}`}
-                >
-                  {l.label}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
       </header>
 
