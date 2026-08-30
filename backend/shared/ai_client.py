@@ -122,10 +122,6 @@ async def chat_completion(
 
             return response.json()["choices"][0]["message"]["content"]
 
-    if len(candidates) <= 1:
-        raise ZenClientError(
-            "All candidates are exhausted: model cache is empty and the default model failed"
-        )
     settings = get_settings()
     if settings.OPENAI_API_KEY:
         logger.info("Zen exhausted, falling back to OpenAI")
@@ -149,6 +145,10 @@ async def chat_completion(
                 logger.warning(f"OpenAI fallback failed: {response.status_code} {response.text}")
         except Exception as e:
             logger.warning(f"OpenAI fallback error: {e}")
+    if len(candidates) <= 1:
+        raise ZenClientError(
+            "All candidates are exhausted: model cache is empty and the default model failed"
+        )
     raise AllModelsFailedError("All Zen models failed")
 
 
@@ -199,7 +199,10 @@ async def stream_chat_completion(
                             if payload == "[DONE]":
                                 yield "[DONE]"
                                 return
-                            chunk = json.loads(payload)
+                            try:
+                                chunk = json.loads(payload)
+                            except json.JSONDecodeError:
+                                continue
                             if not chunk.get("choices"):
                                 continue
                             content = chunk["choices"][0]["delta"].get("content", "")
