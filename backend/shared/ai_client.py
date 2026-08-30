@@ -84,6 +84,30 @@ async def chat_completion(
     temperature: float = 0.0,
 ) -> str:
     settings = get_settings()
+
+    if settings.OPENAI_API_KEY:
+        logger.info("chat_completion trying Groq first")
+        try:
+            async with httpx.AsyncClient(timeout=120) as client:
+                response = await client.post(
+                    f"{settings.OPENAI_BASE_URL}/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
+                        "Content-Type": "application/json",
+                    },
+                    json={
+                        "model": settings.OPENAI_MODEL,
+                        "messages": messages,
+                        "temperature": temperature,
+                        "max_tokens": 4096,
+                    },
+                )
+                if response.is_success:
+                    return response.json()["choices"][0]["message"]["content"]
+                logger.warning(f"Groq failed: {response.status_code} {response.text}")
+        except Exception as e:
+            logger.warning(f"Groq error: {e}")
+
     candidates = _build_candidates(user_model, await get_available_models())
 
     async with httpx.AsyncClient(timeout=120) as client:
@@ -122,12 +146,23 @@ async def chat_completion(
 
             return response.json()["choices"][0]["message"]["content"]
 
+    raise AllModelsFailedError("All models failed")
+
+
+async def stream_chat_completion(
+    messages: list[dict],
+    user_model: str | None = None,
+) -> AsyncIterator[str]:
     settings = get_settings()
+
     if settings.OPENAI_API_KEY:
-        logger.info("Zen exhausted, falling back to OpenAI")
+        logger.info("stream_chat_completion trying Groq first")
         try:
-            async with httpx.AsyncClient(timeout=120) as client:
-                response = await client.post(
+            async with httpx.AsyncClient(
+                timeout=httpx.Timeout(300.0, connect=10.0)
+            ) as client:
+                async with client.stream(
+                    "POST",
                     f"{settings.OPENAI_BASE_URL}/chat/completions",
                     headers={
                         "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
@@ -136,27 +171,33 @@ async def chat_completion(
                     json={
                         "model": settings.OPENAI_MODEL,
                         "messages": messages,
-                        "temperature": temperature,
-                        "max_tokens": 4096,
+                        "stream": True,
                     },
-                )
-                if response.is_success:
-                    return response.json()["choices"][0]["message"]["content"]
-                logger.warning(f"OpenAI fallback failed: {response.status_code} {response.text}")
+                ) as response:
+                    if not response.is_success:
+                        body = (await response.aread()).decode(errors="replace")
+                        logger.warning(f"Groq stream failed: {response.status_code} {body}")
+                    else:
+                        async for line in response.aiter_lines():
+                            line = line.strip()
+                            if not line.startswith("data:"):
+                                continue
+                            payload = line[len("data:"):].strip()
+                            if payload == "[DONE]":
+                                yield "[DONE]"
+                                return
+                            try:
+                                chunk = json.loads(payload)
+                                if not chunk.get("choices"):
+                                    continue
+                                content = chunk["choices"][0]["delta"].get("content", "")
+                                if content:
+                                    yield content
+                            except json.JSONDecodeError:
+                                continue
         except Exception as e:
-            logger.warning(f"OpenAI fallback error: {e}")
-    if len(candidates) <= 1:
-        raise ZenClientError(
-            "All candidates are exhausted: model cache is empty and the default model failed"
-        )
-    raise AllModelsFailedError("All Zen models failed")
+            logger.warning(f"Groq stream error: {e}")
 
-
-async def stream_chat_completion(
-    messages: list[dict],
-    user_model: str | None = None,
-) -> AsyncIterator[str]:
-    settings = get_settings()
     available = await get_available_models()
 
     for attempt in range(2):
@@ -180,7 +221,7 @@ async def stream_chat_completion(
                             "stream": True,
                         },
                     ) as response:
-                        if response.status_code in (400, 429, 503):
+                        if response.status_code in (400, 429, 500, 503):
                             logger.warning(
                                 f"Zen model {candidate} not available, trying another"
                             )
@@ -208,55 +249,11 @@ async def stream_chat_completion(
                             content = chunk["choices"][0]["delta"].get("content", "")
                             if content:
                                 yield content
-            except (httpx.RemoteProtocolError, httpx.ReadError):
+            except (httpx.RemoteProtocolError, httpx.ReadError, ZenClientError):
                 logger.warning(f"Zen model {candidate} not available, trying another")
                 continue
         if attempt == 0:
             logger.warning("All models failed, retrying in 15 seconds...")
             await asyncio.sleep(1)
 
-    settings = get_settings()
-    if settings.OPENAI_API_KEY:
-        logger.info("Zen exhausted, falling back to OpenAI stream")
-        try:
-            async with httpx.AsyncClient(
-                timeout=httpx.Timeout(300.0, connect=10.0)
-            ) as client:
-                async with client.stream(
-                    "POST",
-                    f"{settings.OPENAI_BASE_URL}/chat/completions",
-                    headers={
-                        "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
-                        "Content-Type": "application/json",
-                    },
-                    json={
-                        "model": settings.OPENAI_MODEL,
-                        "messages": messages,
-                        "stream": True,
-                    },
-                ) as response:
-                    if not response.is_success:
-                        body = (await response.aread()).decode(errors="replace")
-                        logger.warning(f"OpenAI stream fallback failed: {response.status_code} {body}")
-                    else:
-                        async for line in response.aiter_lines():
-                            line = line.strip()
-                            if not line.startswith("data:"):
-                                continue
-                            payload = line[len("data:"):].strip()
-                            if payload == "[DONE]":
-                                yield "[DONE]"
-                                return
-                            try:
-                                chunk = json.loads(payload)
-                                if not chunk.get("choices"):
-                                    continue
-                                content = chunk["choices"][0]["delta"].get("content", "")
-                                if content:
-                                    yield content
-                            except json.JSONDecodeError:
-                                continue
-        except Exception as e:
-            logger.warning(f"OpenAI stream fallback error: {e}")
-
-    raise AllModelsFailedError("All Zen models failed")
+    raise AllModelsFailedError("All models failed")
