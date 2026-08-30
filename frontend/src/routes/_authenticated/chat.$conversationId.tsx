@@ -379,8 +379,8 @@ function ConversationPage() {
           </div>
         ))}
         {loading && messages[messages.length - 1]?.role === "user" && (
-          <div className="flex items-center gap-2 text-xs text-foreground/50">
-            <Loader2 className="h-3 w-3 animate-spin" /> Bloom is thinking…
+          <div className="flex items-center gap-1 text-sm text-pink-300 animate-pulse">
+            ✨ Thinking...
           </div>
         )}
       </div>

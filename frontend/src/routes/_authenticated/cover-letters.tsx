@@ -220,6 +220,11 @@ function CoverLettersPage() {
       </section>
 
       <h2 className="mt-10 font-display text-2xl">Saved letters</h2>
+      {busy && (
+        <div className="flex items-center gap-1 text-sm text-pink-300 animate-pulse">
+          ✨ Thinking...
+        </div>
+      )}
       {actionErr && (
         <p className="mt-3 rounded-2xl bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
           {actionErr}
