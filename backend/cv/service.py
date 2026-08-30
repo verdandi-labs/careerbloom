@@ -7,7 +7,7 @@ from slowapi.util import get_remote_address
 
 from cv.schemas import CvData, FIELD_MODELS, RAW_MODELS, TEXT_FIELDS
 from shared.prompts import SAFETY_BOUNDARY, wrap_untrusted
-from shared.zen_client import AllModelsFailedError, chat_completion
+from shared.ai_client import AllModelsFailedError, chat_completion
 
 logger = logging.getLogger(__name__)
 

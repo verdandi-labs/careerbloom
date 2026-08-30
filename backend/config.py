@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     ZEN_BASE_URL: str = "https://opencode.ai/zen/v1"
     ZEN_MODEL_REFRESH_HOURS: int = 6
 
+    # OpenAI
+    OPENAI_API_KEY: str = ""
+    OPENAI_BASE_URL: str = "https://api.openai.com/v1"
+    OPENAI_MODEL: str = "llama-3.3-70b-versatile"
+
     # SendGrid
     SENDGRID_API_KEY: str = ""
 
