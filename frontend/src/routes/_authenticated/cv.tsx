@@ -875,7 +875,11 @@ function CVPage() {
           <div className="glass-strong w-full max-w-md rounded-2xl p-6 shadow-xl bg-pink-50/80">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-sm font-semibold text-foreground">
-                Save CV Version
+                {replaceTarget
+                  ? "Confirm Replace"
+                  : versions.length >= 6
+                    ? "Replace a CV Version"
+                    : "Save CV Version"}
               </h2>
               <button
                 onClick={() => {
@@ -891,64 +895,101 @@ function CVPage() {
                 <X className="h-4 w-4 text-foreground/50 hover:text-foreground" />
               </button>
             </div>
-            <p className="mb-3 text-xs text-foreground/50">
-              You can save up to 6 CV versions. {versions.length} / 6 saved.
-            </p>
-            <input
-              type="text"
-              placeholder="Version name e.g. CV English, CV Tech"
-              value={saveName}
-              onChange={(e) => setSaveName(e.target.value)}
-              className="mb-1 w-full rounded-xl border border-foreground/10 bg-white/60 px-3 py-2 text-xs outline-none focus:border-foreground/30"
-            />
-            {saveNameErr && (
-              <p className="mb-2 text-xs text-red-400">{saveNameErr}</p>
-            )}
+
             {saveSuccess && (
               <p className="mb-2 text-xs text-green-500">{saveSuccess}</p>
             )}
 
-            {saveModalMode === "save" && versions.length < 6 ? (
-              <button
-                onClick={handleSaveVersion}
-                disabled={saveLoading}
-                className="mt-3 w-full rounded-full bg-foreground px-4 py-2 text-xs text-background disabled:opacity-50"
-              >
-                {saveLoading ? "Saving..." : "Save as new version"}
-              </button>
-            ) : (
-              <div className="mt-3">
-                <p className="mb-2 text-xs text-foreground/50">
-                  Maximum 6 versions reached. Pick one to replace:
+            {replaceTarget ? (
+              <>
+                <p className="mb-3 text-xs text-foreground/50">
+                  Replacing:{" "}
+                  <span className="font-medium text-foreground/70">
+                    {versions.find((v) => v.version_id === replaceTarget)?.cv_name}
+                  </span>
                 </p>
-                <div className="mb-3 flex flex-col gap-1">
+                <input
+                  type="text"
+                  placeholder="Version name"
+                  value={saveName}
+                  onChange={(e) => setSaveName(e.target.value)}
+                  className="mb-1 w-full rounded-xl border border-foreground/10 bg-white/60 px-3 py-2 text-xs outline-none focus:border-foreground/30"
+                />
+                {saveNameErr && (
+                  <p className="mb-2 text-xs text-red-400">{saveNameErr}</p>
+                )}
+                <div className="mt-3 flex gap-2">
+                  <button
+                    onClick={() => {
+                      setReplaceTarget(null);
+                      setSaveName("");
+                    }}
+                    className="rounded-full border border-foreground/10 px-4 py-2 text-xs text-foreground/60 hover:border-foreground/30 hover:text-foreground"
+                  >
+                    Back
+                  </button>
+                  <button
+                    onClick={handleSaveVersion}
+                    disabled={saveLoading}
+                    className="flex-1 rounded-full bg-foreground px-4 py-2 text-xs text-background disabled:opacity-50"
+                  >
+                    {saveLoading ? "Replacing..." : "Replace"}
+                  </button>
+                </div>
+              </>
+            ) : versions.length >= 6 ? (
+              <>
+                <p className="mb-3 text-xs text-foreground/50">
+                  You have 6 saved versions. Which one would you like to replace?
+                </p>
+                <div className="flex flex-col gap-2">
                   {versions.map((v) => (
-                    <label
+                    <button
                       key={v.version_id}
-                      className="flex cursor-pointer items-center gap-2 text-xs"
+                      onClick={() => {
+                        setReplaceTarget(v.version_id);
+                        setSaveName(v.cv_name);
+                      }}
+                      className="flex items-center justify-between rounded-xl border border-foreground/10 bg-white/60 px-4 py-3 text-left transition hover:border-foreground/20 hover:bg-white"
                     >
-                      <input
-                        type="radio"
-                        name="replaceTarget"
-                        value={v.version_id}
-                        checked={replaceTarget === v.version_id}
-                        onChange={() => setReplaceTarget(v.version_id)}
-                      />
-                      {v.cv_name}{" "}
-                      <span className="text-foreground/40">
-                        {new Date(v.created_at).toLocaleDateString()}
+                      <div>
+                        <p className="text-xs font-medium text-foreground">
+                          {v.cv_name}
+                        </p>
+                        <p className="text-[11px] text-foreground/40">
+                          {new Date(v.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <span className="text-[11px] text-foreground/30">
+                        Select
                       </span>
-                    </label>
+                    </button>
                   ))}
                 </div>
+              </>
+            ) : (
+              <>
+                <p className="mb-3 text-xs text-foreground/50">
+                  You can save up to 6 CV versions. {versions.length} / 6 saved.
+                </p>
+                <input
+                  type="text"
+                  placeholder="e.g. CV English, CV Tech roles"
+                  value={saveName}
+                  onChange={(e) => setSaveName(e.target.value)}
+                  className="mb-1 w-full rounded-xl border border-foreground/10 bg-white/60 px-3 py-2 text-xs outline-none focus:border-foreground/30"
+                />
+                {saveNameErr && (
+                  <p className="mb-2 text-xs text-red-400">{saveNameErr}</p>
+                )}
                 <button
                   onClick={handleSaveVersion}
-                  disabled={saveLoading || !replaceTarget}
-                  className="w-full rounded-full bg-foreground px-4 py-2 text-xs text-background disabled:opacity-50"
+                  disabled={saveLoading}
+                  className="mt-3 w-full rounded-full bg-foreground px-4 py-2 text-xs text-background disabled:opacity-50"
                 >
-                  {saveLoading ? "Replacing..." : "Replace selected version"}
+                  {saveLoading ? "Saving..." : "Save as new version"}
                 </button>
-              </div>
+              </>
             )}
           </div>
         </div>
