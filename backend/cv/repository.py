@@ -76,7 +76,8 @@ class CvRepository:
         count = result.scalar()
         if count >= MAX_SAVED_VERSIONS:
             raise ValueError("Maximum saved versions reached")
-        row = CvSavedVersion(user_id=user_id, cv_name=cv_name, **data.model_dump())
+        data_dict = data.model_dump()
+        row = CvSavedVersion(user_id=user_id, cv_name=cv_name, **data_dict)
         self.db.add(row)
         await self.db.flush()
         return row
@@ -85,9 +86,10 @@ class CvRepository:
         row = await self.db.get(CvSavedVersion, version_id)
         if row is None or row.user_id != user_id:
             return None
+        data_dict = data.model_dump()
         row.cv_name = cv_name
-        for field in CV_FIELDS:
-            setattr(row, field, getattr(data, field))
+        for field, value in data_dict.items():
+            setattr(row, field, value)
         await self.db.flush()
         return row
 
