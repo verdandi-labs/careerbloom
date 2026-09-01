@@ -282,6 +282,8 @@ function CVPage() {
   const [replaceTarget, setReplaceTarget] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState("");
   const [deletingVersionId, setDeletingVersionId] = useState<string | null>(null);
+  const [saveFromTranslate, setSaveFromTranslate] = useState(false);
+  const [saveModalMode, setSaveModalMode] = useState<"save" | "replace">("save");
 
   async function save(field: string, value: string | CvRow[] | null) {
     setSaving(true);
@@ -377,10 +379,11 @@ function CVPage() {
     setSaveNameErr("");
     setSaveLoading(true);
     try {
+      const dataToSave = saveFromTranslate && translated ? translated.data : undefined;
       if (replaceTarget) {
-        await replaceVersion(replaceTarget, saveName.trim());
+        await replaceVersion(replaceTarget, saveName.trim(), dataToSave);
       } else {
-        await saveVersion(saveName.trim());
+        await saveVersion(saveName.trim(), dataToSave);
       }
       setSaveSuccess(replaceTarget ? "Replaced!" : "Saved!");
       setSaveName("");
@@ -772,7 +775,11 @@ function CVPage() {
         <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/30 p-4 backdrop-blur-md">
           <div className="glass-strong relative max-h-[90vh] w-full max-w-2xl overflow-y-auto p-8">
             <button
-              onClick={() => setTranslated(null)}
+              onClick={() => {
+                setTranslated(null);
+                setSaveFromTranslate(false);
+                setSaveModalMode("save");
+              }}
               className="absolute right-2 top-2 grid h-11 w-11 place-items-center rounded-full bg-white/60 text-foreground hover:bg-white"
             >
               <X className="h-4 w-4" />
@@ -833,6 +840,31 @@ function CVPage() {
                 Export DOCX
               </button>
             </div>
+            <div className="mt-6 border-t border-foreground/10 pt-4 flex gap-3">
+              <button
+                onClick={() => {
+                  setSaveFromTranslate(true);
+                  setSaveModalMode("save");
+                  setSaveModalOpen(true);
+                  void fetchVersions();
+                }}
+                disabled={versions.length >= 6}
+                className="flex-1 rounded-full bg-foreground px-4 py-2 text-xs text-background disabled:opacity-40"
+              >
+                {versions.length >= 6 ? "Max versions reached" : "Save as new version"}
+              </button>
+              <button
+                onClick={() => {
+                  setSaveFromTranslate(true);
+                  setSaveModalMode("replace");
+                  setSaveModalOpen(true);
+                  void fetchVersions();
+                }}
+                className="flex-1 rounded-full bg-white/70 px-4 py-2 text-xs text-foreground hover:bg-white"
+              >
+                Replace existing version
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -848,6 +880,8 @@ function CVPage() {
               <button
                 onClick={() => {
                   setSaveModalOpen(false);
+                  setSaveFromTranslate(false);
+                  setSaveModalMode("save");
                   setSaveName("");
                   setSaveNameErr("");
                   setReplaceTarget(null);
@@ -874,7 +908,7 @@ function CVPage() {
               <p className="mb-2 text-xs text-green-500">{saveSuccess}</p>
             )}
 
-            {versions.length < 6 ? (
+            {saveModalMode === "save" && versions.length < 6 ? (
               <button
                 onClick={handleSaveVersion}
                 disabled={saveLoading}
