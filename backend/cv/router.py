@@ -9,7 +9,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt, Inches, RGBColor
 from docx2python import docx2python
 from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
-from fastapi.responses import Response, StreamingResponse
+from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from cv.repository import CvRepository
@@ -339,17 +339,4 @@ async def delete_version(
     deleted = await repo.delete_version(user.user_id, version_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Version not found")
-    return Response(status_code=204)
-
-
-@router.post("/versions/{version_id}/load", response_model=CvData)
-async def load_version(
-    version_id: str,
-    user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-):
-    repo = CvRepository(db)
-    data = await repo.load_version(user.user_id, version_id)
-    if data is None:
-        raise HTTPException(status_code=404, detail="Version not found")
-    return data
+    return {"ok": True}

@@ -101,12 +101,6 @@ class CvRepository:
         await self.db.flush()
         return True
 
-    async def load_version(self, user_id: UUID, version_id: UUID) -> CvData | None:
-        row = await self.db.get(CvSavedVersion, version_id)
-        if row is None or row.user_id != user_id:
-            return None
-        return CvData(**{field: getattr(row, field) for field in CV_FIELDS})
-
     async def get_current_cv(self, user_id: UUID) -> CvData:
         upload = await self.get_latest_upload(user_id)
         query = select(CvEdit).where(CvEdit.user_id == user_id)

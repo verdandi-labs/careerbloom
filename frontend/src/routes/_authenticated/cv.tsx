@@ -237,9 +237,7 @@ const replaceVersion = (version_id: string, cv_name: string, data?: CvData) =>
     json: { cv_name, data: data ?? null },
   });
 const deleteVersion = (version_id: string) =>
-  api(`/cv/versions/${version_id}`, { method: "DELETE" });
-const loadVersion = (version_id: string) =>
-  api<CvData>(`/cv/versions/${version_id}/load`, { method: "POST" });
+  api<{ ok: boolean }>(`/cv/versions/${version_id}`, { method: "DELETE" });
 
 async function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -397,16 +395,6 @@ function CVPage() {
       setSaveNameErr(errorMessage(e, "Could not save version, please try again"));
     } finally {
       setSaveLoading(false);
-    }
-  }
-
-  async function handleLoadVersion(version_id: string) {
-    try {
-      const data = await loadVersion(version_id);
-      qc.setQueryData(["cv"], data);
-      setVersionsOpen(false);
-    } catch {
-      // silent for now
     }
   }
 
@@ -1037,12 +1025,6 @@ function CVPage() {
                       {new Date(v.created_at).toLocaleDateString()}
                     </p>
                     <div className="mt-2 flex gap-2">
-                      <button
-                        onClick={() => handleLoadVersion(v.version_id)}
-                        className="flex-1 rounded-full bg-foreground px-3 py-1.5 text-xs text-background transition hover:opacity-80"
-                      >
-                        Load
-                      </button>
                       {deletingVersionId === v.version_id ? (
                         <div className="flex items-center gap-2">
                           <span className="text-xs text-foreground/60">
