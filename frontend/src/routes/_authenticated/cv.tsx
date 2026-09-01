@@ -6,11 +6,13 @@ import { api, errorMessage } from "@/lib/api";
 import { DEFAULT_TEMPLATE } from "@/lib/cv-templates";
 import { LANGUAGES } from "@/lib/languages";
 import {
+  BookMarked,
   Download,
   FileUp,
   Languages,
   Loader2,
   Plus,
+  Save,
   Trash2,
   X,
 } from "lucide-react";
@@ -198,6 +200,8 @@ type Draft =
 
 type TranslatedCv = { data: CvData; code: string; label: string };
 
+type VersionListItem = { version_id: string; cv_name: string; created_at: string };
+
 const listText = (data: CvData, key: ListKey) =>
   (data[key] ?? [])
     .map((r) => LIST_SECTIONS.find((s) => s.key === key)!.text(r))
@@ -220,6 +224,22 @@ const toDocxData = (data: CvData): Record<string, string> => ({
   references: "",
   other: "",
 });
+
+const listVersions = () => api<VersionListItem[]>("/cv/versions");
+const saveVersion = (cv_name: string, data?: CvData) =>
+  api<VersionListItem>("/cv/versions", {
+    method: "POST",
+    json: { cv_name, data: data ?? null },
+  });
+const replaceVersion = (version_id: string, cv_name: string, data?: CvData) =>
+  api<VersionListItem>(`/cv/versions/${version_id}`, {
+    method: "PUT",
+    json: { cv_name, data: data ?? null },
+  });
+const deleteVersion = (version_id: string) =>
+  api(`/cv/versions/${version_id}`, { method: "DELETE" });
+const loadVersion = (version_id: string) =>
+  api<CvData>(`/cv/versions/${version_id}/load`, { method: "POST" });
 
 async function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -252,6 +272,15 @@ function CVPage() {
   const [translating, setTranslating] = useState(false);
   const [translated, setTranslated] = useState<TranslatedCv | null>(null);
   const [actionErr, setActionErr] = useState("");
+  const [versionsOpen, setVersionsOpen] = useState(false);
+  const [versions, setVersions] = useState<VersionListItem[]>([]);
+  const [versionsLoading, setVersionsLoading] = useState(false);
+  const [saveModalOpen, setSaveModalOpen] = useState(false);
+  const [saveName, setSaveName] = useState("");
+  const [saveNameErr, setSaveNameErr] = useState("");
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [replaceTarget, setReplaceTarget] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState("");
 
   async function save(field: string, value: string | CvRow[] | null) {
     setSaving(true);
@@ -327,6 +356,65 @@ function CVPage() {
     }
   }
 
+  async function fetchVersions() {
+    setVersionsLoading(true);
+    try {
+      const v = await listVersions();
+      setVersions(v);
+    } catch {
+      // silent
+    } finally {
+      setVersionsLoading(false);
+    }
+  }
+
+  async function handleSaveVersion() {
+    if (!saveName.trim()) {
+      setSaveNameErr("Please enter a name");
+      return;
+    }
+    setSaveNameErr("");
+    setSaveLoading(true);
+    try {
+      if (replaceTarget) {
+        await replaceVersion(replaceTarget, saveName.trim());
+      } else {
+        await saveVersion(saveName.trim());
+      }
+      setSaveSuccess(replaceTarget ? "Replaced!" : "Saved!");
+      setSaveName("");
+      setReplaceTarget(null);
+      await fetchVersions();
+      setTimeout(() => {
+        setSaveSuccess("");
+        setSaveModalOpen(false);
+      }, 1200);
+    } catch (e) {
+      setSaveNameErr(errorMessage(e, "Could not save version, please try again"));
+    } finally {
+      setSaveLoading(false);
+    }
+  }
+
+  async function handleLoadVersion(version_id: string) {
+    try {
+      const data = await loadVersion(version_id);
+      qc.setQueryData(["cv"], data);
+      setVersionsOpen(false);
+    } catch {
+      // silent for now
+    }
+  }
+
+  async function handleDeleteVersion(version_id: string) {
+    try {
+      await deleteVersion(version_id);
+      setVersions((v) => v.filter((x) => x.version_id !== version_id));
+    } catch {
+      // silent
+    }
+  }
+
   async function exportDocx(source: CvData, code?: string) {
     setExporting(true);
     setActionErr("");
@@ -370,6 +458,25 @@ function CVPage() {
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <button
+              onClick={() => {
+                setSaveModalOpen(true);
+                fetchVersions();
+              }}
+              disabled={!cv}
+              className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs text-foreground hover:bg-white disabled:opacity-50"
+            >
+              <Save className="h-3 w-3" /> Save CV
+            </button>
+            <button
+              onClick={() => {
+                setVersionsOpen(true);
+                fetchVersions();
+              }}
+              className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs text-foreground hover:bg-white"
+            >
+              <BookMarked className="h-3 w-3" /> Saved CVs
+            </button>
+            <button
               onClick={() => setUploadOpen(true)}
               className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs text-foreground hover:bg-white"
             >
@@ -402,18 +509,6 @@ function CVPage() {
                 </div>
               )}
             </div>
-            <button
-              onClick={() => cv && void exportDocx(cv)}
-              disabled={exporting || !cv}
-              className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-xs text-background disabled:opacity-50"
-            >
-              {exporting ? (
-                <Loader2 className="h-3 w-3 animate-spin" />
-              ) : (
-                <Download className="h-3 w-3" />
-              )}{" "}
-              Export DOCX
-            </button>
             <div className="w-px self-stretch bg-foreground/15" />
             <button
               onClick={() => navigate({ to: "/cv-preview" })}
@@ -741,6 +836,153 @@ function CVPage() {
         </div>
       )}
       <CvUploadModal open={uploadOpen} onClose={() => setUploadOpen(false)} />
+
+      {saveModalOpen && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/20 backdrop-blur-md">
+          <div className="glass-strong w-full max-w-md rounded-2xl p-6 shadow-xl bg-pink-50/80">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-foreground">
+                Save CV Version
+              </h2>
+              <button
+                onClick={() => {
+                  setSaveModalOpen(false);
+                  setSaveName("");
+                  setSaveNameErr("");
+                  setReplaceTarget(null);
+                  setSaveSuccess("");
+                }}
+              >
+                <X className="h-4 w-4 text-foreground/50 hover:text-foreground" />
+              </button>
+            </div>
+            <p className="mb-3 text-xs text-foreground/50">
+              You can save up to 6 CV versions. {versions.length} / 6 saved.
+            </p>
+            <input
+              type="text"
+              placeholder="Version name e.g. CV English, CV Tech"
+              value={saveName}
+              onChange={(e) => setSaveName(e.target.value)}
+              className="mb-1 w-full rounded-xl border border-foreground/10 bg-white/60 px-3 py-2 text-xs outline-none focus:border-foreground/30"
+            />
+            {saveNameErr && (
+              <p className="mb-2 text-xs text-red-400">{saveNameErr}</p>
+            )}
+            {saveSuccess && (
+              <p className="mb-2 text-xs text-green-500">{saveSuccess}</p>
+            )}
+
+            {versions.length < 6 ? (
+              <button
+                onClick={handleSaveVersion}
+                disabled={saveLoading}
+                className="mt-3 w-full rounded-full bg-foreground px-4 py-2 text-xs text-background disabled:opacity-50"
+              >
+                {saveLoading ? "Saving..." : "Save as new version"}
+              </button>
+            ) : (
+              <div className="mt-3">
+                <p className="mb-2 text-xs text-foreground/50">
+                  Maximum 6 versions reached. Pick one to replace:
+                </p>
+                <div className="mb-3 flex flex-col gap-1">
+                  {versions.map((v) => (
+                    <label
+                      key={v.version_id}
+                      className="flex cursor-pointer items-center gap-2 text-xs"
+                    >
+                      <input
+                        type="radio"
+                        name="replaceTarget"
+                        value={v.version_id}
+                        checked={replaceTarget === v.version_id}
+                        onChange={() => setReplaceTarget(v.version_id)}
+                      />
+                      {v.cv_name}{" "}
+                      <span className="text-foreground/40">
+                        {new Date(v.created_at).toLocaleDateString()}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+                <button
+                  onClick={handleSaveVersion}
+                  disabled={saveLoading || !replaceTarget}
+                  className="w-full rounded-full bg-foreground px-4 py-2 text-xs text-background disabled:opacity-50"
+                >
+                  {saveLoading ? "Replacing..." : "Replace selected version"}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {versionsOpen && (
+        <div
+          className="fixed inset-0 z-50"
+          onClick={() => setVersionsOpen(false)}
+        >
+          <div
+            className="absolute right-0 top-0 flex h-full w-80 flex-col gap-4 bg-pink-50/90 p-6 shadow-2xl backdrop-blur-md"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-foreground">
+                Saved CVs
+              </h2>
+              <button onClick={() => setVersionsOpen(false)}>
+                <X className="h-4 w-4 text-foreground/50 hover:text-foreground" />
+              </button>
+            </div>
+            <p className="text-xs text-foreground/50">
+              You can save up to 6 CV versions. {versions.length} / 6 saved.
+            </p>
+            {versionsLoading ? (
+              <div className="flex justify-center py-8">
+                <Loader2 className="h-5 w-5 animate-spin text-foreground/30" />
+              </div>
+            ) : versions.length === 0 ? (
+              <p className="py-8 text-center text-xs text-foreground/40">
+                No saved versions yet.
+              </p>
+            ) : (
+              <div className="flex flex-col gap-2 overflow-y-auto">
+                {versions.map((v) => (
+                  <div
+                    key={v.version_id}
+                    className="flex items-center justify-between rounded-xl bg-white/60 px-3 py-2"
+                  >
+                    <div>
+                      <p className="text-xs font-medium text-foreground">
+                        {v.cv_name}
+                      </p>
+                      <p className="text-xs text-foreground/40">
+                        {new Date(v.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleLoadVersion(v.version_id)}
+                        className="text-xs text-foreground/60 hover:text-foreground"
+                      >
+                        Load
+                      </button>
+                      <button
+                        onClick={() => handleDeleteVersion(v.version_id)}
+                        className="text-foreground/30 hover:text-red-400"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }
