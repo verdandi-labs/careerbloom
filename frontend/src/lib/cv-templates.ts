@@ -20,7 +20,7 @@ export type CVData = {
 };
 
 export type CVTemplateId =
-  "editorial" | "classic" | "editorialBig" | "geometric" | "soft";
+  "editorial" | "classic" | "editorialBig" | "soft";
 
 export type CVTemplateMeta = {
   id: CVTemplateId;
@@ -34,7 +34,6 @@ export type CVTemplateMeta = {
     | "split"
     | "banner"
     | "editorial-banner"
-    | "geometric-band"
     | "soft-hero";
 };
 
@@ -66,15 +65,6 @@ export const CV_TEMPLATES: CVTemplateMeta[] = [
     bg: "#EFEAE3",
     font: "display-serif",
     layout: "editorial-banner",
-  },
-  {
-    id: "geometric",
-    name: "Geometric",
-    blurb: "Soft sage band, copper rules.",
-    accent: "#B47A5C",
-    bg: "#FFFFFF",
-    font: "sans",
-    layout: "geometric-band",
   },
   {
     id: "soft",
