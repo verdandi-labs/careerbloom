@@ -1,15 +1,15 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from cv.schemas import CvData
-from shared.models.cv import CV_FIELDS, CvEdit, CvTranslate, CvUpload
+from shared.models.cv import CV_FIELDS, CvEdit, CvSavedVersion, CvUpload
 
 MAX_UPLOADS = 4
 MAX_EDITS_PER_FIELD = 5
-MAX_TRANSLATES = 4
+MAX_SAVED_VERSIONS = 6
 
 
 class CvRepository:
@@ -61,24 +61,49 @@ class CvRepository:
         await self.db.flush()
         return row
 
-    async def create_translate(self, user_id: UUID, language: str, data: CvData) -> CvTranslate:
+    async def list_versions(self, user_id: UUID) -> list[CvSavedVersion]:
         result = await self.db.execute(
-            select(CvTranslate.translate_id)
-            .where(CvTranslate.user_id == user_id)
-            .order_by(CvTranslate.created_at.asc())
+            select(CvSavedVersion)
+            .where(CvSavedVersion.user_id == user_id)
+            .order_by(CvSavedVersion.created_at.desc())
         )
-        existing = result.scalars().all()
-        if len(existing) >= MAX_TRANSLATES:
-            row = await self.db.get(CvTranslate, existing[0])
-            row.language = language
-            for field, value in data.model_dump().items():
-                setattr(row, field, value)
-            row.created_at = datetime.now(timezone.utc)
-            return row
-        row = CvTranslate(user_id=user_id, language=language, **data.model_dump())
+        return list(result.scalars().all())
+
+    async def save_version(self, user_id: UUID, cv_name: str, data: CvData) -> CvSavedVersion:
+        result = await self.db.execute(
+            select(func.count()).where(CvSavedVersion.user_id == user_id)
+        )
+        count = result.scalar()
+        if count >= MAX_SAVED_VERSIONS:
+            raise ValueError("Maximum saved versions reached")
+        row = CvSavedVersion(user_id=user_id, cv_name=cv_name, **data.model_dump())
         self.db.add(row)
         await self.db.flush()
         return row
+
+    async def replace_version(self, user_id: UUID, version_id: UUID, cv_name: str, data: CvData) -> CvSavedVersion | None:
+        row = await self.db.get(CvSavedVersion, version_id)
+        if row is None or row.user_id != user_id:
+            return None
+        row.cv_name = cv_name
+        for field in CV_FIELDS:
+            setattr(row, field, getattr(data, field))
+        await self.db.flush()
+        return row
+
+    async def delete_version(self, user_id: UUID, version_id: UUID) -> bool:
+        row = await self.db.get(CvSavedVersion, version_id)
+        if row is None or row.user_id != user_id:
+            return False
+        await self.db.delete(row)
+        await self.db.flush()
+        return True
+
+    async def load_version(self, user_id: UUID, version_id: UUID) -> CvData | None:
+        row = await self.db.get(CvSavedVersion, version_id)
+        if row is None or row.user_id != user_id:
+            return None
+        return CvData(**{field: getattr(row, field) for field in CV_FIELDS})
 
     async def get_current_cv(self, user_id: UUID) -> CvData:
         upload = await self.get_latest_upload(user_id)

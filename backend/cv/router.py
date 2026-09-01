@@ -9,7 +9,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt, Inches, RGBColor
 from docx2python import docx2python
 from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
-from fastapi.responses import StreamingResponse
+from fastapi.responses import Response, StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from cv.repository import CvRepository
@@ -20,7 +20,9 @@ from cv.schemas import (
     CvRawText,
     CvTranslateRequest,
     FIELD_MODELS,
+    SaveVersionRequest,
     TEXT_FIELDS,
+    VersionListItem,
 )
 from cv.service import extract_raw_text, limiter, parse_all_sections, translate_cv
 from database import get_db
@@ -216,7 +218,6 @@ async def translate(
     if _check_suspicious(translated.model_dump_json()):
         logger.warning("Suspicious CV translation rejected")
         raise HTTPException(status_code=400, detail="CV content could not be processed — please check your file and try again")
-    await repo.create_translate(user.user_id, body.language, translated)
     return translated
 
 
@@ -271,3 +272,84 @@ async def export_docx(body: CvExportDocxRequest, user: User = Depends(get_curren
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         headers={"Content-Disposition": "attachment; filename=careerBloom-cv.docx"},
     )
+
+
+@router.get("/versions", response_model=list[VersionListItem])
+async def list_versions(
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    repo = CvRepository(db)
+    versions = await repo.list_versions(user.user_id)
+    return [
+        VersionListItem(
+            version_id=str(v.version_id),
+            cv_name=v.cv_name,
+            created_at=v.created_at.isoformat(),
+        )
+        for v in versions
+    ]
+
+
+@router.post("/versions", response_model=VersionListItem, status_code=201)
+async def create_version(
+    body: SaveVersionRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    repo = CvRepository(db)
+    data = body.data if body.data is not None else await repo.get_current_cv(user.user_id)
+    try:
+        version = await repo.save_version(user.user_id, body.cv_name, data)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return VersionListItem(
+        version_id=str(version.version_id),
+        cv_name=version.cv_name,
+        created_at=version.created_at.isoformat(),
+    )
+
+
+@router.put("/versions/{version_id}", response_model=VersionListItem)
+async def update_version(
+    version_id: str,
+    body: SaveVersionRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    repo = CvRepository(db)
+    data = body.data if body.data is not None else await repo.get_current_cv(user.user_id)
+    version = await repo.replace_version(user.user_id, version_id, body.cv_name, data)
+    if version is None:
+        raise HTTPException(status_code=404, detail="Version not found")
+    return VersionListItem(
+        version_id=str(version.version_id),
+        cv_name=version.cv_name,
+        created_at=version.created_at.isoformat(),
+    )
+
+
+@router.delete("/versions/{version_id}", status_code=204)
+async def delete_version(
+    version_id: str,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    repo = CvRepository(db)
+    deleted = await repo.delete_version(user.user_id, version_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Version not found")
+    return Response(status_code=204)
+
+
+@router.post("/versions/{version_id}/load", response_model=CvData)
+async def load_version(
+    version_id: str,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    repo = CvRepository(db)
+    data = await repo.load_version(user.user_id, version_id)
+    if data is None:
+        raise HTTPException(status_code=404, detail="Version not found")
+    return data

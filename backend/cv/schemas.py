@@ -168,6 +168,19 @@ class CvTranslateRequest(BaseModel):
     language: str = Field(..., min_length=2, max_length=5)
 
 
+class SaveVersionRequest(BaseModel):
+    cv_name: str = Field(..., min_length=1, max_length=100)
+    data: CvData | None = None
+
+
+class VersionListItem(BaseModel):
+    version_id: str
+    cv_name: str
+    created_at: str
+
+    model_config = {"from_attributes": True}
+
+
 class CvExportPdfRequest(BaseModel):
     name: str | None = None
     sections: list[dict[str, str]]
