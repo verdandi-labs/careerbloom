@@ -281,6 +281,7 @@ function CVPage() {
   const [saveLoading, setSaveLoading] = useState(false);
   const [replaceTarget, setReplaceTarget] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState("");
+  const [deletingVersionId, setDeletingVersionId] = useState<string | null>(null);
 
   async function save(field: string, value: string | CvRow[] | null) {
     setSaving(true);
@@ -952,29 +953,50 @@ function CVPage() {
                 {versions.map((v) => (
                   <div
                     key={v.version_id}
-                    className="flex items-center justify-between rounded-xl bg-white/60 px-3 py-2"
+                    className="flex flex-col gap-1 rounded-2xl border border-pink-100 bg-white/80 px-4 py-3 shadow-sm"
                   >
-                    <div>
-                      <p className="text-xs font-medium text-foreground">
-                        {v.cv_name}
-                      </p>
-                      <p className="text-xs text-foreground/40">
-                        {new Date(v.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
+                    <p className="text-sm font-semibold text-foreground">
+                      {v.cv_name}
+                    </p>
+                    <p className="text-xs text-foreground/40">
+                      {new Date(v.created_at).toLocaleDateString()}
+                    </p>
+                    <div className="mt-2 flex gap-2">
                       <button
                         onClick={() => handleLoadVersion(v.version_id)}
-                        className="text-xs text-foreground/60 hover:text-foreground"
+                        className="flex-1 rounded-full bg-foreground px-3 py-1.5 text-xs text-background transition hover:opacity-80"
                       >
                         Load
                       </button>
-                      <button
-                        onClick={() => handleDeleteVersion(v.version_id)}
-                        className="text-foreground/30 hover:text-red-400"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </button>
+                      {deletingVersionId === v.version_id ? (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-foreground/60">
+                            Delete?
+                          </span>
+                          <button
+                            onClick={() => {
+                              void handleDeleteVersion(v.version_id);
+                              setDeletingVersionId(null);
+                            }}
+                            className="text-xs font-medium text-rose-500 hover:text-rose-700"
+                          >
+                            Yes
+                          </button>
+                          <button
+                            onClick={() => setDeletingVersionId(null)}
+                            className="text-xs text-foreground/40 hover:text-foreground"
+                          >
+                            No
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setDeletingVersionId(v.version_id)}
+                          className="rounded-full border border-foreground/10 px-3 py-1.5 text-xs text-foreground/60 transition hover:border-rose-300 hover:text-rose-400"
+                        >
+                          Delete
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
