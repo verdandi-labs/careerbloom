@@ -8,6 +8,7 @@ import {
   CV_TEMPLATES,
   type CVData,
   type CVTemplateId,
+  type StructuredCVData,
   DEFAULT_TEMPLATE,
 } from "@/lib/cv-templates";
 import { ArrowLeft, BookMarked, Loader2, X } from "lucide-react";
@@ -122,6 +123,26 @@ function toDocxData(data: CvData): CVData {
   };
 }
 
+function toStructuredData(data: CvData): StructuredCVData {
+  return {
+    name: data.full_name ?? "",
+    title: data.title ?? "",
+    summary: data.self_summary ?? "",
+    contact: data.contact_details ?? [],
+    experience: data.experience ?? [],
+    education: data.studies ?? [],
+    skills: data.skills ?? [],
+    languages: data.languages ?? [],
+    awards: data.awards ?? [],
+    publications: data.publications ?? [],
+    volunteer: data.volunteering ?? [],
+    projects: data.projects ?? [],
+    certifications: "",
+    references: "",
+    other: "",
+  }
+}
+
 const LOCAL_STORAGE_KEY = "cv-preview-local-edits";
 
 function loadLocalEdits(): Partial<CVData> | null {
@@ -163,6 +184,7 @@ function PreviewPage() {
   const [selectedTemplate, setSelectedTemplate] =
     useState<CVTemplateId>(DEFAULT_TEMPLATE);
   const [mergedData, setMergedData] = useState<CVData | null>(null);
+  const [structuredData, setStructuredData] = useState<StructuredCVData | null>(null);
   const [exporting, setExporting] = useState(false);
   const [actionErr, setActionErr] = useState("");
   const [versionsOpen, setVersionsOpen] = useState(false);
@@ -190,8 +212,15 @@ function PreviewPage() {
 
   useEffect(() => {
     if (!cv) return;
-    const base = toDocxData(cv);
-    setMergedData(base);
+    const base = toStructuredData(cv);
+    const saved = localStorage.getItem("cv-preview-structured-edits");
+    const merged = saved ? { ...base, ...JSON.parse(saved) } : base;
+    setStructuredData(merged);
+
+    const flatBase = toDocxData(cv);
+    const savedFlat = localStorage.getItem("cv-preview-local-edits");
+    const mergedFlat = savedFlat ? { ...flatBase, ...JSON.parse(savedFlat) } : flatBase;
+    setMergedData(mergedFlat);
   }, [cv]);
 
   function handleChange(field: EditableField, value: string) {
@@ -204,8 +233,11 @@ function PreviewPage() {
   }
 
   function handleReset() {
-    localStorage.removeItem(LOCAL_STORAGE_KEY);
-    if (cv) setMergedData(toDocxData(cv));
+    localStorage.removeItem("cv-preview-local-edits");
+    localStorage.removeItem("cv-preview-structured-edits");
+    if (cv) {
+      setMergedData(toDocxData(cv));
+    }
   }
 
   async function handleExport() {
@@ -348,12 +380,14 @@ function PreviewPage() {
         ) : mergedData ? (
           <div ref={containerRef} className="flex justify-center">
             <div style={{ transform: `scale(${scale})`, transformOrigin: "top center" }}>
-              <CvDocument
-                data={mergedData}
-                template={selectedTemplate}
-                editable={false}
-                onChange={handleChange}
-              />
+              {structuredData && (
+                <CvDocument
+                  data={structuredData}
+                  template={selectedTemplate}
+                  editable={false}
+                  onChange={handleChange}
+                />
+              )}
             </div>
           </div>
         ) : null}

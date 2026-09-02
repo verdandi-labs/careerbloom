@@ -9,18 +9,19 @@ import {
   type CSSProperties,
   type ReactNode,
 } from "react";
-import type { CVData, CVTemplateId } from "@/lib/cv-templates";
+import type { CVTemplateId, StructuredCVData } from "@/lib/cv-templates";
 import { Mail, MapPin, Phone, Globe } from "lucide-react";
 import { CVTextSection } from "./cv-render-helpers";
 
-export type EditableField = keyof CVData;
+export type EditableField = "name" | "title" | "summary" | "certifications" | "references" | "other"
 
 type Props = {
-  data: CVData;
-  template: CVTemplateId;
-  editable?: boolean;
-  onChange?: (field: EditableField, value: string) => void;
-};
+  data: StructuredCVData
+  template: CVTemplateId
+  editable?: boolean
+  onChange?: (field: EditableField, value: string) => void
+  onEditItem?: (field: keyof StructuredCVData, index: number, updatedItem: unknown) => void
+}
 
 // --- helpers ---------------------------------------------------------------
 
@@ -66,40 +67,29 @@ export function Editable({
   });
 }
 
-function lines(s: string): string[] {
-  return s
-    .split(/\n+/)
-    .map((l) => l.trim())
-    .filter(Boolean);
-}
-
-// Map of optional/extra section keys to the human label shown in CV.
-const EXTRA_FIELDS: Array<{ key: EditableField; title: string }> = [
-  { key: "projects", title: "Projects" },
-  { key: "volunteer", title: "Volunteer" },
-  { key: "awards", title: "Awards" },
-  { key: "publications", title: "Publications" },
-  { key: "references", title: "References" },
-  { key: "other", title: "Other" },
-];
-
-function extras(data: CVData, editable: boolean, onChange?: Props["onChange"]) {
-  return EXTRA_FIELDS.filter(
-    ({ key }) => (data[key] as string)?.trim() || editable,
-  ).map(({ key, title }) => ({
-    key,
-    title,
-    node: (
-      <Editable
-        value={(data[key] as string) || ""}
-        field={key}
-        editable={editable}
-        onChange={onChange}
-        className="text-[12px] leading-relaxed text-neutral-700"
-        placeholder={editable ? `Add ${title.toLowerCase()}…` : undefined}
-      />
-    ),
-  }));
+function extras(data: StructuredCVData, editable: boolean, onChange?: Props["onChange"]) {
+  const sections = [
+    { key: "awards" as const, title: "Awards", items: data.awards, nameField: "name" as const, commentField: "comments" as const },
+    { key: "publications" as const, title: "Publications", items: data.publications, nameField: "name" as const, commentField: "comments" as const },
+    { key: "volunteer" as const, title: "Volunteering", items: data.volunteer, nameField: "center" as const, commentField: "comments" as const },
+    { key: "projects" as const, title: "Projects", items: data.projects, nameField: "name" as const, commentField: "comments" as const },
+  ]
+  return sections
+    .filter(({ items }) => items.length > 0 || editable)
+    .map(({ key, title, items, nameField, commentField }) => ({
+      key,
+      title,
+      node: (
+        <div className="flex flex-col gap-2">
+          {items.map((item: Record<string, unknown>, i: number) => (
+            <div key={i}>
+              {item[nameField] != null && <p className="text-xs font-semibold text-neutral-800">{String(item[nameField])}</p>}
+              {item[commentField] != null && <p className="text-xs text-neutral-600">{String(item[commentField])}</p>}
+            </div>
+          ))}
+        </div>
+      ),
+    }))
 }
 
 // Balanced two-column flow using CSS multi-column. Sections won't split mid-block.
@@ -159,25 +149,21 @@ function Editorial({
     >
       <div className="grid grid-cols-[180px_1fr] gap-8 p-12">
         <div className="space-y-6">
-          <CVTextSection data={data.contact} field="contact" title="Contact" accent={accent} editable={e} onChange={onChange} className="text-[12px] leading-relaxed text-neutral-700 font-sans text-justify" sectionStyle="serif" />
+          {(data.contact.length > 0 || e) && (
+            <Section title="Contact" accent={accent} serif>
+              {data.contact.map((item) => (
+                <p key={item.line_num} className="text-xs leading-relaxed text-neutral-600">{item.detail}</p>
+              ))}
+            </Section>
+          )}
           <CVTextSection data={data.summary} field="summary" title="About Me" accent={accent} editable={e} onChange={onChange} className="text-[12px] leading-relaxed text-neutral-700 font-sans text-justify" sectionStyle="serif" />
-          {(/\S/.test(data.skills ?? "") || e) && (
+          {(data.skills.length > 0 || e) && (
             <Section title="Skills" accent={accent} serif>
-              <ul className="text-[12px] text-neutral-700 font-sans space-y-1 list-disc list-inside">
-                {lines(data.skills).map((s, i) => (
-                  <li key={i}>{s}</li>
+              <ul className="flex flex-col gap-1">
+                {data.skills.map((item) => (
+                  <li key={item.line_num} className="text-xs text-neutral-700">{item.skill}</li>
                 ))}
               </ul>
-              {e && (
-                <Editable
-                  value={data.skills}
-                  field="skills"
-                  editable={e}
-                  onChange={onChange}
-                  className="mt-2 text-[11px] italic text-neutral-400 font-sans"
-                  placeholder="One skill per line"
-                />
-              )}
             </Section>
           )}
         </div>
@@ -209,20 +195,55 @@ function Editorial({
             )}
           </header>
 
-          <CVTextSection data={data.education} field="education" title="Education" accent={accent} editable={e} onChange={onChange} className="text-[13px] leading-relaxed text-neutral-700 font-sans text-justify" sectionStyle="serif" />
+          {(data.education.length > 0 || e) && (
+            <Section title="Education" accent={accent} serif>
+              {data.education.map((item) => (
+                <div key={item.line_num} className="mb-2">
+                  <p className="text-sm font-semibold text-neutral-800">{item.edu_center}</p>
+                  <p className="text-xs text-neutral-500">
+                    {[item.city, item.start_date && item.end_date
+                      ? `${item.start_date} – ${item.end_date}`
+                      : item.start_date ?? item.end_date
+                    ].filter(Boolean).join(" · ")}
+                  </p>
+                  {item.comments && <p className="text-xs text-neutral-600">{item.comments}</p>}
+                </div>
+              ))}
+            </Section>
+          )}
 
-          <CVTextSection data={data.experience} field="experience" title="Experience" accent={accent} editable={e} onChange={onChange} className="text-[13px] leading-relaxed text-neutral-700 font-sans text-justify" sectionStyle="serif" />
+          {(data.experience.length > 0 || e) && (
+            <Section title="Experience" accent={accent} serif>
+              {data.experience.map((item) => (
+                <div key={item.line_num} className="mb-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-semibold text-neutral-800">{item.company}</p>
+                      <p className="text-xs text-neutral-500">
+                        {[item.city, item.start_date && item.end_date
+                          ? `${item.start_date} – ${item.end_date}`
+                          : item.start_date ?? item.end_date
+                        ].filter(Boolean).join(" · ")}
+                      </p>
+                    </div>
+                  </div>
+                  {item.comments && (
+                    <p className="mt-1 text-xs leading-relaxed text-neutral-600 text-justify">{item.comments}</p>
+                  )}
+                </div>
+              ))}
+            </Section>
+          )}
 
-          {((/\S/.test(data.languages ?? "") || /\S/.test(data.certifications ?? "")) || e) && (
+          {((data.languages.length > 0 || data.certifications) || e) && (
             <div className="grid grid-cols-2 gap-6">
               <Section title="Languages" accent={accent} serif>
-                <Editable
-                  value={data.languages}
-                  field="languages"
-                  editable={e}
-                  onChange={onChange}
-                  className="text-[12px] text-neutral-700 font-sans text-justify"
-                />
+                {data.languages.map((item) => (
+                  <div key={item.line_num} className="flex justify-between text-xs">
+                    <span className="text-neutral-800">{item.language}</span>
+                    {item.level && <span className="text-neutral-400">{item.level}</span>}
+                  </div>
+                ))}
               </Section>
               <Section title="Certifications" accent={accent} serif>
                 <Editable
@@ -294,33 +315,74 @@ function Classic({
 
         <div className="mt-8 grid grid-cols-[200px_1fr] gap-8">
           <aside className="space-y-6 border-r border-neutral-200 pr-6">
-            <CVTextSection data={data.contact} field="contact" title="Contact" accent={accent} editable={e} onChange={onChange} className="text-[12px] leading-relaxed text-neutral-700" sectionStyle="small" />
-            <CVTextSection data={data.education} field="education" title="Education" accent={accent} editable={e} onChange={onChange} className="text-[12px] leading-relaxed text-neutral-700" sectionStyle="small" />
-            {(/\S/.test(data.skills ?? "") || e) && (
-              <Section title="Skills" accent={accent} small>
-                <ul className="text-[12px] text-neutral-700 space-y-1">
-                  {lines(data.skills).map((s, i) => (
-                    <li key={i}>◆ {s}</li>
-                  ))}
-                </ul>
-                {e && (
-                  <Editable
-                    value={data.skills}
-                    field="skills"
-                    editable={e}
-                    onChange={onChange}
-                    className="mt-2 text-[11px] italic text-neutral-400"
-                    placeholder="One per line"
-                  />
-                )}
+            {(data.contact.length > 0 || e) && (
+              <Section title="Contact" accent={accent} small>
+                {data.contact.map((item) => (
+                  <p key={item.line_num} className="text-xs leading-relaxed text-neutral-600">{item.detail}</p>
+                ))}
               </Section>
             )}
-            <CVTextSection data={data.languages} field="languages" title="Languages" accent={accent} editable={e} onChange={onChange} className="text-[12px] text-neutral-700" sectionStyle="small" />
+            {(data.education.length > 0 || e) && (
+              <Section title="Education" accent={accent} small>
+                {data.education.map((item) => (
+                  <div key={item.line_num} className="mb-2">
+                    <p className="text-sm font-semibold text-neutral-800">{item.edu_center}</p>
+                    <p className="text-xs text-neutral-500">
+                      {[item.city, item.start_date && item.end_date
+                        ? `${item.start_date} – ${item.end_date}`
+                        : item.start_date ?? item.end_date
+                      ].filter(Boolean).join(" · ")}
+                    </p>
+                    {item.comments && <p className="text-xs text-neutral-600">{item.comments}</p>}
+                  </div>
+                ))}
+              </Section>
+            )}
+            {(data.skills.length > 0 || e) && (
+              <Section title="Skills" accent={accent} small>
+                <ul className="flex flex-col gap-1">
+                  {data.skills.map((item) => (
+                    <li key={item.line_num} className="text-xs text-neutral-700">◆ {item.skill}</li>
+                  ))}
+                </ul>
+              </Section>
+            )}
+            {(data.languages.length > 0 || e) && (
+              <Section title="Languages" accent={accent} small>
+                {data.languages.map((item) => (
+                  <div key={item.line_num} className="flex justify-between text-xs">
+                    <span className="text-neutral-800">{item.language}</span>
+                    {item.level && <span className="text-neutral-400">{item.level}</span>}
+                  </div>
+                ))}
+              </Section>
+            )}
           </aside>
 
           <main className="space-y-6">
             <CVTextSection data={data.summary} field="summary" title="Profile Summary" accent={accent} editable={e} onChange={onChange} className="text-[13px] leading-relaxed text-neutral-700 text-justify" sectionStyle="small" />
-            <CVTextSection data={data.experience} field="experience" title="Work Experience" accent={accent} editable={e} onChange={onChange} className="text-[13px] leading-relaxed text-neutral-700" sectionStyle="small" />
+            {(data.experience.length > 0 || e) && (
+              <Section title="Work Experience" accent={accent} small>
+                {data.experience.map((item) => (
+                  <div key={item.line_num} className="mb-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-semibold text-neutral-800">{item.company}</p>
+                        <p className="text-xs text-neutral-500">
+                          {[item.city, item.start_date && item.end_date
+                            ? `${item.start_date} – ${item.end_date}`
+                            : item.start_date ?? item.end_date
+                          ].filter(Boolean).join(" · ")}
+                        </p>
+                      </div>
+                    </div>
+                    {item.comments && (
+                      <p className="mt-1 text-xs leading-relaxed text-neutral-600 text-justify">{item.comments}</p>
+                    )}
+                  </div>
+                ))}
+              </Section>
+            )}
             <CVTextSection data={data.certifications} field="certifications" title="Certifications" accent={accent} editable={e} onChange={onChange} className="text-[13px] leading-relaxed text-neutral-700" sectionStyle="small" />
             {xs.map((x) => (
               <Section key={x.key} title={x.title} accent={accent} small>
@@ -388,38 +450,77 @@ function EditorialBig({
             <Block>
               <CVTextSection data={data.summary} field="summary" title="About Me" accent={accent} editable={e} onChange={onChange} className="text-[12px] leading-relaxed text-justify" sectionStyle="bold" />
             </Block>
-            <Block>
-              <CVTextSection data={data.experience} field="experience" title="Experience" accent={accent} editable={e} onChange={onChange} className="text-[12px] leading-relaxed text-justify" sectionStyle="bold" />
-            </Block>
-            <Block>
-              <CVTextSection data={data.education} field="education" title="Education" accent={accent} editable={e} onChange={onChange} className="text-[12px] leading-relaxed" sectionStyle="bold" />
-            </Block>
-            <Block>
-              <CVTextSection data={data.contact} field="contact" title="Contact" accent={accent} editable={e} onChange={onChange} className="text-[12px] leading-relaxed" sectionStyle="bold" />
-            </Block>
-            {(/\S/.test(data.skills ?? "") || e) && (
+            {(data.experience.length > 0 || e) && (
               <Block>
-                <Section title="Skills" accent={accent} bold>
-                  <Editable
-                    value={data.skills}
-                    field="skills"
-                    editable={e}
-                    onChange={onChange}
-                    className="text-[12px] leading-relaxed"
-                  />
+                <Section title="Experience" accent={accent} bold>
+                  {data.experience.map((item) => (
+                    <div key={item.line_num} className="mb-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="text-sm font-semibold text-neutral-800">{item.company}</p>
+                          <p className="text-xs text-neutral-500">
+                            {[item.city, item.start_date && item.end_date
+                              ? `${item.start_date} – ${item.end_date}`
+                              : item.start_date ?? item.end_date
+                            ].filter(Boolean).join(" · ")}
+                          </p>
+                        </div>
+                      </div>
+                      {item.comments && (
+                        <p className="mt-1 text-xs leading-relaxed text-neutral-600 text-justify">{item.comments}</p>
+                      )}
+                    </div>
+                  ))}
                 </Section>
               </Block>
             )}
-            {data.languages && (
+            {(data.education.length > 0 || e) && (
+              <Block>
+                <Section title="Education" accent={accent} bold>
+                  {data.education.map((item) => (
+                    <div key={item.line_num} className="mb-2">
+                      <p className="text-sm font-semibold text-neutral-800">{item.edu_center}</p>
+                      <p className="text-xs text-neutral-500">
+                        {[item.city, item.start_date && item.end_date
+                          ? `${item.start_date} – ${item.end_date}`
+                          : item.start_date ?? item.end_date
+                        ].filter(Boolean).join(" · ")}
+                      </p>
+                      {item.comments && <p className="text-xs text-neutral-600">{item.comments}</p>}
+                    </div>
+                  ))}
+                </Section>
+              </Block>
+            )}
+            {(data.contact.length > 0 || e) && (
+              <Block>
+                <Section title="Contact" accent={accent} bold>
+                  {data.contact.map((item) => (
+                    <p key={item.line_num} className="text-xs leading-relaxed text-neutral-600">{item.detail}</p>
+                  ))}
+                </Section>
+              </Block>
+            )}
+            {(data.skills.length > 0 || e) && (
+              <Block>
+                <Section title="Skills" accent={accent} bold>
+                  <ul className="flex flex-col gap-1">
+                    {data.skills.map((item) => (
+                      <li key={item.line_num} className="text-xs text-neutral-700">{item.skill}</li>
+                    ))}
+                  </ul>
+                </Section>
+              </Block>
+            )}
+            {(data.languages.length > 0 || e) && (
               <Block>
                 <Section title="Languages" accent={accent} bold>
-                  <Editable
-                    value={data.languages}
-                    field="languages"
-                    editable={e}
-                    onChange={onChange}
-                    className="text-[12px] leading-relaxed"
-                  />
+                  {data.languages.map((item) => (
+                    <div key={item.line_num} className="flex justify-between text-xs">
+                      <span className="text-neutral-800">{item.language}</span>
+                      {item.level && <span className="text-neutral-400">{item.level}</span>}
+                    </div>
+                  ))}
                 </Section>
               </Block>
             )}
@@ -511,76 +612,77 @@ function Soft({
 
         <div className="mt-10">
           <BalancedColumns gap="2rem">
-            {(/\S/.test(data.experience ?? "") || e) && (
+            {(data.experience.length > 0 || e) && (
               <Block>
                 <PillSection title="Experience">
-                  <Editable
-                    value={data.experience}
-                    field="experience"
-                    editable={e}
-                    onChange={onChange}
-                    className="text-[13px] leading-relaxed text-neutral-700 text-justify"
-                  />
+                  {data.experience.map((item) => (
+                    <div key={item.line_num} className="mb-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="text-sm font-semibold text-neutral-800">{item.company}</p>
+                          <p className="text-xs text-neutral-500">
+                            {[item.city, item.start_date && item.end_date
+                              ? `${item.start_date} – ${item.end_date}`
+                              : item.start_date ?? item.end_date
+                            ].filter(Boolean).join(" · ")}
+                          </p>
+                        </div>
+                      </div>
+                      {item.comments && (
+                        <p className="mt-1 text-xs leading-relaxed text-neutral-600 text-justify">{item.comments}</p>
+                      )}
+                    </div>
+                  ))}
                 </PillSection>
               </Block>
             )}
-            {(/\S/.test(data.education ?? "") || e) && (
+            {(data.education.length > 0 || e) && (
               <Block>
                 <PillSection title="Education">
-                  <Editable
-                    value={data.education}
-                    field="education"
-                    editable={e}
-                    onChange={onChange}
-                    className="text-[13px] leading-relaxed text-neutral-700 text-justify"
-                  />
+                  {data.education.map((item) => (
+                    <div key={item.line_num} className="mb-2">
+                      <p className="text-sm font-semibold text-neutral-800">{item.edu_center}</p>
+                      <p className="text-xs text-neutral-500">
+                        {[item.city, item.start_date && item.end_date
+                          ? `${item.start_date} – ${item.end_date}`
+                          : item.start_date ?? item.end_date
+                        ].filter(Boolean).join(" · ")}
+                      </p>
+                      {item.comments && <p className="text-xs text-neutral-600">{item.comments}</p>}
+                    </div>
+                  ))}
                 </PillSection>
               </Block>
             )}
-            {(/\S/.test(data.contact ?? "") || e) && (
+            {(data.contact.length > 0 || e) && (
               <Block>
                 <PillSection title="Contact">
-                  <Editable
-                    value={data.contact}
-                    field="contact"
-                    editable={e}
-                    onChange={onChange}
-                    className="text-[12px] leading-relaxed text-neutral-700 text-justify"
-                  />
+                  {data.contact.map((item) => (
+                    <p key={item.line_num} className="text-xs leading-relaxed text-neutral-600">{item.detail}</p>
+                  ))}
                 </PillSection>
               </Block>
             )}
-            {(/\S/.test(data.skills ?? "") || e) && (
+            {(data.skills.length > 0 || e) && (
               <Block>
                 <PillSection title="Skills">
-                <ul className="text-[12px] text-neutral-700 space-y-1">
-                  {lines(data.skills).map((s, i) => (
-                    <li key={i}>⬢ {s}</li>
-                  ))}
-                </ul>
-                {e && (
-                  <Editable
-                    value={data.skills}
-                    field="skills"
-                    editable={e}
-                    onChange={onChange}
-                    className="mt-2 text-[11px] italic text-neutral-400"
-                    placeholder="One per line"
-                  />
-                )}
-              </PillSection>
-            </Block>
+                  <ul className="flex flex-col gap-1">
+                    {data.skills.map((item) => (
+                      <li key={item.line_num} className="text-xs text-neutral-700">⬢ {item.skill}</li>
+                    ))}
+                  </ul>
+                </PillSection>
+              </Block>
             )}
-            {data.languages && (
+            {(data.languages.length > 0 || e) && (
               <Block>
                 <PillSection title="Languages">
-                  <Editable
-                    value={data.languages}
-                    field="languages"
-                    editable={e}
-                    onChange={onChange}
-                    className="text-[12px] leading-relaxed text-neutral-700"
-                  />
+                  {data.languages.map((item) => (
+                    <div key={item.line_num} className="flex justify-between text-xs">
+                      <span className="text-neutral-800">{item.language}</span>
+                      {item.level && <span className="text-neutral-400">{item.level}</span>}
+                    </div>
+                  ))}
                 </PillSection>
               </Block>
             )}
