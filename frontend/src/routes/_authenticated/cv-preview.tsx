@@ -11,7 +11,7 @@ import {
   type StructuredCVData,
   DEFAULT_TEMPLATE,
 } from "@/lib/cv-templates";
-import { ArrowLeft, BookMarked, Loader2, X } from "lucide-react";
+import { ArrowLeft, BookMarked, FileDown, Loader2, X } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cv-preview")({
   head: () => ({ meta: [{ title: "Preview & Export · careerBloom" }] }),
@@ -299,7 +299,7 @@ function PreviewPage() {
 
   return (
     <AppShell>
-      <header className="bg-secondary/70 backdrop-blur-md rounded-[20px] px-7 py-7 shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)]">
+      <header className="no-print bg-secondary/70 backdrop-blur-md rounded-[20px] px-7 py-7 shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)]">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button
@@ -333,6 +333,13 @@ function PreviewPage() {
             >
               {exporting ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
               Export DOCX
+            </button>
+            <button
+              onClick={() => window.print()}
+              disabled={!structuredData}
+              className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-xs text-background disabled:opacity-50"
+            >
+              <FileDown className="h-3 w-3" /> Export PDF
             </button>
             <button
               onClick={handleReset}
@@ -378,7 +385,7 @@ function PreviewPage() {
             </button>
           </div>
         ) : mergedData ? (
-          <div ref={containerRef} className="flex justify-center">
+          <div ref={containerRef} className="w-full overflow-hidden cv-print-target" style={{ height: scale * 1123 }}>
             <div style={{ transform: `scale(${scale})`, transformOrigin: "top center" }}>
               {structuredData && (
                 <CvDocument
@@ -396,7 +403,7 @@ function PreviewPage() {
       {versionsOpen && (
         <div className="fixed inset-0 z-50" onClick={() => setVersionsOpen(false)}>
           <div
-            className="absolute right-0 top-0 h-full w-96 bg-pink-50/95 backdrop-blur-md shadow-2xl flex flex-col p-6 gap-4"
+            className="no-print absolute right-0 top-0 h-full w-96 bg-pink-50/95 backdrop-blur-md shadow-2xl flex flex-col p-6 gap-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
