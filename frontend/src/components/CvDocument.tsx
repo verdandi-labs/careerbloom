@@ -11,6 +11,7 @@ import {
 } from "react";
 import type { CVData, CVTemplateId } from "@/lib/cv-templates";
 import { Mail, MapPin, Phone, Globe } from "lucide-react";
+import { CVTextSection } from "./cv-render-helpers";
 
 export type EditableField = keyof CVData;
 
@@ -23,7 +24,7 @@ type Props = {
 
 // --- helpers ---------------------------------------------------------------
 
-function Editable({
+export function Editable({
   value,
   field,
   editable,
@@ -158,29 +159,9 @@ function Editorial({
     >
       <div className="grid grid-cols-[180px_1fr] gap-8 p-12">
         <div className="space-y-6">
-          {(data.contact?.trim() || e) && (
-            <Section title="Contact" accent={accent} serif>
-              <Editable
-                value={data.contact}
-                field="contact"
-                editable={e}
-                onChange={onChange}
-                className="text-[12px] leading-relaxed text-neutral-700 font-sans text-justify"
-              />
-            </Section>
-          )}
-          {(data.summary?.trim() || e) && (
-            <Section title="About Me" accent={accent} serif>
-              <Editable
-                value={data.summary}
-                field="summary"
-                editable={e}
-                onChange={onChange}
-                className="text-[12px] leading-relaxed text-neutral-700 font-sans text-justify"
-              />
-            </Section>
-          )}
-          {(data.skills?.trim() || e) && (
+          <CVTextSection data={data.contact} field="contact" title="Contact" accent={accent} editable={e} onChange={onChange} className="text-[12px] leading-relaxed text-neutral-700 font-sans text-justify" sectionStyle="serif" />
+          <CVTextSection data={data.summary} field="summary" title="About Me" accent={accent} editable={e} onChange={onChange} className="text-[12px] leading-relaxed text-neutral-700 font-sans text-justify" sectionStyle="serif" />
+          {(/\S/.test(data.skills ?? "") || e) && (
             <Section title="Skills" accent={accent} serif>
               <ul className="text-[12px] text-neutral-700 font-sans space-y-1 list-disc list-inside">
                 {lines(data.skills).map((s, i) => (
@@ -203,7 +184,7 @@ function Editorial({
 
         <div className="space-y-6 border-l border-neutral-200 pl-8">
           <header>
-            {(data.name?.trim() || e) && (
+            {(/\S/.test(data.name ?? "") || e) && (
               <Editable
                 as="h1"
                 value={data.name}
@@ -215,7 +196,7 @@ function Editorial({
                 style={{ color: accent } as React.CSSProperties}
               />
             )}
-            {(data.title?.trim() || e) && (
+            {(/\S/.test(data.title ?? "") || e) && (
               <Editable
                 as="p"
                 value={data.title}
@@ -228,31 +209,11 @@ function Editorial({
             )}
           </header>
 
-          {(data.education?.trim() || e) && (
-            <Section title="Education" accent={accent} serif>
-              <Editable
-                value={data.education}
-                field="education"
-                editable={e}
-                onChange={onChange}
-                className="text-[13px] leading-relaxed text-neutral-700 font-sans text-justify"
-              />
-            </Section>
-          )}
+          <CVTextSection data={data.education} field="education" title="Education" accent={accent} editable={e} onChange={onChange} className="text-[13px] leading-relaxed text-neutral-700 font-sans text-justify" sectionStyle="serif" />
 
-          {(data.experience?.trim() || e) && (
-            <Section title="Experience" accent={accent} serif>
-              <Editable
-                value={data.experience}
-                field="experience"
-                editable={e}
-                onChange={onChange}
-                className="text-[13px] leading-relaxed text-neutral-700 font-sans text-justify"
-              />
-            </Section>
-          )}
+          <CVTextSection data={data.experience} field="experience" title="Experience" accent={accent} editable={e} onChange={onChange} className="text-[13px] leading-relaxed text-neutral-700 font-sans text-justify" sectionStyle="serif" />
 
-          {((data.languages?.trim() || data.certifications?.trim()) || e) && (
+          {((/\S/.test(data.languages ?? "") || /\S/.test(data.certifications ?? "")) || e) && (
             <div className="grid grid-cols-2 gap-6">
               <Section title="Languages" accent={accent} serif>
                 <Editable
@@ -305,7 +266,7 @@ function Classic({
     >
       <div className="p-12">
         <div className="border-b border-neutral-300 pb-6 text-center">
-          {(data.name?.trim() || e) && (
+          {(/\S/.test(data.name ?? "") || e) && (
             <Editable
               as="h1"
               value={data.name}
@@ -317,7 +278,7 @@ function Classic({
               style={{ letterSpacing: "0.3em" } as React.CSSProperties}
             />
           )}
-          {(data.title?.trim() || e) && (
+          {(/\S/.test(data.title ?? "") || e) && (
             <Editable
               as="p"
               value={data.title}
@@ -333,29 +294,9 @@ function Classic({
 
         <div className="mt-8 grid grid-cols-[200px_1fr] gap-8">
           <aside className="space-y-6 border-r border-neutral-200 pr-6">
-            {(data.contact?.trim() || e) && (
-              <Section title="Contact" accent={accent} small>
-                <Editable
-                  value={data.contact}
-                  field="contact"
-                  editable={e}
-                  onChange={onChange}
-                  className="text-[12px] leading-relaxed text-neutral-700"
-                />
-              </Section>
-            )}
-            {(data.education?.trim() || e) && (
-              <Section title="Education" accent={accent} small>
-                <Editable
-                  value={data.education}
-                  field="education"
-                  editable={e}
-                  onChange={onChange}
-                  className="text-[12px] leading-relaxed text-neutral-700"
-                />
-              </Section>
-            )}
-            {(data.skills?.trim() || e) && (
+            <CVTextSection data={data.contact} field="contact" title="Contact" accent={accent} editable={e} onChange={onChange} className="text-[12px] leading-relaxed text-neutral-700" sectionStyle="small" />
+            <CVTextSection data={data.education} field="education" title="Education" accent={accent} editable={e} onChange={onChange} className="text-[12px] leading-relaxed text-neutral-700" sectionStyle="small" />
+            {(/\S/.test(data.skills ?? "") || e) && (
               <Section title="Skills" accent={accent} small>
                 <ul className="text-[12px] text-neutral-700 space-y-1">
                   {lines(data.skills).map((s, i) => (
@@ -374,53 +315,13 @@ function Classic({
                 )}
               </Section>
             )}
-            {(data.languages?.trim() || e) && (
-              <Section title="Languages" accent={accent} small>
-                <Editable
-                  value={data.languages}
-                  field="languages"
-                  editable={e}
-                  onChange={onChange}
-                  className="text-[12px] text-neutral-700"
-                />
-              </Section>
-            )}
+            <CVTextSection data={data.languages} field="languages" title="Languages" accent={accent} editable={e} onChange={onChange} className="text-[12px] text-neutral-700" sectionStyle="small" />
           </aside>
 
           <main className="space-y-6">
-            {(data.summary?.trim() || e) && (
-              <Section title="Profile Summary" accent={accent} small>
-                <Editable
-                  value={data.summary}
-                  field="summary"
-                  editable={e}
-                  onChange={onChange}
-                  className="text-[13px] leading-relaxed text-neutral-700 text-justify"
-                />
-              </Section>
-            )}
-            {(data.experience?.trim() || e) && (
-              <Section title="Work Experience" accent={accent} small>
-                <Editable
-                  value={data.experience}
-                  field="experience"
-                  editable={e}
-                  onChange={onChange}
-                  className="text-[13px] leading-relaxed text-neutral-700"
-                />
-              </Section>
-            )}
-            {(data.certifications?.trim() || e) && (
-              <Section title="Certifications" accent={accent} small>
-                <Editable
-                  value={data.certifications}
-                  field="certifications"
-                  editable={e}
-                  onChange={onChange}
-                  className="text-[13px] leading-relaxed text-neutral-700"
-                />
-              </Section>
-            )}
+            <CVTextSection data={data.summary} field="summary" title="Profile Summary" accent={accent} editable={e} onChange={onChange} className="text-[13px] leading-relaxed text-neutral-700 text-justify" sectionStyle="small" />
+            <CVTextSection data={data.experience} field="experience" title="Work Experience" accent={accent} editable={e} onChange={onChange} className="text-[13px] leading-relaxed text-neutral-700" sectionStyle="small" />
+            <CVTextSection data={data.certifications} field="certifications" title="Certifications" accent={accent} editable={e} onChange={onChange} className="text-[13px] leading-relaxed text-neutral-700" sectionStyle="small" />
             {xs.map((x) => (
               <Section key={x.key} title={x.title} accent={accent} small>
                 {x.node}
@@ -452,7 +353,7 @@ function EditorialBig({
     >
       <div className="p-10">
         <div className="text-center">
-          {(data.title?.trim() || e) && (
+          {(/\S/.test(data.title ?? "") || e) && (
             <Editable
               as="p"
               value={data.title}
@@ -465,7 +366,7 @@ function EditorialBig({
           )}
         </div>
         <div className="relative -mt-2 flex flex-col items-center">
-          {(data.name?.trim() || e) && (
+          {(/\S/.test(data.name ?? "") || e) && (
             <Editable
               as="h1"
               value={data.name}
@@ -484,59 +385,19 @@ function EditorialBig({
 
         <div className="mt-10">
           <BalancedColumns>
-            {(data.summary?.trim() || e) && (
-              <Block>
-                <Section title="About Me" accent={accent} bold>
-                  <Editable
-                    value={data.summary}
-                    field="summary"
-                    editable={e}
-                    onChange={onChange}
-                    className="text-[12px] leading-relaxed text-justify"
-                  />
-                </Section>
-              </Block>
-            )}
-            {(data.experience?.trim() || e) && (
-              <Block>
-                <Section title="Experience" accent={accent} bold>
-                  <Editable
-                    value={data.experience}
-                    field="experience"
-                    editable={e}
-                    onChange={onChange}
-                    className="text-[12px] leading-relaxed text-justify"
-                  />
-                </Section>
-              </Block>
-            )}
-            {(data.education?.trim() || e) && (
-              <Block>
-                <Section title="Education" accent={accent} bold>
-                  <Editable
-                    value={data.education}
-                    field="education"
-                    editable={e}
-                    onChange={onChange}
-                    className="text-[12px] leading-relaxed"
-                  />
-                </Section>
-              </Block>
-            )}
-            {(data.contact?.trim() || e) && (
-              <Block>
-                <Section title="Contact" accent={accent} bold>
-                  <Editable
-                    value={data.contact}
-                    field="contact"
-                    editable={e}
-                    onChange={onChange}
-                    className="text-[12px] leading-relaxed"
-                  />
-                </Section>
-              </Block>
-            )}
-            {(data.skills?.trim() || e) && (
+            <Block>
+              <CVTextSection data={data.summary} field="summary" title="About Me" accent={accent} editable={e} onChange={onChange} className="text-[12px] leading-relaxed text-justify" sectionStyle="bold" />
+            </Block>
+            <Block>
+              <CVTextSection data={data.experience} field="experience" title="Experience" accent={accent} editable={e} onChange={onChange} className="text-[12px] leading-relaxed text-justify" sectionStyle="bold" />
+            </Block>
+            <Block>
+              <CVTextSection data={data.education} field="education" title="Education" accent={accent} editable={e} onChange={onChange} className="text-[12px] leading-relaxed" sectionStyle="bold" />
+            </Block>
+            <Block>
+              <CVTextSection data={data.contact} field="contact" title="Contact" accent={accent} editable={e} onChange={onChange} className="text-[12px] leading-relaxed" sectionStyle="bold" />
+            </Block>
+            {(/\S/.test(data.skills ?? "") || e) && (
               <Block>
                 <Section title="Skills" accent={accent} bold>
                   <Editable
@@ -612,7 +473,7 @@ function Soft({
         />
         <div className="relative grid grid-cols-[160px_1fr] items-center gap-8">
           <div>
-            {(data.name?.trim() || e) && (
+            {(/\S/.test(data.name ?? "") || e) && (
               <Editable
                 as="h1"
                 value={data.name}
@@ -623,7 +484,7 @@ function Soft({
                 className="text-4xl font-light tracking-wide"
               />
             )}
-            {(data.title?.trim() || e) && (
+            {(/\S/.test(data.title ?? "") || e) && (
               <div className="mt-3 inline-block rounded-full border border-neutral-800 px-4 py-1">
                 <Editable
                   as="span"
@@ -636,7 +497,7 @@ function Soft({
                 />
               </div>
             )}
-            {(data.summary?.trim() || e) && (
+            {(/\S/.test(data.summary ?? "") || e) && (
               <Editable
                 value={data.summary}
                 field="summary"
@@ -650,7 +511,7 @@ function Soft({
 
         <div className="mt-10">
           <BalancedColumns gap="2rem">
-            {(data.experience?.trim() || e) && (
+            {(/\S/.test(data.experience ?? "") || e) && (
               <Block>
                 <PillSection title="Experience">
                   <Editable
@@ -663,7 +524,7 @@ function Soft({
                 </PillSection>
               </Block>
             )}
-            {(data.education?.trim() || e) && (
+            {(/\S/.test(data.education ?? "") || e) && (
               <Block>
                 <PillSection title="Education">
                   <Editable
@@ -676,7 +537,7 @@ function Soft({
                 </PillSection>
               </Block>
             )}
-            {(data.contact?.trim() || e) && (
+            {(/\S/.test(data.contact ?? "") || e) && (
               <Block>
                 <PillSection title="Contact">
                   <Editable
@@ -689,7 +550,7 @@ function Soft({
                 </PillSection>
               </Block>
             )}
-            {(data.skills?.trim() || e) && (
+            {(/\S/.test(data.skills ?? "") || e) && (
               <Block>
                 <PillSection title="Skills">
                 <ul className="text-[12px] text-neutral-700 space-y-1">
@@ -750,7 +611,7 @@ function Soft({
 
 // --- shared section primitives --------------------------------------------
 
-function Section({
+export function Section({
   title,
   accent,
   children,

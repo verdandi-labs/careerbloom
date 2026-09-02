@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { api, errorMessage } from "@/lib/api";
@@ -169,12 +169,29 @@ function PreviewPage() {
   const [versions, setVersions] = useState<{version_id: string; cv_name: string; created_at: string}[]>([]);
   const [versionsLoading, setVersionsLoading] = useState(false);
   const [deletingVersionId, setDeletingVersionId] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+
+  const recalcScale = useCallback(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const parent = el.parentElement;
+    if (!parent) return;
+    const available = parent.clientWidth - 32;
+    setScale(Math.min(1, available / 794));
+  }, []);
+
+  useEffect(() => {
+    recalcScale();
+    const ro = new ResizeObserver(recalcScale);
+    if (containerRef.current?.parentElement) ro.observe(containerRef.current.parentElement);
+    return () => ro.disconnect();
+  }, [recalcScale]);
 
   useEffect(() => {
     if (!cv) return;
     const base = toDocxData(cv);
-    const localEdits = loadLocalEdits();
-    setMergedData(localEdits ? { ...base, ...localEdits } : base);
+    setMergedData(base);
   }, [cv]);
 
   function handleChange(field: EditableField, value: string) {
@@ -329,12 +346,16 @@ function PreviewPage() {
             </button>
           </div>
         ) : mergedData ? (
-          <CvDocument
-            data={mergedData}
-            template={selectedTemplate}
-            editable={false}
-            onChange={handleChange}
-          />
+          <div ref={containerRef} className="flex justify-center">
+            <div style={{ transform: `scale(${scale})`, transformOrigin: "top center" }}>
+              <CvDocument
+                data={mergedData}
+                template={selectedTemplate}
+                editable={false}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
         ) : null}
       </section>
 
