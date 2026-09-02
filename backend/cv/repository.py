@@ -101,6 +101,15 @@ class CvRepository:
         await self.db.flush()
         return True
 
+    async def get_version(self, user_id: UUID, version_id: UUID) -> CvSavedVersion | None:
+        result = await self.db.execute(
+            select(CvSavedVersion).where(
+                CvSavedVersion.version_id == version_id,
+                CvSavedVersion.user_id == user_id,
+            )
+        )
+        return result.scalar_one_or_none()
+
     async def get_current_cv(self, user_id: UUID) -> CvData:
         upload = await self.get_latest_upload(user_id)
         query = select(CvEdit).where(CvEdit.user_id == user_id)

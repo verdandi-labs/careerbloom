@@ -158,87 +158,101 @@ function Editorial({
     >
       <div className="grid grid-cols-[180px_1fr] gap-8 p-12">
         <div className="space-y-6">
-          <Section title="Contact" accent={accent} serif>
-            <Editable
-              value={data.contact}
-              field="contact"
-              editable={e}
-              onChange={onChange}
-              className="text-[12px] leading-relaxed text-neutral-700 font-sans"
-            />
-          </Section>
-          <Section title="About Me" accent={accent} serif>
-            <Editable
-              value={data.summary}
-              field="summary"
-              editable={e}
-              onChange={onChange}
-              className="text-[12px] leading-relaxed text-neutral-700 font-sans"
-            />
-          </Section>
-          <Section title="Skills" accent={accent} serif>
-            <ul className="text-[12px] text-neutral-700 font-sans space-y-1 list-disc list-inside">
-              {lines(data.skills).map((s, i) => (
-                <li key={i}>{s}</li>
-              ))}
-            </ul>
-            {e && (
+          {(data.contact?.trim() || e) && (
+            <Section title="Contact" accent={accent} serif>
               <Editable
-                value={data.skills}
-                field="skills"
+                value={data.contact}
+                field="contact"
                 editable={e}
                 onChange={onChange}
-                className="mt-2 text-[11px] italic text-neutral-400 font-sans"
-                placeholder="One skill per line"
+                className="text-[12px] leading-relaxed text-neutral-700 font-sans text-justify"
               />
-            )}
-          </Section>
+            </Section>
+          )}
+          {(data.summary?.trim() || e) && (
+            <Section title="About Me" accent={accent} serif>
+              <Editable
+                value={data.summary}
+                field="summary"
+                editable={e}
+                onChange={onChange}
+                className="text-[12px] leading-relaxed text-neutral-700 font-sans text-justify"
+              />
+            </Section>
+          )}
+          {(data.skills?.trim() || e) && (
+            <Section title="Skills" accent={accent} serif>
+              <ul className="text-[12px] text-neutral-700 font-sans space-y-1 list-disc list-inside">
+                {lines(data.skills).map((s, i) => (
+                  <li key={i}>{s}</li>
+                ))}
+              </ul>
+              {e && (
+                <Editable
+                  value={data.skills}
+                  field="skills"
+                  editable={e}
+                  onChange={onChange}
+                  className="mt-2 text-[11px] italic text-neutral-400 font-sans"
+                  placeholder="One skill per line"
+                />
+              )}
+            </Section>
+          )}
         </div>
 
         <div className="space-y-6 border-l border-neutral-200 pl-8">
           <header>
-            <Editable
-              as="h1"
-              value={data.name}
-              field="name"
-              editable={e}
-              onChange={onChange}
-              multiline={false}
-              className="text-4xl font-semibold tracking-tight"
-              style={{ color: accent } as React.CSSProperties}
-            />
-            <Editable
-              as="p"
-              value={data.title}
-              field="title"
-              editable={e}
-              onChange={onChange}
-              multiline={false}
-              className="mt-1 text-xl text-neutral-700"
-            />
+            {(data.name?.trim() || e) && (
+              <Editable
+                as="h1"
+                value={data.name}
+                field="name"
+                editable={e}
+                onChange={onChange}
+                multiline={false}
+                className="text-4xl font-semibold tracking-tight"
+                style={{ color: accent } as React.CSSProperties}
+              />
+            )}
+            {(data.title?.trim() || e) && (
+              <Editable
+                as="p"
+                value={data.title}
+                field="title"
+                editable={e}
+                onChange={onChange}
+                multiline={false}
+                className="mt-1 text-xl text-neutral-700"
+              />
+            )}
           </header>
 
-          <Section title="Education" accent={accent} serif>
-            <Editable
-              value={data.education}
-              field="education"
-              editable={e}
-              onChange={onChange}
-              className="text-[13px] leading-relaxed text-neutral-700 font-sans"
-            />
-          </Section>
+          {(data.education?.trim() || e) && (
+            <Section title="Education" accent={accent} serif>
+              <Editable
+                value={data.education}
+                field="education"
+                editable={e}
+                onChange={onChange}
+                className="text-[13px] leading-relaxed text-neutral-700 font-sans text-justify"
+              />
+            </Section>
+          )}
 
-          <Section title="Experience" accent={accent} serif>
-            <Editable
-              value={data.experience}
-              field="experience"
-              editable={e}
-              onChange={onChange}
-              className="text-[13px] leading-relaxed text-neutral-700 font-sans"
-            />
-          </Section>
+          {(data.experience?.trim() || e) && (
+            <Section title="Experience" accent={accent} serif>
+              <Editable
+                value={data.experience}
+                field="experience"
+                editable={e}
+                onChange={onChange}
+                className="text-[13px] leading-relaxed text-neutral-700 font-sans text-justify"
+              />
+            </Section>
+          )}
 
-          {(data.languages || data.certifications) && (
+          {((data.languages?.trim() || data.certifications?.trim()) || e) && (
             <div className="grid grid-cols-2 gap-6">
               <Section title="Languages" accent={accent} serif>
                 <Editable
@@ -246,7 +260,7 @@ function Editorial({
                   field="languages"
                   editable={e}
                   onChange={onChange}
-                  className="text-[12px] text-neutral-700 font-sans"
+                  className="text-[12px] text-neutral-700 font-sans text-justify"
                 />
               </Section>
               <Section title="Certifications" accent={accent} serif>
@@ -255,7 +269,7 @@ function Editorial({
                   field="certifications"
                   editable={e}
                   onChange={onChange}
-                  className="text-[12px] text-neutral-700 font-sans"
+                  className="text-[12px] text-neutral-700 font-sans text-justify"
                 />
               </Section>
             </div>
@@ -291,96 +305,112 @@ function Classic({
     >
       <div className="p-12">
         <div className="border-b border-neutral-300 pb-6 text-center">
-          <Editable
-            as="h1"
-            value={data.name}
-            field="name"
-            editable={e}
-            onChange={onChange}
-            multiline={false}
-            className="text-4xl font-light"
-            style={{ letterSpacing: "0.3em" } as React.CSSProperties}
-          />
-          <Editable
-            as="p"
-            value={data.title}
-            field="title"
-            editable={e}
-            onChange={onChange}
-            multiline={false}
-            className="mt-3 text-sm text-neutral-600"
-            style={{ letterSpacing: "0.4em" } as React.CSSProperties}
-          />
+          {(data.name?.trim() || e) && (
+            <Editable
+              as="h1"
+              value={data.name}
+              field="name"
+              editable={e}
+              onChange={onChange}
+              multiline={false}
+              className="text-4xl font-light"
+              style={{ letterSpacing: "0.3em" } as React.CSSProperties}
+            />
+          )}
+          {(data.title?.trim() || e) && (
+            <Editable
+              as="p"
+              value={data.title}
+              field="title"
+              editable={e}
+              onChange={onChange}
+              multiline={false}
+              className="mt-3 text-sm text-neutral-600"
+              style={{ letterSpacing: "0.4em" } as React.CSSProperties}
+            />
+          )}
         </div>
 
         <div className="mt-8 grid grid-cols-[200px_1fr] gap-8">
           <aside className="space-y-6 border-r border-neutral-200 pr-6">
-            <Section title="Contact" accent={accent} small>
-              <Editable
-                value={data.contact}
-                field="contact"
-                editable={e}
-                onChange={onChange}
-                className="text-[12px] leading-relaxed text-neutral-700"
-              />
-            </Section>
-            <Section title="Education" accent={accent} small>
-              <Editable
-                value={data.education}
-                field="education"
-                editable={e}
-                onChange={onChange}
-                className="text-[12px] leading-relaxed text-neutral-700"
-              />
-            </Section>
-            <Section title="Skills" accent={accent} small>
-              <ul className="text-[12px] text-neutral-700 space-y-1">
-                {lines(data.skills).map((s, i) => (
-                  <li key={i}>◆ {s}</li>
-                ))}
-              </ul>
-              {e && (
+            {(data.contact?.trim() || e) && (
+              <Section title="Contact" accent={accent} small>
                 <Editable
-                  value={data.skills}
-                  field="skills"
+                  value={data.contact}
+                  field="contact"
                   editable={e}
                   onChange={onChange}
-                  className="mt-2 text-[11px] italic text-neutral-400"
-                  placeholder="One per line"
+                  className="text-[12px] leading-relaxed text-neutral-700"
                 />
-              )}
-            </Section>
-            <Section title="Languages" accent={accent} small>
-              <Editable
-                value={data.languages}
-                field="languages"
-                editable={e}
-                onChange={onChange}
-                className="text-[12px] text-neutral-700"
-              />
-            </Section>
+              </Section>
+            )}
+            {(data.education?.trim() || e) && (
+              <Section title="Education" accent={accent} small>
+                <Editable
+                  value={data.education}
+                  field="education"
+                  editable={e}
+                  onChange={onChange}
+                  className="text-[12px] leading-relaxed text-neutral-700"
+                />
+              </Section>
+            )}
+            {(data.skills?.trim() || e) && (
+              <Section title="Skills" accent={accent} small>
+                <ul className="text-[12px] text-neutral-700 space-y-1">
+                  {lines(data.skills).map((s, i) => (
+                    <li key={i}>◆ {s}</li>
+                  ))}
+                </ul>
+                {e && (
+                  <Editable
+                    value={data.skills}
+                    field="skills"
+                    editable={e}
+                    onChange={onChange}
+                    className="mt-2 text-[11px] italic text-neutral-400"
+                    placeholder="One per line"
+                  />
+                )}
+              </Section>
+            )}
+            {(data.languages?.trim() || e) && (
+              <Section title="Languages" accent={accent} small>
+                <Editable
+                  value={data.languages}
+                  field="languages"
+                  editable={e}
+                  onChange={onChange}
+                  className="text-[12px] text-neutral-700"
+                />
+              </Section>
+            )}
           </aside>
 
           <main className="space-y-6">
-            <Section title="Profile Summary" accent={accent} small>
-              <Editable
-                value={data.summary}
-                field="summary"
-                editable={e}
-                onChange={onChange}
-                className="text-[13px] leading-relaxed text-neutral-700 text-justify"
-              />
-            </Section>
-            <Section title="Work Experience" accent={accent} small>
-              <Editable
-                value={data.experience}
-                field="experience"
-                editable={e}
-                onChange={onChange}
-                className="text-[13px] leading-relaxed text-neutral-700"
-              />
-            </Section>
-            {data.certifications && (
+            {(data.summary?.trim() || e) && (
+              <Section title="Profile Summary" accent={accent} small>
+                <Editable
+                  value={data.summary}
+                  field="summary"
+                  editable={e}
+                  onChange={onChange}
+                  className="text-[13px] leading-relaxed text-neutral-700 text-justify"
+                />
+              </Section>
+            )}
+            {(data.experience?.trim() || e) && (
+              <Section title="Work Experience" accent={accent} small>
+                <Editable
+                  value={data.experience}
+                  field="experience"
+                  editable={e}
+                  onChange={onChange}
+                  className="text-[13px] leading-relaxed text-neutral-700"
+                />
+              </Section>
+            )}
+            {(data.certifications?.trim() || e) && (
               <Section title="Certifications" accent={accent} small>
                 <Editable
                   value={data.certifications}
@@ -422,89 +452,103 @@ function EditorialBig({
     >
       <div className="p-10">
         <div className="text-center">
-          <Editable
-            as="p"
-            value={data.title}
-            field="title"
-            editable={e}
-            onChange={onChange}
-            multiline={false}
-            className="text-sm font-bold uppercase tracking-wider"
-          />
+          {(data.title?.trim() || e) && (
+            <Editable
+              as="p"
+              value={data.title}
+              field="title"
+              editable={e}
+              onChange={onChange}
+              multiline={false}
+              className="text-sm font-bold uppercase tracking-wider"
+            />
+          )}
         </div>
         <div className="relative -mt-2 flex flex-col items-center">
-          <Editable
-            as="h1"
-            value={data.name}
-            field="name"
-            editable={e}
-            onChange={onChange}
-            multiline={false}
-            className="text-[120px] font-black leading-none text-center"
-            style={
-              { letterSpacing: "-0.04em", color: accent } as React.CSSProperties
-            }
-          />
+          {(data.name?.trim() || e) && (
+            <Editable
+              as="h1"
+              value={data.name}
+              field="name"
+              editable={e}
+              onChange={onChange}
+              multiline={false}
+              className="text-[120px] font-black leading-none text-center"
+              style={
+                { letterSpacing: "-0.04em", color: accent } as React.CSSProperties
+              }
+            />
+          )}
           <div className="-mt-12 z-10"></div>
         </div>
 
         <div className="mt-10">
           <BalancedColumns>
-            <Block>
-              <Section title="About Me" accent={accent} bold>
-                <Editable
-                  value={data.summary}
-                  field="summary"
-                  editable={e}
-                  onChange={onChange}
-                  className="text-[12px] leading-relaxed text-justify"
-                />
-              </Section>
-            </Block>
-            <Block>
-              <Section title="Experience" accent={accent} bold>
-                <Editable
-                  value={data.experience}
-                  field="experience"
-                  editable={e}
-                  onChange={onChange}
-                  className="text-[12px] leading-relaxed text-justify"
-                />
-              </Section>
-            </Block>
-            <Block>
-              <Section title="Education" accent={accent} bold>
-                <Editable
-                  value={data.education}
-                  field="education"
-                  editable={e}
-                  onChange={onChange}
-                  className="text-[12px] leading-relaxed"
-                />
-              </Section>
-            </Block>
-            <Block>
-              <Section title="Contact" accent={accent} bold>
-                <Editable
-                  value={data.contact}
-                  field="contact"
-                  editable={e}
-                  onChange={onChange}
-                  className="text-[12px] leading-relaxed"
-                />
-              </Section>
-            </Block>
-            <Block>
-              <Section title="Skills" accent={accent} bold>
-                <Editable
-                  value={data.skills}
-                  field="skills"
-                  editable={e}
-                  onChange={onChange}
-                  className="text-[12px] leading-relaxed"
-                />
-              </Section>
-            </Block>
+            {(data.summary?.trim() || e) && (
+              <Block>
+                <Section title="About Me" accent={accent} bold>
+                  <Editable
+                    value={data.summary}
+                    field="summary"
+                    editable={e}
+                    onChange={onChange}
+                    className="text-[12px] leading-relaxed text-justify"
+                  />
+                </Section>
+              </Block>
+            )}
+            {(data.experience?.trim() || e) && (
+              <Block>
+                <Section title="Experience" accent={accent} bold>
+                  <Editable
+                    value={data.experience}
+                    field="experience"
+                    editable={e}
+                    onChange={onChange}
+                    className="text-[12px] leading-relaxed text-justify"
+                  />
+                </Section>
+              </Block>
+            )}
+            {(data.education?.trim() || e) && (
+              <Block>
+                <Section title="Education" accent={accent} bold>
+                  <Editable
+                    value={data.education}
+                    field="education"
+                    editable={e}
+                    onChange={onChange}
+                    className="text-[12px] leading-relaxed"
+                  />
+                </Section>
+              </Block>
+            )}
+            {(data.contact?.trim() || e) && (
+              <Block>
+                <Section title="Contact" accent={accent} bold>
+                  <Editable
+                    value={data.contact}
+                    field="contact"
+                    editable={e}
+                    onChange={onChange}
+                    className="text-[12px] leading-relaxed"
+                  />
+                </Section>
+              </Block>
+            )}
+            {(data.skills?.trim() || e) && (
+              <Block>
+                <Section title="Skills" accent={accent} bold>
+                  <Editable
+                    value={data.skills}
+                    field="skills"
+                    editable={e}
+                    onChange={onChange}
+                    className="text-[12px] leading-relaxed"
+                  />
+                </Section>
+              </Block>
+            )}
             {data.languages && (
               <Block>
                 <Section title="Languages" accent={accent} bold>
@@ -568,73 +612,86 @@ function Soft({
         />
         <div className="relative grid grid-cols-[160px_1fr] items-center gap-8">
           <div>
-            <Editable
-              as="h1"
-              value={data.name}
-              field="name"
-              editable={e}
-              onChange={onChange}
-              multiline={false}
-              className="text-4xl font-light tracking-wide"
-            />
-            <div className="mt-3 inline-block rounded-full border border-neutral-800 px-4 py-1">
+            {(data.name?.trim() || e) && (
               <Editable
-                as="span"
-                value={data.title}
-                field="title"
+                as="h1"
+                value={data.name}
+                field="name"
                 editable={e}
                 onChange={onChange}
                 multiline={false}
-                className="text-xs font-bold uppercase tracking-wider"
+                className="text-4xl font-light tracking-wide"
               />
-            </div>
-            <Editable
-              value={data.summary}
-              field="summary"
-              editable={e}
-              onChange={onChange}
-              className="mt-4 text-[13px] leading-relaxed text-neutral-700"
-            />
+            )}
+            {(data.title?.trim() || e) && (
+              <div className="mt-3 inline-block rounded-full border border-neutral-800 px-4 py-1">
+                <Editable
+                  as="span"
+                  value={data.title}
+                  field="title"
+                  editable={e}
+                  onChange={onChange}
+                  multiline={false}
+                  className="text-xs font-bold uppercase tracking-wider"
+                />
+              </div>
+            )}
+            {(data.summary?.trim() || e) && (
+              <Editable
+                value={data.summary}
+                field="summary"
+                editable={e}
+                onChange={onChange}
+                className="mt-4 text-[13px] leading-relaxed text-neutral-700 text-justify"
+              />
+            )}
           </div>
         </div>
 
         <div className="mt-10">
           <BalancedColumns gap="2rem">
-            <Block>
-              <PillSection title="Experience">
-                <Editable
-                  value={data.experience}
-                  field="experience"
-                  editable={e}
-                  onChange={onChange}
-                  className="text-[13px] leading-relaxed text-neutral-700"
-                />
-              </PillSection>
-            </Block>
-            <Block>
-              <PillSection title="Education">
-                <Editable
-                  value={data.education}
-                  field="education"
-                  editable={e}
-                  onChange={onChange}
-                  className="text-[13px] leading-relaxed text-neutral-700"
-                />
-              </PillSection>
-            </Block>
-            <Block>
-              <PillSection title="Contact">
-                <Editable
-                  value={data.contact}
-                  field="contact"
-                  editable={e}
-                  onChange={onChange}
-                  className="text-[12px] leading-relaxed text-neutral-700"
-                />
-              </PillSection>
-            </Block>
-            <Block>
-              <PillSection title="Skills">
+            {(data.experience?.trim() || e) && (
+              <Block>
+                <PillSection title="Experience">
+                  <Editable
+                    value={data.experience}
+                    field="experience"
+                    editable={e}
+                    onChange={onChange}
+                    className="text-[13px] leading-relaxed text-neutral-700 text-justify"
+                  />
+                </PillSection>
+              </Block>
+            )}
+            {(data.education?.trim() || e) && (
+              <Block>
+                <PillSection title="Education">
+                  <Editable
+                    value={data.education}
+                    field="education"
+                    editable={e}
+                    onChange={onChange}
+                    className="text-[13px] leading-relaxed text-neutral-700 text-justify"
+                  />
+                </PillSection>
+              </Block>
+            )}
+            {(data.contact?.trim() || e) && (
+              <Block>
+                <PillSection title="Contact">
+                  <Editable
+                    value={data.contact}
+                    field="contact"
+                    editable={e}
+                    onChange={onChange}
+                    className="text-[12px] leading-relaxed text-neutral-700 text-justify"
+                  />
+                </PillSection>
+              </Block>
+            )}
+            {(data.skills?.trim() || e) && (
+              <Block>
+                <PillSection title="Skills">
                 <ul className="text-[12px] text-neutral-700 space-y-1">
                   {lines(data.skills).map((s, i) => (
                     <li key={i}>⬢ {s}</li>
@@ -652,6 +709,7 @@ function Soft({
                 )}
               </PillSection>
             </Block>
+            )}
             {data.languages && (
               <Block>
                 <PillSection title="Languages">

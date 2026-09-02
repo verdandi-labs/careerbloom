@@ -291,6 +291,19 @@ async def list_versions(
     ]
 
 
+@router.get("/versions/{version_id}", response_model=CvData)
+async def get_version(
+    version_id: str,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    repo = CvRepository(db)
+    version = await repo.get_version(user.user_id, version_id)
+    if not version:
+        raise HTTPException(status_code=404, detail="Version not found")
+    return CvData(**{f: getattr(version, f) for f in CV_FIELDS})
+
+
 @router.post("/versions", response_model=VersionListItem, status_code=201)
 async def create_version(
     body: SaveVersionRequest,
