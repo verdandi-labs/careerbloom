@@ -47,7 +47,7 @@ export type StructuredCVData = {
   other: string
 }
 
-export type CVTemplateId = "terracotta"
+export type CVTemplateId = "terracotta" | "sage"
 
 export type CVTemplateMeta = {
   id: CVTemplateId;
@@ -73,6 +73,15 @@ export const CV_TEMPLATES: CVTemplateMeta[] = [
     bg: "#FFFFFF",
     font: "sans",
     layout: "sidebar",
+  },
+  {
+    id: "sage",
+    name: "Sage",
+    blurb: "Clean editorial layout with sage green accents.",
+    accent: "#7B9E87",
+    bg: "#FFFFFF",
+    font: "sans",
+    layout: "split",
   },
 ];
 

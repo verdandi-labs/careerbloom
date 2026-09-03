@@ -255,7 +255,7 @@ function PreviewPage() {
     try {
       await registerFonts()
       const blob = await pdf(
-        <CvPdfDocument data={structuredData} />
+        <CvPdfDocument data={structuredData} template={selectedTemplate} />
       ).toBlob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
