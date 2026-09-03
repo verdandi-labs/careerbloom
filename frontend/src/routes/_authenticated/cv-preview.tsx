@@ -11,7 +11,10 @@ import {
   type StructuredCVData,
   DEFAULT_TEMPLATE,
 } from "@/lib/cv-templates";
-import { ArrowLeft, BookMarked, Loader2, X } from "lucide-react";
+import { ArrowLeft, BookMarked, Download, Loader2, X } from "lucide-react";
+import { pdf } from "@react-pdf/renderer";
+import { CvPdfDocument } from "@/components/CvPdfDocument";
+import { registerFonts } from "@/lib/pdf-fonts";
 
 export const Route = createFileRoute("/_authenticated/cv-preview")({
   head: () => ({ meta: [{ title: "Preview & Export · careerBloom" }] }),
@@ -181,6 +184,7 @@ function PreviewPage() {
   const [versions, setVersions] = useState<{version_id: string; cv_name: string; created_at: string}[]>([]);
   const [versionsLoading, setVersionsLoading] = useState(false);
   const [deletingVersionId, setDeletingVersionId] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     if (!cv) return;
@@ -245,6 +249,27 @@ function PreviewPage() {
     }
   }
 
+  async function handleExportPdf() {
+    if (!structuredData) return
+    setExporting(true)
+    try {
+      await registerFonts()
+      const blob = await pdf(
+        <CvPdfDocument data={structuredData} />
+      ).toBlob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = "careerbloom-cv.pdf"
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch (e) {
+      console.error("PDF export failed", e)
+    } finally {
+      setExporting(false)
+    }
+  }
+
   return (
     <AppShell>
       <header className="bg-secondary/70 backdrop-blur-md rounded-[20px] px-7 py-7 shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)]">
@@ -274,6 +299,14 @@ function PreviewPage() {
                 </button>
               ))}
             </div>
+            <button
+              onClick={() => void handleExportPdf()}
+              disabled={exporting || !structuredData}
+              className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-xs text-background disabled:opacity-50"
+            >
+              {exporting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3 w-3" />}
+              Export PDF
+            </button>
             <button
               onClick={handleReset}
               className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs text-foreground hover:bg-white"
