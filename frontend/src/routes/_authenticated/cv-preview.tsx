@@ -192,7 +192,9 @@ function PreviewPage() {
   const [versionsLoading, setVersionsLoading] = useState(false);
   const [deletingVersionId, setDeletingVersionId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const cvRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
+  const [cvHeight, setCvHeight] = useState(1123);
 
   const recalcScale = useCallback(() => {
     const el = containerRef.current;
@@ -209,6 +211,16 @@ function PreviewPage() {
     if (containerRef.current?.parentElement) ro.observe(containerRef.current.parentElement);
     return () => ro.disconnect();
   }, [recalcScale]);
+
+  useEffect(() => {
+    const el = cvRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      setCvHeight(el.scrollHeight);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!cv) return;
@@ -385,8 +397,8 @@ function PreviewPage() {
             </button>
           </div>
         ) : mergedData ? (
-          <div ref={containerRef} className="w-full overflow-hidden cv-print-target" style={{ height: scale * 1123 }}>
-            <div style={{ transform: `scale(${scale})`, transformOrigin: "top center" }}>
+          <div ref={containerRef} className="w-full overflow-hidden cv-print-target" style={{ height: scale * cvHeight }}>
+            <div ref={cvRef} style={{ transform: `scale(${scale})`, transformOrigin: "top left", width: 794 }}>
               {structuredData && (
                 <CvDocument
                   data={structuredData}

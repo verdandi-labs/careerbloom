@@ -259,18 +259,20 @@
   width: 794px;
   min-height: 1123px;
   box-sizing: border-box;
-  overflow: hidden;
 }
 
 @media print {
   /* Hide everything except the CV */
   body > * { display: none !important; }
-  .cv-print-target { display: block !important; }
+  .cv-print-target { 
+    display: block !important;
+    height: auto !important;
+  }
 
-  /* Remove the scale transform for print — render at full A4 size */
   .cv-print-target > div {
     transform: none !important;
     width: 794px !important;
+    height: auto !important;
   }
 
   /* A4 page setup */
