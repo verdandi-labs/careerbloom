@@ -260,27 +260,3 @@
   min-height: 1123px;
   box-sizing: border-box;
 }
-
-@media print {
-  /* Hide everything except the CV */
-  body > * { display: none !important; }
-  .cv-print-target { 
-    display: block !important;
-    height: auto !important;
-  }
-
-  .cv-print-target > div {
-    transform: none !important;
-    width: 794px !important;
-    height: auto !important;
-  }
-
-  /* A4 page setup */
-  @page {
-    size: A4;
-    margin: 0;
-  }
-
-  /* Hide header, buttons, panels */
-  header, nav, button, .no-print { display: none !important; }
-}

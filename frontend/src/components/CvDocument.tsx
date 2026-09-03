@@ -1,16 +1,10 @@
-// Renders a CVData object into one of five cohesive single-document templates.
-// All fields are inline-editable via contentEditable when `editable` is true.
-// On blur, the parent receives the field key + new text.
-
 import {
   useEffect,
   useRef,
   createElement,
   type CSSProperties,
-  type ReactNode,
 } from "react";
 import type { CVTemplateId, StructuredCVData } from "@/lib/cv-templates";
-import { Mail, MapPin, Phone, Globe } from "lucide-react";
 import { CVTextSection } from "./cv-render-helpers";
 
 export type EditableField = "name" | "title" | "summary" | "certifications" | "references" | "other"
@@ -22,8 +16,6 @@ type Props = {
   onChange?: (field: EditableField, value: string) => void
   onEditItem?: (field: keyof StructuredCVData, index: number, updatedItem: unknown) => void
 }
-
-// --- helpers ---------------------------------------------------------------
 
 export function Editable({
   value,
@@ -67,650 +59,6 @@ export function Editable({
   });
 }
 
-function extras(data: StructuredCVData, editable: boolean, onChange?: Props["onChange"]) {
-  const sections = [
-    { key: "awards" as const, title: "Awards", items: data.awards, nameField: "name" as const, commentField: "comments" as const },
-    { key: "publications" as const, title: "Publications", items: data.publications, nameField: "name" as const, commentField: "comments" as const },
-    { key: "volunteer" as const, title: "Volunteering", items: data.volunteer, nameField: "center" as const, commentField: "comments" as const },
-    { key: "projects" as const, title: "Projects", items: data.projects, nameField: "name" as const, commentField: "comments" as const },
-  ]
-  return sections
-    .filter(({ items }) => items.length > 0 || editable)
-    .map(({ key, title, items, nameField, commentField }) => ({
-      key,
-      title,
-      node: (
-        <div className="flex flex-col gap-2">
-          {items.map((item: Record<string, unknown>, i: number) => (
-            <div key={i}>
-              {item[nameField] != null && <p className="text-xs font-semibold text-neutral-800">{String(item[nameField])}</p>}
-              {item[commentField] != null && <p className="text-xs text-neutral-600">{String(item[commentField])}</p>}
-            </div>
-          ))}
-        </div>
-      ),
-    }))
-}
-
-// Balanced two-column flow using CSS multi-column. Sections won't split mid-block.
-function BalancedColumns({
-  children,
-  gap = "2.5rem",
-}: {
-  children: ReactNode;
-  gap?: string;
-}) {
-  return (
-    <div
-      style={{
-        columnCount: 2,
-        columnGap: gap,
-        columnFill: "balance",
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-function Block({ children }: { children: ReactNode }) {
-  return (
-    <div
-      className="mb-6"
-      style={{
-        breakInside: "avoid",
-        pageBreakInside: "avoid",
-        ...({ WebkitColumnBreakInside: "avoid" } as CSSProperties),
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-// --- templates -------------------------------------------------------------
-
-function Editorial({
-  data,
-  editable,
-  onChange,
-}: Required<Pick<Props, "data">> & Props) {
-  const e = !!editable;
-  const accent = "#B96A4B";
-  const xs = extras(data, e, onChange);
-  return (
-    <div
-      className="cv-page font-serif"
-      style={{
-        background: "#fff",
-        color: "#1a1a1a",
-        fontFamily: "'Cormorant Garamond', Georgia, serif",
-      }}
-    >
-      <div className="grid grid-cols-[180px_1fr] gap-8 p-12">
-        <div className="space-y-6">
-          {(data.contact.length > 0 || e) && (
-            <Section title="Contact" accent={accent} serif>
-              {data.contact.map((item) => (
-                <p key={item.line_num} className="text-xs leading-relaxed text-neutral-600">{item.detail}</p>
-              ))}
-            </Section>
-          )}
-          <CVTextSection data={data.summary} field="summary" title="About Me" accent={accent} editable={e} onChange={onChange} className="text-[12px] leading-relaxed text-neutral-700 font-sans text-justify" sectionStyle="serif" />
-          {(data.skills.length > 0 || e) && (
-            <Section title="Skills" accent={accent} serif>
-              <ul className="flex flex-col gap-1">
-                {data.skills.map((item) => (
-                  <li key={item.line_num} className="text-xs text-neutral-700">{item.skill}</li>
-                ))}
-              </ul>
-            </Section>
-          )}
-        </div>
-
-        <div className="space-y-6 border-l border-neutral-200 pl-8">
-          <header>
-            {(/\S/.test(data.name ?? "") || e) && (
-              <Editable
-                as="h1"
-                value={data.name}
-                field="name"
-                editable={e}
-                onChange={onChange}
-                multiline={false}
-                className="text-4xl font-semibold tracking-tight"
-                style={{ color: accent } as React.CSSProperties}
-              />
-            )}
-            {(/\S/.test(data.title ?? "") || e) && (
-              <Editable
-                as="p"
-                value={data.title}
-                field="title"
-                editable={e}
-                onChange={onChange}
-                multiline={false}
-                className="mt-1 text-xl text-neutral-700"
-              />
-            )}
-          </header>
-
-          {(data.education.length > 0 || e) && (
-            <Section title="Education" accent={accent} serif>
-              {data.education.map((item) => (
-                <div key={item.line_num} className="mb-2">
-                  <p className="text-sm font-semibold text-neutral-800">{item.edu_center}</p>
-                  <p className="text-xs text-neutral-500">
-                    {[item.city, item.start_date && item.end_date
-                      ? `${item.start_date} – ${item.end_date}`
-                      : item.start_date ?? item.end_date
-                    ].filter(Boolean).join(" · ")}
-                  </p>
-                  {item.comments && <p className="text-xs text-neutral-600">{item.comments}</p>}
-                </div>
-              ))}
-            </Section>
-          )}
-
-          {(data.experience.length > 0 || e) && (
-            <Section title="Experience" accent={accent} serif>
-              {data.experience.map((item) => (
-                <div key={item.line_num} className="mb-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <p className="text-sm font-semibold text-neutral-800">{item.company}</p>
-                      <p className="text-xs text-neutral-500">
-                        {[item.city, item.start_date && item.end_date
-                          ? `${item.start_date} – ${item.end_date}`
-                          : item.start_date ?? item.end_date
-                        ].filter(Boolean).join(" · ")}
-                      </p>
-                    </div>
-                  </div>
-                  {item.comments && (
-                    <p className="mt-1 text-xs leading-relaxed text-neutral-600 text-justify">{item.comments}</p>
-                  )}
-                </div>
-              ))}
-            </Section>
-          )}
-
-          {((data.languages.length > 0 || data.certifications) || e) && (
-            <div className="grid grid-cols-2 gap-6">
-              <Section title="Languages" accent={accent} serif>
-                {data.languages.map((item) => (
-                  <div key={item.line_num} className="flex justify-between text-xs">
-                    <span className="text-neutral-800">{item.language}</span>
-                    {item.level && <span className="text-neutral-400">{item.level}</span>}
-                  </div>
-                ))}
-              </Section>
-              <Section title="Certifications" accent={accent} serif>
-                <Editable
-                  value={data.certifications}
-                  field="certifications"
-                  editable={e}
-                  onChange={onChange}
-                  className="text-[12px] text-neutral-700 font-sans text-justify"
-                />
-              </Section>
-            </div>
-          )}
-
-          {xs.map((x) => (
-            <Section key={x.key} title={x.title} accent={accent} serif>
-              <div className="font-sans">{x.node}</div>
-            </Section>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Classic({
-  data,
-  editable,
-  onChange,
-}: Required<Pick<Props, "data">> & Props) {
-  const e = !!editable;
-  const accent = "#5C5C5C";
-  const xs = extras(data, e, onChange);
-  return (
-    <div
-      className="cv-page"
-      style={{
-        background: "#fff",
-        color: "#1a1a1a",
-        fontFamily: "'DM Sans', system-ui, sans-serif",
-      }}
-    >
-      <div className="p-12">
-        <div className="border-b border-neutral-300 pb-6 text-center">
-          {(/\S/.test(data.name ?? "") || e) && (
-            <Editable
-              as="h1"
-              value={data.name}
-              field="name"
-              editable={e}
-              onChange={onChange}
-              multiline={false}
-              className="text-4xl font-light"
-              style={{ letterSpacing: "0.3em" } as React.CSSProperties}
-            />
-          )}
-          {(/\S/.test(data.title ?? "") || e) && (
-            <Editable
-              as="p"
-              value={data.title}
-              field="title"
-              editable={e}
-              onChange={onChange}
-              multiline={false}
-              className="mt-3 text-sm text-neutral-600"
-              style={{ letterSpacing: "0.4em" } as React.CSSProperties}
-            />
-          )}
-        </div>
-
-        <div className="mt-8 grid grid-cols-[200px_1fr] gap-8">
-          <aside className="space-y-6 border-r border-neutral-200 pr-6">
-            {(data.contact.length > 0 || e) && (
-              <Section title="Contact" accent={accent} small>
-                {data.contact.map((item) => (
-                  <p key={item.line_num} className="text-xs leading-relaxed text-neutral-600">{item.detail}</p>
-                ))}
-              </Section>
-            )}
-            {(data.education.length > 0 || e) && (
-              <Section title="Education" accent={accent} small>
-                {data.education.map((item) => (
-                  <div key={item.line_num} className="mb-2">
-                    <p className="text-sm font-semibold text-neutral-800">{item.edu_center}</p>
-                    <p className="text-xs text-neutral-500">
-                      {[item.city, item.start_date && item.end_date
-                        ? `${item.start_date} – ${item.end_date}`
-                        : item.start_date ?? item.end_date
-                      ].filter(Boolean).join(" · ")}
-                    </p>
-                    {item.comments && <p className="text-xs text-neutral-600">{item.comments}</p>}
-                  </div>
-                ))}
-              </Section>
-            )}
-            {(data.skills.length > 0 || e) && (
-              <Section title="Skills" accent={accent} small>
-                <ul className="flex flex-col gap-1">
-                  {data.skills.map((item) => (
-                    <li key={item.line_num} className="text-xs text-neutral-700">◆ {item.skill}</li>
-                  ))}
-                </ul>
-              </Section>
-            )}
-            {(data.languages.length > 0 || e) && (
-              <Section title="Languages" accent={accent} small>
-                {data.languages.map((item) => (
-                  <div key={item.line_num} className="flex justify-between text-xs">
-                    <span className="text-neutral-800">{item.language}</span>
-                    {item.level && <span className="text-neutral-400">{item.level}</span>}
-                  </div>
-                ))}
-              </Section>
-            )}
-          </aside>
-
-          <main className="space-y-6">
-            <CVTextSection data={data.summary} field="summary" title="Profile Summary" accent={accent} editable={e} onChange={onChange} className="text-[13px] leading-relaxed text-neutral-700 text-justify" sectionStyle="small" />
-            {(data.experience.length > 0 || e) && (
-              <Section title="Work Experience" accent={accent} small>
-                {data.experience.map((item) => (
-                  <div key={item.line_num} className="mb-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <p className="text-sm font-semibold text-neutral-800">{item.company}</p>
-                        <p className="text-xs text-neutral-500">
-                          {[item.city, item.start_date && item.end_date
-                            ? `${item.start_date} – ${item.end_date}`
-                            : item.start_date ?? item.end_date
-                          ].filter(Boolean).join(" · ")}
-                        </p>
-                      </div>
-                    </div>
-                    {item.comments && (
-                      <p className="mt-1 text-xs leading-relaxed text-neutral-600 text-justify">{item.comments}</p>
-                    )}
-                  </div>
-                ))}
-              </Section>
-            )}
-            <CVTextSection data={data.certifications} field="certifications" title="Certifications" accent={accent} editable={e} onChange={onChange} className="text-[13px] leading-relaxed text-neutral-700" sectionStyle="small" />
-            {xs.map((x) => (
-              <Section key={x.key} title={x.title} accent={accent} small>
-                {x.node}
-              </Section>
-            ))}
-          </main>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function EditorialBig({
-  data,
-  editable,
-  onChange,
-}: Required<Pick<Props, "data">> & Props) {
-  const e = !!editable;
-  const accent = "#3D3D3D";
-  const xs = extras(data, e, onChange);
-  return (
-    <div
-      className="cv-page"
-      style={{
-        background: "#EFEAE3",
-        color: accent,
-        fontFamily: "'DM Sans', system-ui, sans-serif",
-      }}
-    >
-      <div className="p-10">
-        <div className="text-center">
-          {(/\S/.test(data.title ?? "") || e) && (
-            <Editable
-              as="p"
-              value={data.title}
-              field="title"
-              editable={e}
-              onChange={onChange}
-              multiline={false}
-              className="text-sm font-bold uppercase tracking-wider"
-            />
-          )}
-        </div>
-        <div className="relative -mt-2 flex flex-col items-center">
-          {(/\S/.test(data.name ?? "") || e) && (
-            <Editable
-              as="h1"
-              value={data.name}
-              field="name"
-              editable={e}
-              onChange={onChange}
-              multiline={false}
-              className="text-[120px] font-black leading-none text-center"
-              style={
-                { letterSpacing: "-0.04em", color: accent } as React.CSSProperties
-              }
-            />
-          )}
-          <div className="-mt-12 z-10"></div>
-        </div>
-
-        <div className="mt-10">
-          <BalancedColumns>
-            <Block>
-              <CVTextSection data={data.summary} field="summary" title="About Me" accent={accent} editable={e} onChange={onChange} className="text-[12px] leading-relaxed text-justify" sectionStyle="bold" />
-            </Block>
-            {(data.experience.length > 0 || e) && (
-              <Block>
-                <Section title="Experience" accent={accent} bold>
-                  {data.experience.map((item) => (
-                    <div key={item.line_num} className="mb-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <p className="text-sm font-semibold text-neutral-800">{item.company}</p>
-                          <p className="text-xs text-neutral-500">
-                            {[item.city, item.start_date && item.end_date
-                              ? `${item.start_date} – ${item.end_date}`
-                              : item.start_date ?? item.end_date
-                            ].filter(Boolean).join(" · ")}
-                          </p>
-                        </div>
-                      </div>
-                      {item.comments && (
-                        <p className="mt-1 text-xs leading-relaxed text-neutral-600 text-justify">{item.comments}</p>
-                      )}
-                    </div>
-                  ))}
-                </Section>
-              </Block>
-            )}
-            {(data.education.length > 0 || e) && (
-              <Block>
-                <Section title="Education" accent={accent} bold>
-                  {data.education.map((item) => (
-                    <div key={item.line_num} className="mb-2">
-                      <p className="text-sm font-semibold text-neutral-800">{item.edu_center}</p>
-                      <p className="text-xs text-neutral-500">
-                        {[item.city, item.start_date && item.end_date
-                          ? `${item.start_date} – ${item.end_date}`
-                          : item.start_date ?? item.end_date
-                        ].filter(Boolean).join(" · ")}
-                      </p>
-                      {item.comments && <p className="text-xs text-neutral-600">{item.comments}</p>}
-                    </div>
-                  ))}
-                </Section>
-              </Block>
-            )}
-            {(data.contact.length > 0 || e) && (
-              <Block>
-                <Section title="Contact" accent={accent} bold>
-                  {data.contact.map((item) => (
-                    <p key={item.line_num} className="text-xs leading-relaxed text-neutral-600">{item.detail}</p>
-                  ))}
-                </Section>
-              </Block>
-            )}
-            {(data.skills.length > 0 || e) && (
-              <Block>
-                <Section title="Skills" accent={accent} bold>
-                  <ul className="flex flex-col gap-1">
-                    {data.skills.map((item) => (
-                      <li key={item.line_num} className="text-xs text-neutral-700">{item.skill}</li>
-                    ))}
-                  </ul>
-                </Section>
-              </Block>
-            )}
-            {(data.languages.length > 0 || e) && (
-              <Block>
-                <Section title="Languages" accent={accent} bold>
-                  {data.languages.map((item) => (
-                    <div key={item.line_num} className="flex justify-between text-xs">
-                      <span className="text-neutral-800">{item.language}</span>
-                      {item.level && <span className="text-neutral-400">{item.level}</span>}
-                    </div>
-                  ))}
-                </Section>
-              </Block>
-            )}
-            {data.certifications && (
-              <Block>
-                <Section title="Certifications" accent={accent} bold>
-                  <Editable
-                    value={data.certifications}
-                    field="certifications"
-                    editable={e}
-                    onChange={onChange}
-                    className="text-[12px] leading-relaxed"
-                  />
-                </Section>
-              </Block>
-            )}
-            {xs.map((x) => (
-              <Block key={x.key}>
-                <Section title={x.title} accent={accent} bold>
-                  {x.node}
-                </Section>
-              </Block>
-            ))}
-          </BalancedColumns>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Soft({
-  data,
-  editable,
-  onChange,
-}: Required<Pick<Props, "data">> & Props) {
-  const e = !!editable;
-  const xs = extras(data, e, onChange);
-  return (
-    <div
-      className="cv-page"
-      style={{
-        background: "#fff",
-        color: "#1a1a1a",
-        fontFamily: "'DM Sans', system-ui, sans-serif",
-      }}
-    >
-      <div className="relative p-10">
-        <div
-          className="absolute left-0 top-0 h-56 w-56 rounded-br-full -z-0"
-          style={{ background: "#F5DDE6" }}
-        />
-        <div className="relative grid grid-cols-[160px_1fr] items-center gap-8">
-          <div>
-            {(/\S/.test(data.name ?? "") || e) && (
-              <Editable
-                as="h1"
-                value={data.name}
-                field="name"
-                editable={e}
-                onChange={onChange}
-                multiline={false}
-                className="text-4xl font-light tracking-wide"
-              />
-            )}
-            {(/\S/.test(data.title ?? "") || e) && (
-              <div className="mt-3 inline-block rounded-full border border-neutral-800 px-4 py-1">
-                <Editable
-                  as="span"
-                  value={data.title}
-                  field="title"
-                  editable={e}
-                  onChange={onChange}
-                  multiline={false}
-                  className="text-xs font-bold uppercase tracking-wider"
-                />
-              </div>
-            )}
-            {(/\S/.test(data.summary ?? "") || e) && (
-              <Editable
-                value={data.summary}
-                field="summary"
-                editable={e}
-                onChange={onChange}
-                className="mt-4 text-[13px] leading-relaxed text-neutral-700 text-justify"
-              />
-            )}
-          </div>
-        </div>
-
-        <div className="mt-10">
-          <BalancedColumns gap="2rem">
-            {(data.experience.length > 0 || e) && (
-              <Block>
-                <PillSection title="Experience">
-                  {data.experience.map((item) => (
-                    <div key={item.line_num} className="mb-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <p className="text-sm font-semibold text-neutral-800">{item.company}</p>
-                          <p className="text-xs text-neutral-500">
-                            {[item.city, item.start_date && item.end_date
-                              ? `${item.start_date} – ${item.end_date}`
-                              : item.start_date ?? item.end_date
-                            ].filter(Boolean).join(" · ")}
-                          </p>
-                        </div>
-                      </div>
-                      {item.comments && (
-                        <p className="mt-1 text-xs leading-relaxed text-neutral-600 text-justify">{item.comments}</p>
-                      )}
-                    </div>
-                  ))}
-                </PillSection>
-              </Block>
-            )}
-            {(data.education.length > 0 || e) && (
-              <Block>
-                <PillSection title="Education">
-                  {data.education.map((item) => (
-                    <div key={item.line_num} className="mb-2">
-                      <p className="text-sm font-semibold text-neutral-800">{item.edu_center}</p>
-                      <p className="text-xs text-neutral-500">
-                        {[item.city, item.start_date && item.end_date
-                          ? `${item.start_date} – ${item.end_date}`
-                          : item.start_date ?? item.end_date
-                        ].filter(Boolean).join(" · ")}
-                      </p>
-                      {item.comments && <p className="text-xs text-neutral-600">{item.comments}</p>}
-                    </div>
-                  ))}
-                </PillSection>
-              </Block>
-            )}
-            {(data.contact.length > 0 || e) && (
-              <Block>
-                <PillSection title="Contact">
-                  {data.contact.map((item) => (
-                    <p key={item.line_num} className="text-xs leading-relaxed text-neutral-600">{item.detail}</p>
-                  ))}
-                </PillSection>
-              </Block>
-            )}
-            {(data.skills.length > 0 || e) && (
-              <Block>
-                <PillSection title="Skills">
-                  <ul className="flex flex-col gap-1">
-                    {data.skills.map((item) => (
-                      <li key={item.line_num} className="text-xs text-neutral-700">⬢ {item.skill}</li>
-                    ))}
-                  </ul>
-                </PillSection>
-              </Block>
-            )}
-            {(data.languages.length > 0 || e) && (
-              <Block>
-                <PillSection title="Languages">
-                  {data.languages.map((item) => (
-                    <div key={item.line_num} className="flex justify-between text-xs">
-                      <span className="text-neutral-800">{item.language}</span>
-                      {item.level && <span className="text-neutral-400">{item.level}</span>}
-                    </div>
-                  ))}
-                </PillSection>
-              </Block>
-            )}
-            {data.certifications && (
-              <Block>
-                <PillSection title="Certifications">
-                  <Editable
-                    value={data.certifications}
-                    field="certifications"
-                    editable={e}
-                    onChange={onChange}
-                    className="text-[12px] leading-relaxed text-neutral-700"
-                  />
-                </PillSection>
-              </Block>
-            )}
-            {xs.map((x) => (
-              <Block key={x.key}>
-                <PillSection title={x.title}>{x.node}</PillSection>
-              </Block>
-            ))}
-          </BalancedColumns>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function SidebarLabel({ children, color }: { children: React.ReactNode; color: string }) {
   return (
     <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color }}>
@@ -719,7 +67,51 @@ function SidebarLabel({ children, color }: { children: React.ReactNode; color: s
   )
 }
 
-function Terracotta({ data, editable, onChange }: Props) {
+export function Section({
+  title,
+  accent,
+  children,
+  serif,
+  small,
+  bold,
+  mono,
+  thin,
+}: {
+  title: string;
+  accent: string;
+  children: React.ReactNode;
+  serif?: boolean;
+  small?: boolean;
+  bold?: boolean;
+  mono?: boolean;
+  thin?: boolean;
+}) {
+  const headingClass = mono
+    ? "text-[13px] font-bold uppercase tracking-wider"
+    : bold
+      ? "text-base font-bold uppercase tracking-wide"
+      : serif
+        ? "text-xl font-semibold"
+        : small
+          ? "text-[11px] font-semibold uppercase tracking-[0.22em]"
+          : thin
+            ? "text-base font-semibold"
+            : "text-sm font-semibold uppercase tracking-wide";
+  return (
+    <section>
+      <h2 className={headingClass} style={{ color: accent }}>
+        {title}
+      </h2>
+      <div
+        className="mt-1 mb-2 h-px w-full"
+        style={{ background: `${accent}33` }}
+      />
+      {children}
+    </section>
+  );
+}
+
+function Terracotta({ data, editable, onChange, template: _template }: Props) {
   const TERRACOTTA = "#CB6843"
   const TERRACOTTA_LIGHT = "#FDE8E8"
   const MUTED = "#9b8b86"
@@ -843,91 +235,10 @@ function Terracotta({ data, editable, onChange }: Props) {
   )
 }
 
-// --- shared section primitives --------------------------------------------
-
-export function Section({
-  title,
-  accent,
-  children,
-  serif,
-  small,
-  bold,
-  mono,
-  thin,
-}: {
-  title: string;
-  accent: string;
-  children: React.ReactNode;
-  serif?: boolean;
-  small?: boolean;
-  bold?: boolean;
-  mono?: boolean;
-  thin?: boolean;
-}) {
-  const headingClass = mono
-    ? "text-[13px] font-bold uppercase tracking-wider"
-    : bold
-      ? "text-base font-bold uppercase tracking-wide"
-      : serif
-        ? "text-xl font-semibold"
-        : small
-          ? "text-[11px] font-semibold uppercase tracking-[0.22em]"
-          : thin
-            ? "text-base font-semibold"
-            : "text-sm font-semibold uppercase tracking-wide";
-  return (
-    <section>
-      <h2 className={headingClass} style={{ color: accent }}>
-        {title}
-      </h2>
-      <div
-        className="mt-1 mb-2 h-px w-full"
-        style={{ background: `${accent}33` }}
-      />
-      {children}
-    </section>
-  );
-}
-
-function PillSection({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section>
-      <div className="inline-block rounded-full border border-neutral-800 px-4 py-1 mb-3">
-        <h2 className="text-[11px] font-bold uppercase tracking-wider">
-          {title}
-        </h2>
-      </div>
-      {children}
-    </section>
-  );
-}
-
-// --- entry -----------------------------------------------------------------
-
 export function CvDocument(props: Props) {
-  const { template } = props;
-  const inner =
-    template === "classic" ? (
-      <Classic {...props} />
-    ) : template === "editorialBig" ? (
-      <EditorialBig {...props} />
-    ) : template === "soft" ? (
-      <Soft {...props} />
-    ) : template === "terracotta" ? (
-      <Terracotta {...props} />
-    ) : (
-      <Editorial {...props} />
-    );
-
   return (
     <div className="mx-auto w-full max-w-[820px] overflow-hidden rounded-md shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)] ring-1 ring-black/5">
-      {inner}
+      <Terracotta {...props} />
       <style>{`
         .cv-editable[contenteditable="true"]:empty::before {
           content: attr(data-placeholder);
@@ -945,5 +256,3 @@ export function CvDocument(props: Props) {
     </div>
   );
 }
-
-export { Mail, MapPin, Phone, Globe };

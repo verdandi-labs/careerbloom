@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
-import { api, errorMessage } from "@/lib/api";
+import { api } from "@/lib/api";
 import { CvDocument, type EditableField } from "@/components/CvDocument";
 import {
   CV_TEMPLATES,
@@ -11,7 +11,7 @@ import {
   type StructuredCVData,
   DEFAULT_TEMPLATE,
 } from "@/lib/cv-templates";
-import { ArrowLeft, BookMarked, FileDown, Loader2, X } from "lucide-react";
+import { ArrowLeft, BookMarked, Loader2, X } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cv-preview")({
   head: () => ({ meta: [{ title: "Preview & Export · careerBloom" }] }),
@@ -158,15 +158,6 @@ function saveLocalEdits(data: CVData) {
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
 }
 
-async function downloadBlob(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
 function PreviewPage() {
   const navigate = useNavigate();
   const {
@@ -185,42 +176,11 @@ function PreviewPage() {
     useState<CVTemplateId>(DEFAULT_TEMPLATE);
   const [mergedData, setMergedData] = useState<CVData | null>(null);
   const [structuredData, setStructuredData] = useState<StructuredCVData | null>(null);
-  const [exporting, setExporting] = useState(false);
   const [actionErr, setActionErr] = useState("");
   const [versionsOpen, setVersionsOpen] = useState(false);
   const [versions, setVersions] = useState<{version_id: string; cv_name: string; created_at: string}[]>([]);
   const [versionsLoading, setVersionsLoading] = useState(false);
   const [deletingVersionId, setDeletingVersionId] = useState<string | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const cvRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
-  const [cvHeight, setCvHeight] = useState(1123);
-
-  const recalcScale = useCallback(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const parent = el.parentElement;
-    if (!parent) return;
-    const available = parent.clientWidth - 32;
-    setScale(Math.min(1, available / 794));
-  }, []);
-
-  useEffect(() => {
-    recalcScale();
-    const ro = new ResizeObserver(recalcScale);
-    if (containerRef.current?.parentElement) ro.observe(containerRef.current.parentElement);
-    return () => ro.disconnect();
-  }, [recalcScale]);
-
-  useEffect(() => {
-    const el = cvRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver(() => {
-      setCvHeight(el.scrollHeight);
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
 
   useEffect(() => {
     if (!cv) return;
@@ -249,30 +209,6 @@ function PreviewPage() {
     localStorage.removeItem("cv-preview-structured-edits");
     if (cv) {
       setMergedData(toDocxData(cv));
-    }
-  }
-
-  async function handleExport() {
-    if (!mergedData) return;
-    setExporting(true);
-    setActionErr("");
-    try {
-      const res = await fetch("/api/v1/cv/export/docx", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          data: mergedData,
-          template: selectedTemplate,
-          language: "en",
-        }),
-      });
-      if (!res.ok) throw new Error("Export failed");
-      await downloadBlob(await res.blob(), "careerbloom-cv.docx");
-    } catch (e) {
-      setActionErr(errorMessage(e, "CV export failed, please try again"));
-    } finally {
-      setExporting(false);
     }
   }
 
@@ -311,7 +247,7 @@ function PreviewPage() {
 
   return (
     <AppShell>
-      <header className="no-print bg-secondary/70 backdrop-blur-md rounded-[20px] px-7 py-7 shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)]">
+      <header className="bg-secondary/70 backdrop-blur-md rounded-[20px] px-7 py-7 shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)]">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button
@@ -338,21 +274,6 @@ function PreviewPage() {
                 </button>
               ))}
             </div>
-            <button
-              onClick={() => void handleExport()}
-              disabled={exporting || !mergedData}
-              className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-xs text-background disabled:opacity-50"
-            >
-              {exporting ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
-              Export DOCX
-            </button>
-            <button
-              onClick={() => window.print()}
-              disabled={!structuredData}
-              className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-xs text-background disabled:opacity-50"
-            >
-              <FileDown className="h-3 w-3" /> Export PDF
-            </button>
             <button
               onClick={handleReset}
               className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs text-foreground hover:bg-white"
@@ -397,17 +318,15 @@ function PreviewPage() {
             </button>
           </div>
         ) : mergedData ? (
-          <div ref={containerRef} className="w-full overflow-hidden cv-print-target" style={{ height: scale * cvHeight }}>
-            <div ref={cvRef} style={{ transform: `scale(${scale})`, transformOrigin: "top left", width: 794 }}>
-              {structuredData && (
-                <CvDocument
-                  data={structuredData}
-                  template={selectedTemplate}
-                  editable={false}
-                  onChange={handleChange}
-                />
-              )}
-            </div>
+          <div className="w-full flex justify-center overflow-x-auto py-8">
+            {structuredData && (
+              <CvDocument
+                data={structuredData}
+                template={selectedTemplate}
+                editable={false}
+                onChange={handleChange}
+              />
+            )}
           </div>
         ) : null}
       </section>
@@ -415,7 +334,7 @@ function PreviewPage() {
       {versionsOpen && (
         <div className="fixed inset-0 z-50" onClick={() => setVersionsOpen(false)}>
           <div
-            className="no-print absolute right-0 top-0 h-full w-96 bg-pink-50/95 backdrop-blur-md shadow-2xl flex flex-col p-6 gap-4"
+            className="absolute right-0 top-0 h-full w-96 bg-pink-50/95 backdrop-blur-md shadow-2xl flex flex-col p-6 gap-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">

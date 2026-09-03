@@ -47,8 +47,7 @@ export type StructuredCVData = {
   other: string
 }
 
-export type CVTemplateId =
-  "editorial" | "classic" | "editorialBig" | "soft" | "terracotta";
+export type CVTemplateId = "terracotta"
 
 export type CVTemplateMeta = {
   id: CVTemplateId;
@@ -67,43 +66,6 @@ export type CVTemplateMeta = {
 
 export const CV_TEMPLATES: CVTemplateMeta[] = [
   {
-    id: "editorial",
-    name: "Editorial",
-    blurb: "Elegant serif with a quiet terracotta accent.",
-    accent: "#B96A4B",
-    bg: "#FFFFFF",
-    font: "serif",
-    layout: "split",
-  },
-  {
-    id: "classic",
-    name: "Classic",
-    blurb: "Centered letter-spaced name. Two-column sidebar.",
-    accent: "#5C5C5C",
-    bg: "#FFFFFF",
-    font: "sans",
-    layout: "sidebar",
-  },
-  {
-    id: "editorialBig",
-
-    name: "Statement",
-    blurb: "Huge display name on a beige backdrop.",
-    accent: "#3D3D3D",
-    bg: "#EFEAE3",
-    font: "display-serif",
-    layout: "editorial-banner",
-  },
-  {
-    id: "soft",
-    name: "Soft",
-    blurb: "Pink blossom blob, pill headers.",
-    accent: "#E8C5D0",
-    bg: "#FFFFFF",
-    font: "sans",
-    layout: "soft-hero",
-  },
-  {
     id: "terracotta",
     name: "Terracotta",
     blurb: "Warm sidebar, Playfair accents.",
@@ -114,7 +76,7 @@ export const CV_TEMPLATES: CVTemplateMeta[] = [
   },
 ];
 
-export const DEFAULT_TEMPLATE: CVTemplateId = "editorial";
+export const DEFAULT_TEMPLATE: CVTemplateId = "terracotta";
 
 export function getTemplate(id?: string | null): CVTemplateMeta {
   return CV_TEMPLATES.find((t) => t.id === id) ?? CV_TEMPLATES[0];
