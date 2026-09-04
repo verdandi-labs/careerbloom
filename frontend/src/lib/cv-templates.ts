@@ -115,6 +115,22 @@ export const CV_TEMPLATES: CVTemplateMeta[] = [
   },
 ];
 
+export type SectionOrderItem =
+  | { type: "section"; key: keyof StructuredCVData }
+  | { type: "page-break" }
+
+export const DEFAULT_SECTION_ORDER: SectionOrderItem[] = [
+  { type: "section", key: "experience" },
+  { type: "section", key: "education" },
+  { type: "section", key: "skills" },
+  { type: "section", key: "languages" },
+  { type: "section", key: "contact" },
+  { type: "section", key: "awards" },
+  { type: "section", key: "publications" },
+  { type: "section", key: "volunteer" },
+  { type: "section", key: "projects" },
+]
+
 export const DEFAULT_TEMPLATE: CVTemplateId = "terracotta";
 
 export function getTemplate(id?: string | null): CVTemplateMeta {

@@ -5,7 +5,7 @@ import {
   type CSSProperties,
 } from "react";
 import { Pencil } from "lucide-react";
-import type { CVTemplateId, StructuredCVData } from "@/lib/cv-templates";
+import type { CVTemplateId, StructuredCVData, SectionOrderItem } from "@/lib/cv-templates";
 import { CVTextSection } from "./cv-render-helpers";
 
 export type EditableField = "name" | "title" | "summary" | "certifications" | "references" | "other"
@@ -17,6 +17,7 @@ type Props = {
   onChange?: (field: EditableField, value: string) => void
   onEditItem?: (field: keyof StructuredCVData, index: number, updatedItem: unknown) => void
   onEditPlain?: (field: EditableField, value: string) => void
+  sectionOrder?: SectionOrderItem[]
 }
 
 export function Editable({
