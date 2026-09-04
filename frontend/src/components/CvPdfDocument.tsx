@@ -1,4 +1,4 @@
-import { Document, Page, View, Text, StyleSheet } from "@react-pdf/renderer"
+import { Document, Page, View, Text, StyleSheet, Image } from "@react-pdf/renderer"
 import type { CVTemplateId, StructuredCVData } from "@/lib/cv-templates"
 
 const TERRACOTTA = "#CB6843"
@@ -8,6 +8,15 @@ const SAGE_LIGHT = "#EAF0EC"
 const SAGE_MID = "#C5D8CB"
 const MUTED = "#9b8b86"
 const INK = "#1c1410"
+const CLASSIC_INK = "#111"
+const CLASSIC_MUTED = "#666"
+const CLASSIC_RULE = "#d0c8c4"
+const BOLD_INK = "#111"
+const BOLD_MUTED = "#555"
+const BOLD_BG = "#E8E5DC"
+const MINIMAL_INK = "#111"
+const MINIMAL_MUTED = "#666"
+const MINIMAL_LIGHT = "#f5f5f5"
 
 const terracottaStyles = StyleSheet.create({
   page: {
@@ -288,11 +297,373 @@ const sageStyles = StyleSheet.create({
   },
 })
 
+const classicStyles = StyleSheet.create({
+  page: {
+    fontFamily: "DM Sans",
+    backgroundColor: "#ffffff",
+    padding: 48,
+    flexDirection: "column",
+  },
+  name: {
+    fontFamily: "Playfair Display",
+    fontSize: 32,
+    fontWeight: 700,
+    color: CLASSIC_INK,
+    textAlign: "center",
+    marginBottom: 6,
+  },
+  contactLine: {
+    fontSize: 8,
+    color: CLASSIC_MUTED,
+    textAlign: "center",
+    letterSpacing: 2,
+    textTransform: "uppercase",
+    marginBottom: 16,
+  },
+  rule: {
+    height: 1,
+    backgroundColor: CLASSIC_RULE,
+    marginVertical: 16,
+  },
+  sectionLabel: {
+    fontFamily: "Playfair Display",
+    fontSize: 8,
+    textTransform: "uppercase",
+    letterSpacing: 2.5,
+    color: CLASSIC_INK,
+    fontWeight: 600,
+    marginBottom: 12,
+  },
+  summaryText: {
+    fontSize: 9,
+    lineHeight: 1.6,
+    color: CLASSIC_MUTED,
+  },
+  expRole: {
+    fontFamily: "Playfair Display",
+    fontSize: 10,
+    fontWeight: 700,
+    color: CLASSIC_INK,
+  },
+  expDate: {
+    fontSize: 8,
+    color: CLASSIC_MUTED,
+  },
+  expCompany: {
+    fontSize: 8,
+    fontStyle: "italic",
+    color: CLASSIC_MUTED,
+    marginBottom: 2,
+  },
+  expComment: {
+    fontSize: 8,
+    color: CLASSIC_MUTED,
+    lineHeight: 1.5,
+  },
+  bottomRow: {
+    flexDirection: "row",
+    gap: 32,
+  },
+  bottomCol: {
+    flex: 1,
+  },
+  skillText: {
+    fontSize: 9,
+    color: CLASSIC_MUTED,
+    lineHeight: 1.6,
+  },
+  languageRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 3,
+  },
+  languageName: {
+    fontSize: 9,
+    color: CLASSIC_INK,
+  },
+  languageLevel: {
+    fontSize: 9,
+    color: CLASSIC_MUTED,
+  },
+})
+
+const boldStyles = StyleSheet.create({
+  topBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: BOLD_INK,
+    borderBottomStyle: "solid",
+    fontSize: 7,
+    textTransform: "uppercase",
+    letterSpacing: 2,
+    color: BOLD_INK,
+  },
+  heroRow: {
+    flexDirection: "row",
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+    gap: 16,
+  },
+  heroLeft: {
+    flex: 1,
+  },
+  heroTitle: {
+    fontSize: 48,
+    fontWeight: 900,
+    textTransform: "uppercase",
+    color: BOLD_INK,
+    letterSpacing: -1,
+    marginBottom: 8,
+  },
+  heroSubtitle: {
+    fontSize: 9,
+    textTransform: "uppercase",
+    letterSpacing: 2,
+    color: BOLD_INK,
+    marginBottom: 4,
+  },
+  heroName: {
+    fontSize: 9,
+    textTransform: "uppercase",
+    letterSpacing: 2,
+    color: BOLD_INK,
+    marginBottom: 12,
+  },
+  heroSummary: {
+    fontSize: 9,
+    lineHeight: 1.6,
+    color: BOLD_MUTED,
+    maxWidth: 280,
+  },
+  heroPhoto: {
+    width: 140,
+    height: 180,
+    borderRadius: 3,
+    backgroundColor: "#C8C5BC",
+  },
+  fullRule: {
+    height: 1,
+    backgroundColor: BOLD_INK,
+    marginHorizontal: 24,
+  },
+  bodyRow: {
+    flexDirection: "row",
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 16,
+    gap: 24,
+  },
+  bodyCol: {
+    flex: 1,
+  },
+  sectionLabel: {
+    fontSize: 7,
+    textTransform: "uppercase",
+    letterSpacing: 2,
+    color: BOLD_INK,
+    fontWeight: 700,
+    marginBottom: 8,
+  },
+  expCompany: {
+    fontSize: 9,
+    fontWeight: 700,
+    textTransform: "uppercase",
+    color: BOLD_INK,
+  },
+  expDate: {
+    fontSize: 8,
+    color: BOLD_MUTED,
+  },
+  expCity: {
+    fontSize: 8,
+    fontStyle: "italic",
+    color: BOLD_MUTED,
+  },
+  expComment: {
+    fontSize: 8,
+    color: BOLD_MUTED,
+    marginTop: 2,
+  },
+  languageRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  languageName: {
+    fontSize: 8,
+    color: BOLD_INK,
+  },
+  skillPill: {
+    fontSize: 8,
+    fontWeight: 700,
+    textTransform: "uppercase",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+    marginRight: 4,
+    marginBottom: 4,
+  },
+  footerName: {
+    fontSize: 40,
+    fontWeight: 900,
+    textTransform: "uppercase",
+    textAlign: "center",
+    color: BOLD_INK,
+    borderTopWidth: 1,
+    borderTopColor: BOLD_INK,
+    borderTopStyle: "solid",
+    paddingVertical: 12,
+    marginHorizontal: 24,
+    letterSpacing: -1,
+  },
+})
+
+const minimalStyles = StyleSheet.create({
+  page: {
+    fontFamily: "DM Sans",
+    backgroundColor: "#ffffff",
+    flexDirection: "column",
+  },
+  topRow: {
+    flexDirection: "row",
+  },
+  photoCol: {
+    width: 180,
+    backgroundColor: "#C8C8C6",
+  },
+  photo: {
+    width: "100%",
+    height: 180,
+  },
+  infoCol: {
+    flex: 1,
+    padding: 28,
+  },
+  name: {
+    fontFamily: "Playfair Display",
+    fontSize: 24,
+    fontWeight: 700,
+    color: MINIMAL_INK,
+    marginBottom: 4,
+  },
+  title: {
+    fontSize: 9,
+    color: MINIMAL_MUTED,
+    marginBottom: 10,
+  },
+  shortRule: {
+    width: 24,
+    height: 2,
+    backgroundColor: MINIMAL_INK,
+    marginBottom: 12,
+  },
+  sectionLabel: {
+    fontSize: 7,
+    textTransform: "uppercase",
+    letterSpacing: 2,
+    color: MINIMAL_INK,
+    fontWeight: 700,
+    marginBottom: 6,
+  },
+  summaryText: {
+    fontSize: 9,
+    lineHeight: 1.6,
+    color: MINIMAL_MUTED,
+  },
+  fullRule: {
+    height: 1,
+    backgroundColor: "#e0e0e0",
+  },
+  bodyRow: {
+    flexDirection: "row",
+  },
+  sideCol: {
+    width: 180,
+    backgroundColor: MINIMAL_LIGHT,
+    borderRightWidth: 1,
+    borderRightColor: "#e0e0e0",
+    borderRightStyle: "solid",
+    padding: 28,
+    paddingTop: 20,
+    flexDirection: "column",
+    gap: 16,
+  },
+  mainCol: {
+    flex: 1,
+    padding: 28,
+    paddingTop: 20,
+    flexDirection: "column",
+    gap: 16,
+  },
+  contactItem: {
+    fontSize: 8,
+    color: MINIMAL_MUTED,
+    lineHeight: 1.5,
+    marginBottom: 2,
+  },
+  skillItem: {
+    fontSize: 8,
+    color: MINIMAL_MUTED,
+    lineHeight: 1.5,
+    marginBottom: 2,
+  },
+  languageItem: {
+    fontSize: 8,
+    color: MINIMAL_MUTED,
+    lineHeight: 1.5,
+    marginBottom: 2,
+  },
+  eduTitle: {
+    fontSize: 9,
+    fontWeight: 700,
+    textTransform: "uppercase",
+    color: MINIMAL_INK,
+    marginBottom: 1,
+  },
+  eduSub: {
+    fontSize: 8,
+    color: MINIMAL_MUTED,
+  },
+  expCompany: {
+    fontSize: 9,
+    fontWeight: 700,
+    textTransform: "uppercase",
+    color: MINIMAL_INK,
+  },
+  expDate: {
+    fontSize: 8,
+    color: MINIMAL_MUTED,
+  },
+  expCity: {
+    fontSize: 8,
+    color: MINIMAL_MUTED,
+  },
+  expComment: {
+    fontSize: 8,
+    color: MINIMAL_MUTED,
+    lineHeight: 1.5,
+    marginTop: 2,
+  },
+})
+
 function TerracottaPdfDocument({ data }: { data: StructuredCVData }) {
   return (
     <Document>
       <Page size="A4" style={terracottaStyles.page}>
         <View style={terracottaStyles.sidebar}>
+          <View style={{ width: "100%", height: 100, marginBottom: 12, backgroundColor: "#F5E6DF", borderRadius: 3 }}>
+            {data.photo ? (
+              <Image src={data.photo} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              <View style={{ width: "100%", height: "100%", alignItems: "center", justifyContent: "center" }}>
+                <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: "#CB6843", opacity: 0.3 }} />
+              </View>
+            )}
+          </View>
           {data.contact.length > 0 && (
             <View style={terracottaStyles.sectionBlock}>
               <Text style={terracottaStyles.sidebarLabel}>Contact</Text>
@@ -466,6 +837,15 @@ function SagePdfDocument({ data }: { data: StructuredCVData }) {
 
           {/* Right sidebar */}
           <View style={sageStyles.sideCol}>
+            <View style={{ width: "100%", height: 100, marginBottom: 12, backgroundColor: "#EAF0EC", borderRadius: 3 }}>
+              {data.photo ? (
+                <Image src={data.photo} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              ) : (
+                <View style={{ width: "100%", height: "100%", alignItems: "center", justifyContent: "center" }}>
+                  <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: "#7B9E87", opacity: 0.3 }} />
+                </View>
+              )}
+            </View>
             {data.skills.length > 0 && (
               <View style={sageStyles.sectionBlock}>
                 <Text style={sageStyles.sectionLabel}>Skills</Text>
@@ -495,6 +875,331 @@ function SagePdfDocument({ data }: { data: StructuredCVData }) {
   )
 }
 
+function ClassicPdfDocument({ data }: { data: StructuredCVData }) {
+  const contactText = data.contact.map((c) => c.detail).filter(Boolean).join(" · ")
+
+  return (
+    <Document>
+      <Page size="A4" style={classicStyles.page}>
+        <Text style={classicStyles.name}>{data.name}</Text>
+        <Text style={classicStyles.contactLine}>
+          {data.title ? `${data.title}${contactText ? " · " : ""}` : ""}{contactText}
+        </Text>
+
+        <View style={classicStyles.rule} />
+
+        {data.summary && (
+          <View style={{ marginBottom: 8 }}>
+            <Text style={classicStyles.sectionLabel}>Profile</Text>
+            <Text style={classicStyles.summaryText}>{data.summary}</Text>
+          </View>
+        )}
+
+        <View style={classicStyles.rule} />
+
+        {data.experience.length > 0 && (
+          <View style={{ marginBottom: 8 }}>
+            <Text style={classicStyles.sectionLabel}>Experience</Text>
+            {data.experience.map((item, i) => (
+              <View key={i} style={{ marginBottom: 8 }}>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 2 }}>
+                  <Text style={classicStyles.expRole}>{item.company}</Text>
+                  {(item.start_date || item.end_date) && (
+                    <Text style={classicStyles.expDate}>
+                      {item.start_date && item.end_date
+                        ? `${item.start_date} – ${item.end_date}`
+                        : item.start_date ?? item.end_date}
+                    </Text>
+                  )}
+                </View>
+                {item.city && <Text style={classicStyles.expCompany}>{item.city}</Text>}
+                {item.comments && (
+                  <Text style={classicStyles.expComment}>{item.comments}</Text>
+                )}
+              </View>
+            ))}
+          </View>
+        )}
+
+        <View style={classicStyles.rule} />
+
+        {data.education.length > 0 && (
+          <View style={{ marginBottom: 8 }}>
+            <Text style={classicStyles.sectionLabel}>Education</Text>
+            {data.education.map((item, i) => (
+              <View key={i} style={{ marginBottom: 6 }}>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 2 }}>
+                  <Text style={classicStyles.expRole}>{item.edu_center}</Text>
+                  {(item.start_date || item.end_date) && (
+                    <Text style={classicStyles.expDate}>
+                      {item.start_date && item.end_date
+                        ? `${item.start_date} – ${item.end_date}`
+                        : item.start_date ?? item.end_date}
+                    </Text>
+                  )}
+                </View>
+                {item.city && <Text style={classicStyles.expCompany}>{item.city}</Text>}
+              </View>
+            ))}
+          </View>
+        )}
+
+        <View style={classicStyles.rule} />
+
+        <View style={classicStyles.bottomRow}>
+          <View style={classicStyles.bottomCol}>
+            {data.skills.length > 0 && (
+              <View>
+                <Text style={classicStyles.sectionLabel}>Skills</Text>
+                <Text style={classicStyles.skillText}>
+                  {data.skills.map((item) => item.skill).filter(Boolean).join(", ")}
+                </Text>
+              </View>
+            )}
+          </View>
+          <View style={classicStyles.bottomCol}>
+            {data.languages.length > 0 && (
+              <View>
+                <Text style={classicStyles.sectionLabel}>Languages</Text>
+                {data.languages.map((item, i) => (
+                  <View key={i} style={classicStyles.languageRow}>
+                    <Text style={classicStyles.languageName}>{item.language}</Text>
+                    {item.level && <Text style={classicStyles.languageLevel}>{item.level}</Text>}
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+        </View>
+      </Page>
+    </Document>
+  )
+}
+
+function BoldPdfDocument({ data }: { data: StructuredCVData }) {
+  return (
+    <Document>
+      <Page size="A4" style={{ backgroundColor: BOLD_BG, fontFamily: "DM Sans" }}>
+        <View style={boldStyles.topBar}>
+          <Text>{data.name}</Text>
+          <Text>{data.contact[0]?.detail}</Text>
+          <Text>{data.contact[1]?.detail}</Text>
+        </View>
+
+        <View style={boldStyles.heroRow}>
+          <View style={boldStyles.heroLeft}>
+            <Text style={boldStyles.heroTitle}>RESUME</Text>
+            <Text style={boldStyles.heroSubtitle}>{data.title}</Text>
+            <Text style={boldStyles.heroName}>{data.name}</Text>
+            {data.summary && <Text style={boldStyles.heroSummary}>{data.summary}</Text>}
+          </View>
+          <View style={boldStyles.heroPhoto}>
+            {data.photo ? (
+              <Image src={data.photo} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              <View style={{ width: "100%", height: "100%", alignItems: "center", justifyContent: "center" }}>
+                <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: BOLD_INK, opacity: 0.15 }} />
+              </View>
+            )}
+          </View>
+        </View>
+
+        <View style={boldStyles.fullRule} />
+
+        <View style={boldStyles.bodyRow}>
+          <View style={boldStyles.bodyCol}>
+            {data.experience.length > 0 && (
+              <View style={{ marginBottom: 16 }}>
+                {data.experience.map((item, i) => (
+                  <View key={i} style={{ marginBottom: 10 }}>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                      <Text style={boldStyles.expCompany}>{item.company}</Text>
+                      {(item.start_date || item.end_date) && (
+                        <Text style={boldStyles.expDate}>
+                          {item.start_date && item.end_date ? `${item.start_date} – ${item.end_date}` : item.start_date ?? item.end_date}
+                        </Text>
+                      )}
+                    </View>
+                    {item.city && <Text style={boldStyles.expCity}>{item.city}</Text>}
+                    {item.comments && <Text style={boldStyles.expComment}>{item.comments}</Text>}
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {data.languages.length > 0 && (
+              <View>
+                <Text style={boldStyles.sectionLabel}>Languages</Text>
+                {data.languages.map((item, i) => (
+                  <View key={i} style={boldStyles.languageRow}>
+                    <Text style={boldStyles.languageName}>{item.language}{item.level ? ` — ${item.level}` : ""}</Text>
+                    <View style={{ flexDirection: "row", gap: 3 }}>
+                      {Array.from({ length: 5 }).map((_, di) => {
+                        const map: Record<string, number> = { native: 5, fluent: 4, advanced: 3, intermediate: 2, basic: 1 }
+                        const filled = map[(item.level ?? "").toLowerCase()] ?? 3
+                        return (
+                          <View key={di} style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: di < filled ? BOLD_INK : "transparent", borderWidth: 1, borderColor: BOLD_INK }} />
+                        )
+                      })}
+                    </View>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+
+          <View style={boldStyles.bodyCol}>
+            {data.education.length > 0 && (
+              <View style={{ marginBottom: 16 }}>
+                {data.education.map((item, i) => (
+                  <View key={i} style={{ marginBottom: 10 }}>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                      <Text style={boldStyles.expCompany}>{item.edu_center}</Text>
+                      {(item.start_date || item.end_date) && (
+                        <Text style={boldStyles.expDate}>
+                          {item.start_date && item.end_date ? `${item.start_date} – ${item.end_date}` : item.start_date ?? item.end_date}
+                        </Text>
+                      )}
+                    </View>
+                    {item.city && <Text style={boldStyles.expCity}>{item.city}</Text>}
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {data.skills.length > 0 && (
+              <View style={{ marginBottom: 16 }}>
+                <Text style={boldStyles.sectionLabel}>Skills</Text>
+                <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                  {data.skills.map((item, i) => (
+                    <Text key={i} style={[boldStyles.skillPill, i < Math.ceil(data.skills.length / 2)
+                      ? { backgroundColor: BOLD_INK, color: BOLD_BG }
+                      : { backgroundColor: "transparent", color: BOLD_INK, borderWidth: 1, borderColor: BOLD_INK }
+                    ]}>{item.skill}</Text>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {data.references.length > 0 && (
+              <View>
+                <Text style={boldStyles.sectionLabel}>References</Text>
+                <Text style={{ fontSize: 8, color: BOLD_MUTED, lineHeight: 1.5 }}>{data.references}</Text>
+              </View>
+            )}
+          </View>
+        </View>
+
+        <Text style={boldStyles.footerName}>{data.name}</Text>
+      </Page>
+    </Document>
+  )
+}
+
+function MinimalPdfDocument({ data }: { data: StructuredCVData }) {
+  return (
+    <Document>
+      <Page size="A4" style={minimalStyles.page}>
+        <View style={minimalStyles.topRow}>
+          <View style={minimalStyles.photoCol}>
+            {data.photo ? (
+              <Image src={data.photo} style={minimalStyles.photo} />
+            ) : (
+              <View style={{ width: "100%", height: 180, alignItems: "center", justifyContent: "center" }}>
+                <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: MINIMAL_INK, opacity: 0.15 }} />
+              </View>
+            )}
+          </View>
+          <View style={minimalStyles.infoCol}>
+            <Text style={minimalStyles.name}>{data.name}</Text>
+            {data.title && <Text style={minimalStyles.title}>{data.title}</Text>}
+            <View style={minimalStyles.shortRule} />
+            <Text style={minimalStyles.sectionLabel}>Summary</Text>
+            {data.summary && <Text style={minimalStyles.summaryText}>{data.summary}</Text>}
+          </View>
+        </View>
+
+        <View style={minimalStyles.fullRule} />
+
+        <View style={minimalStyles.bodyRow}>
+          <View style={minimalStyles.sideCol}>
+            {data.contact.length > 0 && (
+              <View>
+                <Text style={minimalStyles.sectionLabel}>Contact</Text>
+                {data.contact.map((item, i) => (
+                  <Text key={i} style={minimalStyles.contactItem}>• {item.detail}</Text>
+                ))}
+              </View>
+            )}
+
+            {data.skills.length > 0 && (
+              <View>
+                <Text style={minimalStyles.sectionLabel}>Skills</Text>
+                {data.skills.map((item, i) => (
+                  <Text key={i} style={minimalStyles.skillItem}>• {item.skill}</Text>
+                ))}
+              </View>
+            )}
+
+            {data.education.length > 0 && (
+              <View>
+                <Text style={minimalStyles.sectionLabel}>Education</Text>
+                {data.education.map((item, i) => (
+                  <View key={i} style={{ marginBottom: 6 }}>
+                    <Text style={minimalStyles.eduTitle}>{item.edu_center}</Text>
+                    <Text style={minimalStyles.eduSub}>
+                      {[item.start_date ?? item.end_date].filter(Boolean).join(" – ")}
+                    </Text>
+                    {item.comments && <Text style={minimalStyles.eduSub}>{item.comments}</Text>}
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {data.languages.length > 0 && (
+              <View>
+                <Text style={minimalStyles.sectionLabel}>Languages</Text>
+                {data.languages.map((item, i) => (
+                  <Text key={i} style={minimalStyles.languageItem}>• {item.language}{item.level ? ` — ${item.level}` : ""}</Text>
+                ))}
+              </View>
+            )}
+          </View>
+
+          <View style={minimalStyles.mainCol}>
+            {data.experience.length > 0 && (
+              <View>
+                <Text style={minimalStyles.sectionLabel}>Experience</Text>
+                {data.experience.map((item, i) => (
+                  <View key={i} style={{ marginBottom: 10 }}>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                      <Text style={minimalStyles.expCompany}>{item.company}</Text>
+                      {(item.start_date || item.end_date) && (
+                        <Text style={minimalStyles.expDate}>
+                          {item.start_date && item.end_date ? `${item.start_date} – ${item.end_date}` : item.start_date ?? item.end_date}
+                        </Text>
+                      )}
+                    </View>
+                    {item.city && <Text style={minimalStyles.expCity}>{item.city}</Text>}
+                    {item.comments && <Text style={minimalStyles.expComment}>{item.comments}</Text>}
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {data.references.length > 0 && (
+              <View>
+                <Text style={minimalStyles.sectionLabel}>References</Text>
+                <Text style={{ fontSize: 8, color: MINIMAL_MUTED, lineHeight: 1.5 }}>{data.references}</Text>
+              </View>
+            )}
+          </View>
+        </View>
+      </Page>
+    </Document>
+  )
+}
+
 export function CvPdfDocument({
   data,
   template,
@@ -503,5 +1208,8 @@ export function CvPdfDocument({
   template: CVTemplateId
 }) {
   if (template === "sage") return <SagePdfDocument data={data} />
+  if (template === "classic") return <ClassicPdfDocument data={data} />
+  if (template === "bold") return <BoldPdfDocument data={data} />
+  if (template === "minimal") return <MinimalPdfDocument data={data} />
   return <TerracottaPdfDocument data={data} />
 }

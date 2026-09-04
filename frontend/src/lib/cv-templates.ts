@@ -45,9 +45,10 @@ export type StructuredCVData = {
   certifications: string
   references: string
   other: string
+  photo?: string
 }
 
-export type CVTemplateId = "terracotta" | "sage"
+export type CVTemplateId = "terracotta" | "sage" | "classic" | "bold" | "minimal"
 
 export type CVTemplateMeta = {
   id: CVTemplateId;
@@ -61,7 +62,9 @@ export type CVTemplateMeta = {
     | "split"
     | "banner"
     | "editorial-banner"
-    | "soft-hero";
+    | "soft-hero"
+    | "single"
+    | "editorial";
 };
 
 export const CV_TEMPLATES: CVTemplateMeta[] = [
@@ -82,6 +85,33 @@ export const CV_TEMPLATES: CVTemplateMeta[] = [
     bg: "#FFFFFF",
     font: "sans",
     layout: "split",
+  },
+  {
+    id: "classic",
+    name: "Classic",
+    blurb: "Centered header, clean rules, timeless.",
+    accent: "#111111",
+    bg: "#FFFFFF",
+    font: "sans",
+    layout: "single",
+  },
+  {
+    id: "bold",
+    name: "Bold",
+    blurb: "Editorial layout, strong typography.",
+    accent: "#111111",
+    bg: "#E8E5DC",
+    font: "sans",
+    layout: "editorial",
+  },
+  {
+    id: "minimal",
+    name: "Minimal",
+    blurb: "Clean sidebar, photo, structured.",
+    accent: "#111111",
+    bg: "#FFFFFF",
+    font: "sans",
+    layout: "sidebar",
   },
 ];
 
