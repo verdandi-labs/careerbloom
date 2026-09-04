@@ -4,6 +4,7 @@ import {
   createElement,
   type CSSProperties,
 } from "react";
+import { Pencil } from "lucide-react";
 import type { CVTemplateId, StructuredCVData } from "@/lib/cv-templates";
 import { CVTextSection } from "./cv-render-helpers";
 
@@ -15,6 +16,7 @@ type Props = {
   editable?: boolean
   onChange?: (field: EditableField, value: string) => void
   onEditItem?: (field: keyof StructuredCVData, index: number, updatedItem: unknown) => void
+  onEditPlain?: (field: EditableField, value: string) => void
 }
 
 export function Editable({
@@ -111,7 +113,7 @@ export function Section({
   );
 }
 
-function Terracotta({ data, editable, onChange, template: _template }: Props) {
+function Terracotta({ data, editable, onChange, onEditItem, onEditPlain, template: _template }: Props) {
   const TERRACOTTA = "#CB6843"
   const TERRACOTTA_LIGHT = "#FDE8E8"
   const MUTED = "#9b8b86"
@@ -151,8 +153,8 @@ function Terracotta({ data, editable, onChange, template: _template }: Props) {
           {data.contact.length > 0 && (
             <div>
               <SidebarLabel color={TERRACOTTA}>Contact</SidebarLabel>
-              {data.contact.map((item) => (
-                <p key={item.line_num} className="text-xs leading-relaxed" style={{ color: MUTED }}>{item.detail}</p>
+              {data.contact.map((item, i) => (
+                <p key={item.line_num} onClick={() => onEditItem?.("contact", i, item)} className="text-xs leading-relaxed cursor-pointer hover:bg-black/5 rounded transition" style={{ color: MUTED }}>{item.detail}</p>
               ))}
             </div>
           )}
@@ -162,8 +164,8 @@ function Terracotta({ data, editable, onChange, template: _template }: Props) {
             <div>
               <SidebarLabel color={TERRACOTTA}>Skills</SidebarLabel>
               <div className="flex flex-wrap gap-1.5">
-                {data.skills.map((item) => (
-                  <span key={item.line_num} className="text-[10px] px-2 py-1 rounded-md" style={{ backgroundColor: TERRACOTTA_LIGHT, color: TERRACOTTA }}>
+                {data.skills.map((item, i) => (
+                  <span key={item.line_num} onClick={() => onEditItem?.("skills", i, item)} className="text-[10px] px-2 py-1 rounded-md cursor-pointer hover:bg-black/5 transition" style={{ backgroundColor: TERRACOTTA_LIGHT, color: TERRACOTTA }}>
                     {item.skill}
                   </span>
                 ))}
@@ -175,8 +177,8 @@ function Terracotta({ data, editable, onChange, template: _template }: Props) {
           {data.languages.length > 0 && (
             <div>
               <SidebarLabel color={TERRACOTTA}>Languages</SidebarLabel>
-              {data.languages.map((item) => (
-                <div key={item.line_num} className="flex justify-between">
+              {data.languages.map((item, i) => (
+                <div key={item.line_num} onClick={() => onEditItem?.("languages", i, item)} className="flex justify-between cursor-pointer hover:bg-black/5 rounded transition">
                   <span className="text-xs" style={{ color: INK }}>{item.language}</span>
                   {item.level && <span className="text-xs" style={{ color: MUTED }}>{item.level}</span>}
                 </div>
@@ -188,8 +190,8 @@ function Terracotta({ data, editable, onChange, template: _template }: Props) {
           {data.education.length > 0 && (
             <div>
               <SidebarLabel color={TERRACOTTA}>Education</SidebarLabel>
-              {data.education.map((item) => (
-                <div key={item.line_num} className="mb-2">
+              {data.education.map((item, i) => (
+                <div key={item.line_num} onClick={() => onEditItem?.("education", i, item)} className="mb-2 cursor-pointer hover:bg-black/5 rounded transition">
                   <p className="text-xs font-medium" style={{ color: INK }}>{item.edu_center}</p>
                   <p className="text-[10px]" style={{ color: MUTED }}>
                     {[item.city, item.end_date ?? item.start_date].filter(Boolean).join(" · ")}
@@ -205,7 +207,7 @@ function Terracotta({ data, editable, onChange, template: _template }: Props) {
         <div className="p-7 flex flex-col gap-5">
           {/* Name */}
           {(/\S/.test(data.name ?? "") || e) && (
-            <div>
+            <div className="relative group">
               <h1 style={{ fontFamily: "Playfair Display, serif", color: INK }} className="text-4xl font-bold leading-tight">
                 <Editable value={data.name} field="name" editable={e} onChange={onChange} as="span" multiline={false} />
               </h1>
@@ -219,6 +221,14 @@ function Terracotta({ data, editable, onChange, template: _template }: Props) {
                   <Editable value={data.summary} field="summary" editable={e} onChange={onChange} className="text-xs leading-relaxed" />
                 </p>
               )}
+              {!e && onEditPlain && (
+                <button
+                  className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition"
+                  onClick={() => onEditPlain("name", data.name)}
+                >
+                  <Pencil className="h-3 w-3 text-foreground/40" />
+                </button>
+              )}
             </div>
           )}
 
@@ -230,8 +240,8 @@ function Terracotta({ data, editable, onChange, template: _template }: Props) {
             <div>
               <SidebarLabel color={TERRACOTTA}>Experience</SidebarLabel>
               <div className="flex flex-col gap-5">
-                {data.experience.map((item) => (
-                  <div key={item.line_num}>
+            {data.experience.map((item, i) => (
+              <div key={item.line_num} onClick={() => onEditItem?.("experience", i, item)} className="cursor-pointer hover:bg-black/5 rounded transition">
                     <div className="flex items-start justify-between gap-3 mb-1">
                       <div>
                         <p style={{ fontFamily: "Playfair Display, serif", color: INK }} className="text-sm font-semibold">
@@ -259,7 +269,7 @@ function Terracotta({ data, editable, onChange, template: _template }: Props) {
   )
 }
 
-function Sage({ data, editable, onChange, template: _template }: Props) {
+function Sage({ data, editable, onChange, onEditItem, onEditPlain, template: _template }: Props) {
   const SAGE = "#7B9E87"
   const SAGE_LIGHT = "#EAF0EC"
   const SAGE_MID = "#C5D8CB"
@@ -284,7 +294,7 @@ function Sage({ data, editable, onChange, template: _template }: Props) {
   return (
     <div className="cv-page" style={{ fontFamily: "DM Sans, sans-serif", backgroundColor: "#ffffff" }}>
       {/* Header block */}
-      <div className="px-8 pt-8 pb-5" style={{ borderBottom: `1px solid ${SAGE_LIGHT}` }}>
+      <div className="relative group px-8 pt-8 pb-5" style={{ borderBottom: `1px solid ${SAGE_LIGHT}` }}>
         <p className="text-[9px] uppercase tracking-[0.2em] font-semibold mb-2" style={{ color: SAGE }}>Curriculum Vitae</p>
         {(/\S/.test(data.name ?? "") || e) && (
           <h1 style={{ fontFamily: "Playfair Display, serif", color: INK }} className="text-5xl font-bold leading-tight mb-2">
@@ -307,6 +317,14 @@ function Sage({ data, editable, onChange, template: _template }: Props) {
             <Editable value={data.summary} field="summary" editable={e} onChange={onChange} className="text-xs leading-relaxed" style={{ color: "#4a4a4a" }} />
           </div>
         )}
+        {!e && onEditPlain && (
+          <button
+            className="absolute top-8 right-8 opacity-0 group-hover:opacity-100 transition"
+            onClick={() => onEditPlain("name", data.name)}
+          >
+            <Pencil className="h-3 w-3 text-foreground/40" />
+          </button>
+        )}
       </div>
 
       {/* Body: two columns */}
@@ -317,8 +335,8 @@ function Sage({ data, editable, onChange, template: _template }: Props) {
           {data.experience.length > 0 && (
             <SageSection label="Experience">
               <div className="flex flex-col gap-4">
-                {data.experience.map((item) => (
-                  <div key={item.line_num}>
+                {data.experience.map((item, i) => (
+                  <div key={item.line_num} onClick={() => onEditItem?.("experience", i, item)} className="cursor-pointer hover:bg-black/5 rounded transition">
                     <div className="flex items-start justify-between gap-3 mb-1">
                       <div>
                         <p style={{ fontFamily: "Playfair Display, serif", color: INK }} className="text-sm font-semibold">
@@ -352,8 +370,8 @@ function Sage({ data, editable, onChange, template: _template }: Props) {
           {data.education.length > 0 && (
             <SageSection label="Education">
               <div className="flex flex-col gap-4">
-                {data.education.map((item) => (
-                  <div key={item.line_num}>
+                {data.education.map((item, i) => (
+                  <div key={item.line_num} onClick={() => onEditItem?.("education", i, item)} className="cursor-pointer hover:bg-black/5 rounded transition">
                     <div className="flex items-start justify-between gap-3 mb-1">
                       <div>
                         <p style={{ fontFamily: "Playfair Display, serif", color: INK }} className="text-sm font-semibold">
@@ -405,8 +423,8 @@ function Sage({ data, editable, onChange, template: _template }: Props) {
           {data.skills.length > 0 && (
             <SageSection label="Skills">
               <div className="flex flex-col gap-1.5">
-                {data.skills.map((item) => (
-                  <p key={item.line_num} className="text-xs" style={{ color: INK }}>{item.skill}</p>
+                {data.skills.map((item, i) => (
+                  <p key={item.line_num} onClick={() => onEditItem?.("skills", i, item)} className="text-xs cursor-pointer hover:bg-black/5 rounded transition" style={{ color: INK }}>{item.skill}</p>
                 ))}
               </div>
             </SageSection>
@@ -416,8 +434,8 @@ function Sage({ data, editable, onChange, template: _template }: Props) {
           {data.languages.length > 0 && (
             <SageSection label="Languages">
               <div className="flex flex-col gap-1.5">
-                {data.languages.map((item) => (
-                  <div key={item.line_num} className="flex justify-between">
+                {data.languages.map((item, i) => (
+                  <div key={item.line_num} onClick={() => onEditItem?.("languages", i, item)} className="flex justify-between cursor-pointer hover:bg-black/5 rounded transition">
                     <span className="text-xs" style={{ color: INK }}>{item.language}</span>
                     {item.level && <span className="text-xs" style={{ color: MUTED }}>{item.level}</span>}
                   </div>
@@ -431,7 +449,7 @@ function Sage({ data, editable, onChange, template: _template }: Props) {
   )
 }
 
-function Classic({ data, editable, onChange, template: _template }: Props) {
+function Classic({ data, editable, onChange, onEditItem, template: _template }: Props) {
   const INK = "#111"
   const MUTED = "#666"
   const RULE = "#d0c8c4"
@@ -484,8 +502,8 @@ function Classic({ data, editable, onChange, template: _template }: Props) {
         <div className="mb-5">
           <SectionHeading>Experience</SectionHeading>
           <div className="flex flex-col gap-4">
-            {data.experience.map((item) => (
-              <div key={item.line_num}>
+                {data.experience.map((item, i) => (
+                  <div key={item.line_num} onClick={() => onEditItem?.("experience", i, item)} className="cursor-pointer hover:bg-black/5 rounded transition">
                 <div className="flex items-start justify-between gap-3 mb-1">
                   <p style={{ fontFamily: "Playfair Display, serif", color: INK }} className="text-sm font-semibold">
                     {item.company}
@@ -519,8 +537,8 @@ function Classic({ data, editable, onChange, template: _template }: Props) {
         <div className="mb-5">
           <SectionHeading>Education</SectionHeading>
           <div className="flex flex-col gap-4">
-            {data.education.map((item) => (
-              <div key={item.line_num}>
+            {data.education.map((item, i) => (
+              <div key={item.line_num} onClick={() => onEditItem?.("education", i, item)} className="cursor-pointer hover:bg-black/5 rounded transition">
                 <div className="flex items-start justify-between gap-3 mb-1">
                   <p style={{ fontFamily: "Playfair Display, serif", color: INK }} className="text-sm font-semibold">
                     {item.edu_center}
@@ -556,8 +574,8 @@ function Classic({ data, editable, onChange, template: _template }: Props) {
             <div>
               <SectionHeading>Languages</SectionHeading>
               <div className="flex flex-col gap-1.5">
-                {data.languages.map((item) => (
-                  <div key={item.line_num} className="flex justify-between">
+                {data.languages.map((item, i) => (
+                  <div key={item.line_num} onClick={() => onEditItem?.("languages", i, item)} className="flex justify-between cursor-pointer hover:bg-black/5 rounded transition">
                     <span className="text-xs" style={{ color: INK }}>{item.language}</span>
                     {item.level && <span className="text-xs" style={{ color: MUTED }}>{item.level}</span>}
                   </div>
@@ -571,7 +589,7 @@ function Classic({ data, editable, onChange, template: _template }: Props) {
   )
 }
 
-function Bold({ data, editable, onChange, template: _template }: Props) {
+function Bold({ data, editable, onChange, onEditItem, template: _template }: Props) {
   const INK = "#111"
   const MUTED = "#555"
   const BG = "#E8E5DC"
@@ -649,8 +667,8 @@ function Bold({ data, editable, onChange, template: _template }: Props) {
         <div>
           {data.experience.length > 0 && (
             <div className="mb-5">
-              {data.experience.map((item) => (
-                <div key={item.line_num} className="mb-4">
+              {data.experience.map((item, i) => (
+                <div key={item.line_num} onClick={() => onEditItem?.("experience", i, item)} className="mb-4 cursor-pointer hover:bg-black/5 rounded transition">
                   <div className="flex justify-between items-start">
                     <p className="text-[11px] font-bold uppercase" style={{ color: INK }}>{item.company}</p>
                     {(item.start_date || item.end_date) && (
@@ -669,8 +687,8 @@ function Bold({ data, editable, onChange, template: _template }: Props) {
           {data.languages.length > 0 && (
             <div>
               <p className="text-[9px] uppercase tracking-widest font-semibold mb-3" style={{ color: INK }}>Languages</p>
-              {data.languages.map((item) => (
-                <div key={item.line_num} className="flex items-center justify-between mb-2">
+              {data.languages.map((item, i) => (
+                <div key={item.line_num} onClick={() => onEditItem?.("languages", i, item)} className="flex items-center justify-between mb-2 cursor-pointer hover:bg-black/5 rounded transition">
                   <span className="text-[10px]" style={{ color: INK }}>{item.language}{item.level ? ` — ${item.level}` : ""}</span>
                   <DotRating level={item.level} />
                 </div>
@@ -682,8 +700,8 @@ function Bold({ data, editable, onChange, template: _template }: Props) {
         <div>
           {data.education.length > 0 && (
             <div className="mb-5">
-              {data.education.map((item) => (
-                <div key={item.line_num} className="mb-4">
+              {data.education.map((item, i) => (
+                <div key={item.line_num} onClick={() => onEditItem?.("education", i, item)} className="mb-4 cursor-pointer hover:bg-black/5 rounded transition">
                   <div className="flex justify-between items-start">
                     <p className="text-[11px] font-bold uppercase" style={{ color: INK }}>{item.edu_center}</p>
                     {(item.start_date || item.end_date) && (
@@ -703,7 +721,14 @@ function Bold({ data, editable, onChange, template: _template }: Props) {
               <p className="text-[9px] uppercase tracking-widest font-semibold mb-3" style={{ color: INK }}>Skills</p>
               <div className="flex flex-wrap">
                 {data.skills.map((item, i) => (
-                  <SkillPill key={item.line_num} label={item.skill ?? ""} filled={i < Math.ceil(data.skills.length / 2)} />
+                  <span key={item.line_num} onClick={() => onEditItem?.("skills", i, item)} className="inline-block text-[10px] font-semibold uppercase tracking-wide px-3 py-1.5 rounded-full mr-1.5 mb-1.5 cursor-pointer hover:bg-black/5 transition"
+                    style={i < Math.ceil(data.skills.length / 2)
+                      ? { backgroundColor: INK, color: BG }
+                      : { backgroundColor: "transparent", color: INK, border: `1.5px solid ${INK}` }
+                    }
+                  >
+                    {item.skill}
+                  </span>
                 ))}
               </div>
             </div>
@@ -727,7 +752,7 @@ function Bold({ data, editable, onChange, template: _template }: Props) {
   )
 }
 
-function Minimal({ data, editable, onChange, template: _template }: Props) {
+function Minimal({ data, editable, onChange, onEditItem, template: _template }: Props) {
   const INK = "#111"
   const MUTED = "#666"
   const LIGHT = "#f5f5f5"
@@ -771,8 +796,8 @@ function Minimal({ data, editable, onChange, template: _template }: Props) {
           {data.contact.length > 0 && (
             <div>
               <p className="text-[9px] uppercase tracking-widest font-semibold mb-2" style={{ color: INK }}>Contact</p>
-              {data.contact.map((item) => (
-                <p key={item.line_num} className="text-[10px] leading-relaxed flex items-start gap-2" style={{ color: MUTED }}>
+              {data.contact.map((item, i) => (
+                <p key={item.line_num} onClick={() => onEditItem?.("contact", i, item)} className="text-[10px] leading-relaxed flex items-start gap-2 cursor-pointer hover:bg-black/5 rounded transition" style={{ color: MUTED }}>
                   <span className="shrink-0">•</span>{item.detail}
                 </p>
               ))}
@@ -782,8 +807,8 @@ function Minimal({ data, editable, onChange, template: _template }: Props) {
           {data.skills.length > 0 && (
             <div>
               <p className="text-[9px] uppercase tracking-widest font-semibold mb-2" style={{ color: INK }}>Skills</p>
-              {data.skills.map((item) => (
-                <p key={item.line_num} className="text-[10px] leading-relaxed flex items-start gap-2" style={{ color: MUTED }}>
+              {data.skills.map((item, i) => (
+                <p key={item.line_num} onClick={() => onEditItem?.("skills", i, item)} className="text-[10px] leading-relaxed flex items-start gap-2 cursor-pointer hover:bg-black/5 rounded transition" style={{ color: MUTED }}>
                   <span className="shrink-0">•</span>{item.skill}
                 </p>
               ))}
@@ -793,8 +818,8 @@ function Minimal({ data, editable, onChange, template: _template }: Props) {
           {data.education.length > 0 && (
             <div>
               <p className="text-[9px] uppercase tracking-widest font-semibold mb-2" style={{ color: INK }}>Education</p>
-              {data.education.map((item) => (
-                <div key={item.line_num} className="mb-2">
+              {data.education.map((item, i) => (
+                <div key={item.line_num} onClick={() => onEditItem?.("education", i, item)} className="mb-2 cursor-pointer hover:bg-black/5 rounded transition">
                   <p className="text-[10px] font-bold uppercase" style={{ color: INK }}>{item.edu_center}</p>
                   <p className="text-[9px]" style={{ color: MUTED }}>
                     {[item.start_date ?? item.end_date].filter(Boolean).join(" – ")}
@@ -808,8 +833,8 @@ function Minimal({ data, editable, onChange, template: _template }: Props) {
           {data.languages.length > 0 && (
             <div>
               <p className="text-[9px] uppercase tracking-widest font-semibold mb-2" style={{ color: INK }}>Languages</p>
-              {data.languages.map((item) => (
-                <p key={item.line_num} className="text-[10px] leading-relaxed flex items-start gap-2" style={{ color: MUTED }}>
+              {data.languages.map((item, i) => (
+                <p key={item.line_num} onClick={() => onEditItem?.("languages", i, item)} className="text-[10px] leading-relaxed flex items-start gap-2 cursor-pointer hover:bg-black/5 rounded transition" style={{ color: MUTED }}>
                   <span className="shrink-0">•</span>{item.language}{item.level ? ` — ${item.level}` : ""}
                 </p>
               ))}
@@ -821,8 +846,8 @@ function Minimal({ data, editable, onChange, template: _template }: Props) {
           {data.experience.length > 0 && (
             <div>
               <p className="text-[9px] uppercase tracking-widest font-semibold mb-3" style={{ color: INK }}>Experience</p>
-              {data.experience.map((item) => (
-                <div key={item.line_num} className="mb-4">
+              {data.experience.map((item, i) => (
+                <div key={item.line_num} onClick={() => onEditItem?.("experience", i, item)} className="mb-4 cursor-pointer hover:bg-black/5 rounded transition">
                   <div className="flex justify-between items-start">
                     <p className="text-[11px] font-bold uppercase" style={{ color: INK }}>{item.company}</p>
                     {(item.start_date || item.end_date) && (
