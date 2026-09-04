@@ -342,7 +342,7 @@ async def update_version(
     )
 
 
-@router.delete("/versions/{version_id}", status_code=204)
+@router.delete("/versions/{version_id}")
 async def delete_version(
     version_id: str,
     user: User = Depends(get_current_user),
