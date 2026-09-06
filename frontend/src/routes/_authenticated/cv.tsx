@@ -229,14 +229,18 @@ function PreviewPage() {
   }
 
   function handleReset() {
-    localStorage.removeItem("cv-preview-local-edits");
-    localStorage.removeItem("cv-preview-structured-edits");
-    localStorage.removeItem("cv-preview-photo");
+    localStorage.removeItem("cv-preview-local-edits")
+    localStorage.removeItem("cv-preview-structured-edits")
+    localStorage.removeItem("cv-preview-photo")
+    localStorage.removeItem("cv-preview-section-order")
     if (cv) {
-      setMergedData(toDocxData(cv));
-      setStructuredData(toStructuredData(cv));
+      setMergedData(toDocxData(cv))
+      setStructuredData(toStructuredData(cv))
+      const balanced = autoBalance(toStructuredData(cv))
+      setSectionOrder(balanced)
+      localStorage.setItem("cv-preview-section-order", JSON.stringify(balanced))
     }
-    setPhoto(null);
+    setPhoto(null)
   }
 
   useEffect(() => {
@@ -344,11 +348,14 @@ function PreviewPage() {
 
   async function handleLoadVersion(version_id: string) {
     try {
-      const data = await api<CvData>(`/cv/versions/${version_id}`);
-      const base = toDocxData(data);
-      setMergedData(base);
-      saveLocalEdits(base);
-      setVersionsOpen(false);
+      const data = await api<CvData>(`/cv/versions/${version_id}`)
+      const structured = toStructuredData(data)
+      const flat = toDocxData(data)
+      setStructuredData(structured)
+      setMergedData(flat)
+      localStorage.setItem("cv-preview-structured-edits", JSON.stringify(structured))
+      saveLocalEdits(flat)
+      setVersionsOpen(false)
     } catch {
       // silent
     }
