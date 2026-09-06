@@ -1038,7 +1038,7 @@ function SagePdfDocument({
 
 function ClassicPdfDocument({
   data,
-  sectionOrder: _sectionOrder,
+  sectionOrder,
 }: {
   data: StructuredCVData;
   sectionOrder?: SectionOrderItem[];
@@ -1048,334 +1048,397 @@ function ClassicPdfDocument({
     .filter(Boolean)
     .join(" · ");
 
+  const allKeys = orderedSections(sectionOrder, [
+    "experience",
+    "education",
+    "skills",
+    "languages",
+  ]);
+  const groups = splitAtPageBreaks(sectionOrder, allKeys);
+
+  function renderSection(key: string) {
+    if (key === "experience" && data.experience.length > 0) {
+      return (
+        <View key="experience" style={{ marginBottom: 8 }}>
+          <Text style={classicStyles.sectionLabel}>Experience</Text>
+          {data.experience.map((item, i) => (
+            <View key={i} style={{ marginBottom: 8 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginBottom: 2,
+                }}
+              >
+                <Text style={classicStyles.expRole}>{item.company}</Text>
+                {(item.start_date || item.end_date) && (
+                  <Text style={classicStyles.expDate}>
+                    {item.start_date && item.end_date
+                      ? `${item.start_date} – ${item.end_date}`
+                      : (item.start_date ?? item.end_date)}
+                  </Text>
+                )}
+              </View>
+              {item.city && (
+                <Text style={classicStyles.expCompany}>{item.city}</Text>
+              )}
+              {item.comments && (
+                <Text style={classicStyles.expComment}>{item.comments}</Text>
+              )}
+            </View>
+          ))}
+        </View>
+      );
+    }
+    if (key === "education" && data.education.length > 0) {
+      return (
+        <View key="education" style={{ marginBottom: 8 }}>
+          <Text style={classicStyles.sectionLabel}>Education</Text>
+          {data.education.map((item, i) => (
+            <View key={i} style={{ marginBottom: 6 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginBottom: 2,
+                }}
+              >
+                <Text style={classicStyles.expRole}>{item.edu_center}</Text>
+                {(item.start_date || item.end_date) && (
+                  <Text style={classicStyles.expDate}>
+                    {item.start_date && item.end_date
+                      ? `${item.start_date} – ${item.end_date}`
+                      : (item.start_date ?? item.end_date)}
+                  </Text>
+                )}
+              </View>
+              {item.city && (
+                <Text style={classicStyles.expCompany}>{item.city}</Text>
+              )}
+            </View>
+          ))}
+        </View>
+      );
+    }
+    if (key === "skills" && data.skills.length > 0) {
+      return (
+        <View key="skills">
+          <Text style={classicStyles.sectionLabel}>Skills</Text>
+          <Text style={classicStyles.skillText}>
+            {data.skills
+              .map((item) => item.skill)
+              .filter(Boolean)
+              .join(", ")}
+          </Text>
+        </View>
+      );
+    }
+    if (key === "languages" && data.languages.length > 0) {
+      return (
+        <View key="languages">
+          <Text style={classicStyles.sectionLabel}>Languages</Text>
+          {data.languages.map((item, i) => (
+            <View key={i} style={classicStyles.languageRow}>
+              <Text style={classicStyles.languageName}>{item.language}</Text>
+              {item.level && (
+                <Text style={classicStyles.languageLevel}>{item.level}</Text>
+              )}
+            </View>
+          ))}
+        </View>
+      );
+    }
+    return null;
+  }
+
   return (
     <Document>
-      <Page size="A4" style={classicStyles.page}>
-        <Text style={classicStyles.name}>{data.name}</Text>
-        <Text style={classicStyles.contactLine}>
-          {data.title ? `${data.title}${contactText ? " · " : ""}` : ""}
-          {contactText}
-        </Text>
-
-        <View style={classicStyles.rule} />
-
-        {data.summary && (
-          <View style={{ marginBottom: 8 }}>
-            <Text style={classicStyles.sectionLabel}>Profile</Text>
-            <Text style={classicStyles.summaryText}>{data.summary}</Text>
-          </View>
-        )}
-
-        <View style={classicStyles.rule} />
-
-        {data.experience.length > 0 && (
-          <View style={{ marginBottom: 8 }}>
-            <Text style={classicStyles.sectionLabel}>Experience</Text>
-            {data.experience.map((item, i) => (
-              <View key={i} style={{ marginBottom: 8 }}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    marginBottom: 2,
-                  }}
-                >
-                  <Text style={classicStyles.expRole}>{item.company}</Text>
-                  {(item.start_date || item.end_date) && (
-                    <Text style={classicStyles.expDate}>
-                      {item.start_date && item.end_date
-                        ? `${item.start_date} – ${item.end_date}`
-                        : (item.start_date ?? item.end_date)}
-                    </Text>
-                  )}
+      {groups.map((group, gi) => (
+        <Page key={gi} size="A4" style={classicStyles.page}>
+          {gi === 0 && (
+            <>
+              <Text style={classicStyles.name}>{data.name}</Text>
+              <Text style={classicStyles.contactLine}>
+                {data.title ? `${data.title}${contactText ? " · " : ""}` : ""}
+                {contactText}
+              </Text>
+              <View style={classicStyles.rule} />
+              {data.summary && (
+                <View style={{ marginBottom: 8 }}>
+                  <Text style={classicStyles.sectionLabel}>Profile</Text>
+                  <Text style={classicStyles.summaryText}>{data.summary}</Text>
                 </View>
-                {item.city && (
-                  <Text style={classicStyles.expCompany}>{item.city}</Text>
-                )}
-                {item.comments && (
-                  <Text style={classicStyles.expComment}>{item.comments}</Text>
-                )}
-              </View>
-            ))}
-          </View>
-        )}
-
-        <View style={classicStyles.rule} />
-
-        {data.education.length > 0 && (
-          <View style={{ marginBottom: 8 }}>
-            <Text style={classicStyles.sectionLabel}>Education</Text>
-            {data.education.map((item, i) => (
-              <View key={i} style={{ marginBottom: 6 }}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    marginBottom: 2,
-                  }}
-                >
-                  <Text style={classicStyles.expRole}>{item.edu_center}</Text>
-                  {(item.start_date || item.end_date) && (
-                    <Text style={classicStyles.expDate}>
-                      {item.start_date && item.end_date
-                        ? `${item.start_date} – ${item.end_date}`
-                        : (item.start_date ?? item.end_date)}
-                    </Text>
-                  )}
-                </View>
-                {item.city && (
-                  <Text style={classicStyles.expCompany}>{item.city}</Text>
-                )}
-              </View>
-            ))}
-          </View>
-        )}
-
-        <View style={classicStyles.rule} />
-
-        <View style={classicStyles.bottomRow}>
-          <View style={classicStyles.bottomCol}>
-            {data.skills.length > 0 && (
-              <View>
-                <Text style={classicStyles.sectionLabel}>Skills</Text>
-                <Text style={classicStyles.skillText}>
-                  {data.skills
-                    .map((item) => item.skill)
-                    .filter(Boolean)
-                    .join(", ")}
-                </Text>
-              </View>
-            )}
-          </View>
-          <View style={classicStyles.bottomCol}>
-            {data.languages.length > 0 && (
-              <View>
-                <Text style={classicStyles.sectionLabel}>Languages</Text>
-                {data.languages.map((item, i) => (
-                  <View key={i} style={classicStyles.languageRow}>
-                    <Text style={classicStyles.languageName}>
-                      {item.language}
-                    </Text>
-                    {item.level && (
-                      <Text style={classicStyles.languageLevel}>
-                        {item.level}
-                      </Text>
-                    )}
-                  </View>
-                ))}
-              </View>
-            )}
-          </View>
-        </View>
-      </Page>
+              )}
+              <View style={classicStyles.rule} />
+            </>
+          )}
+          {gi > 0 && (
+            <View
+              style={{
+                marginTop: 24,
+                borderTopWidth: 1,
+                borderTopColor: "#e5e7eb",
+                borderTopStyle: "dashed",
+                paddingTop: 24,
+              }}
+            />
+          )}
+          {group.map((key) => (
+            <View key={key}>
+              {renderSection(key)}
+              <View style={classicStyles.rule} />
+            </View>
+          ))}
+        </Page>
+      ))}
     </Document>
   );
 }
 
 function BoldPdfDocument({
   data,
-  sectionOrder: _sectionOrder,
+  sectionOrder,
 }: {
   data: StructuredCVData;
   sectionOrder?: SectionOrderItem[];
 }) {
-  return (
-    <Document>
-      <Page
-        size="A4"
-        style={{ backgroundColor: BOLD_BG, fontFamily: "DM Sans" }}
-      >
-        <View style={boldStyles.topBar}>
-          <Text>{data.name}</Text>
-          <Text>{data.contact[0]?.detail}</Text>
-          <Text>{data.contact[1]?.detail}</Text>
-        </View>
+  const allKeys = orderedSections(sectionOrder, [
+    "experience",
+    "languages",
+    "education",
+    "skills",
+    "references",
+  ]);
+  const groups = splitAtPageBreaks(sectionOrder, allKeys);
 
-        <View style={boldStyles.heroRow}>
-          <View style={boldStyles.heroLeft}>
-            <Text style={boldStyles.heroTitle}>RESUME</Text>
-            <Text style={boldStyles.heroSubtitle}>{data.title}</Text>
-            <Text style={boldStyles.heroName}>{data.name}</Text>
-            {data.summary && (
-              <Text style={boldStyles.heroSummary}>{data.summary}</Text>
-            )}
-          </View>
-          <View style={boldStyles.heroPhoto}>
-            {data.photo ? (
-              <Image
-                src={data.photo}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
-            ) : (
+  function renderSection(key: string) {
+    if (key === "experience" && data.experience.length > 0) {
+      return (
+        <View key="experience" style={{ marginBottom: 16 }}>
+          {data.experience.map((item, i) => (
+            <View key={i} style={{ marginBottom: 10 }}>
               <View
                 style={{
-                  width: "100%",
-                  height: "100%",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
                 }}
               >
-                <View
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 16,
-                    backgroundColor: BOLD_INK,
-                    opacity: 0.15,
-                  }}
-                />
+                <Text style={boldStyles.expCompany}>{item.company}</Text>
+                {(item.start_date || item.end_date) && (
+                  <Text style={boldStyles.expDate}>
+                    {item.start_date && item.end_date
+                      ? `${item.start_date} – ${item.end_date}`
+                      : (item.start_date ?? item.end_date)}
+                  </Text>
+                )}
               </View>
-            )}
+              {item.city && <Text style={boldStyles.expCity}>{item.city}</Text>}
+              {item.comments && (
+                <Text style={boldStyles.expComment}>{item.comments}</Text>
+              )}
+            </View>
+          ))}
+        </View>
+      );
+    }
+    if (key === "languages" && data.languages.length > 0) {
+      return (
+        <View key="languages">
+          <Text style={boldStyles.sectionLabel}>Languages</Text>
+          {data.languages.map((item, i) => (
+            <View key={i} style={boldStyles.languageRow}>
+              <Text style={boldStyles.languageName}>
+                {item.language}
+                {item.level ? ` — ${item.level}` : ""}
+              </Text>
+              <View style={{ flexDirection: "row", gap: 3 }}>
+                {Array.from({ length: 5 }).map((_, di) => {
+                  const map: Record<string, number> = {
+                    native: 5,
+                    fluent: 4,
+                    advanced: 3,
+                    intermediate: 2,
+                    basic: 1,
+                  };
+                  const filled = map[(item.level ?? "").toLowerCase()] ?? 3;
+                  return (
+                    <View
+                      key={di}
+                      style={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: 4,
+                        backgroundColor: di < filled ? BOLD_INK : "transparent",
+                        borderWidth: 1,
+                        borderColor: BOLD_INK,
+                      }}
+                    />
+                  );
+                })}
+              </View>
+            </View>
+          ))}
+        </View>
+      );
+    }
+    if (key === "education" && data.education.length > 0) {
+      return (
+        <View key="education" style={{ marginBottom: 16 }}>
+          {data.education.map((item, i) => (
+            <View key={i} style={{ marginBottom: 10 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Text style={boldStyles.expCompany}>{item.edu_center}</Text>
+                {(item.start_date || item.end_date) && (
+                  <Text style={boldStyles.expDate}>
+                    {item.start_date && item.end_date
+                      ? `${item.start_date} – ${item.end_date}`
+                      : (item.start_date ?? item.end_date)}
+                  </Text>
+                )}
+              </View>
+              {item.city && <Text style={boldStyles.expCity}>{item.city}</Text>}
+            </View>
+          ))}
+        </View>
+      );
+    }
+    if (key === "skills" && data.skills.length > 0) {
+      return (
+        <View key="skills" style={{ marginBottom: 16 }}>
+          <Text style={boldStyles.sectionLabel}>Skills</Text>
+          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            {data.skills.map((item, i) => (
+              <Text
+                key={i}
+                style={[
+                  boldStyles.skillPill,
+                  i < Math.ceil(data.skills.length / 2)
+                    ? { backgroundColor: BOLD_INK, color: BOLD_BG }
+                    : {
+                        backgroundColor: "transparent",
+                        color: BOLD_INK,
+                        borderWidth: 1,
+                        borderColor: BOLD_INK,
+                      },
+                ]}
+              >
+                {item.skill}
+              </Text>
+            ))}
           </View>
         </View>
+      );
+    }
+    if (key === "references" && data.references.length > 0) {
+      return (
+        <View key="references">
+          <Text style={boldStyles.sectionLabel}>References</Text>
+          <Text style={{ fontSize: 8, color: BOLD_MUTED, lineHeight: 1.5 }}>
+            {data.references}
+          </Text>
+        </View>
+      );
+    }
+    return null;
+  }
 
-        <View style={boldStyles.fullRule} />
-
-        <View style={boldStyles.bodyRow}>
-          <View style={boldStyles.bodyCol}>
-            {data.experience.length > 0 && (
-              <View style={{ marginBottom: 16 }}>
-                {data.experience.map((item, i) => (
-                  <View key={i} style={{ marginBottom: 10 }}>
+  return (
+    <Document>
+      {groups.map((group, gi) => (
+        <Page
+          key={gi}
+          size="A4"
+          style={{ backgroundColor: BOLD_BG, fontFamily: "DM Sans" }}
+        >
+          {gi === 0 && (
+            <>
+              <View style={boldStyles.topBar}>
+                <Text>{data.name}</Text>
+                <Text>{data.contact[0]?.detail}</Text>
+                <Text>{data.contact[1]?.detail}</Text>
+              </View>
+              <View style={boldStyles.heroRow}>
+                <View style={boldStyles.heroLeft}>
+                  <Text style={boldStyles.heroTitle}>RESUME</Text>
+                  <Text style={boldStyles.heroSubtitle}>{data.title}</Text>
+                  <Text style={boldStyles.heroName}>{data.name}</Text>
+                  {data.summary && (
+                    <Text style={boldStyles.heroSummary}>{data.summary}</Text>
+                  )}
+                </View>
+                <View style={boldStyles.heroPhoto}>
+                  {data.photo ? (
+                    <Image
+                      src={data.photo}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  ) : (
                     <View
                       style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
+                        width: "100%",
+                        height: "100%",
+                        alignItems: "center",
+                        justifyContent: "center",
                       }}
                     >
-                      <Text style={boldStyles.expCompany}>{item.company}</Text>
-                      {(item.start_date || item.end_date) && (
-                        <Text style={boldStyles.expDate}>
-                          {item.start_date && item.end_date
-                            ? `${item.start_date} – ${item.end_date}`
-                            : (item.start_date ?? item.end_date)}
-                        </Text>
-                      )}
+                      <View
+                        style={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: 16,
+                          backgroundColor: BOLD_INK,
+                          opacity: 0.15,
+                        }}
+                      />
                     </View>
-                    {item.city && (
-                      <Text style={boldStyles.expCity}>{item.city}</Text>
-                    )}
-                    {item.comments && (
-                      <Text style={boldStyles.expComment}>{item.comments}</Text>
-                    )}
-                  </View>
-                ))}
-              </View>
-            )}
-
-            {data.languages.length > 0 && (
-              <View>
-                <Text style={boldStyles.sectionLabel}>Languages</Text>
-                {data.languages.map((item, i) => (
-                  <View key={i} style={boldStyles.languageRow}>
-                    <Text style={boldStyles.languageName}>
-                      {item.language}
-                      {item.level ? ` — ${item.level}` : ""}
-                    </Text>
-                    <View style={{ flexDirection: "row", gap: 3 }}>
-                      {Array.from({ length: 5 }).map((_, di) => {
-                        const map: Record<string, number> = {
-                          native: 5,
-                          fluent: 4,
-                          advanced: 3,
-                          intermediate: 2,
-                          basic: 1,
-                        };
-                        const filled =
-                          map[(item.level ?? "").toLowerCase()] ?? 3;
-                        return (
-                          <View
-                            key={di}
-                            style={{
-                              width: 8,
-                              height: 8,
-                              borderRadius: 4,
-                              backgroundColor:
-                                di < filled ? BOLD_INK : "transparent",
-                              borderWidth: 1,
-                              borderColor: BOLD_INK,
-                            }}
-                          />
-                        );
-                      })}
-                    </View>
-                  </View>
-                ))}
-              </View>
-            )}
-          </View>
-
-          <View style={boldStyles.bodyCol}>
-            {data.education.length > 0 && (
-              <View style={{ marginBottom: 16 }}>
-                {data.education.map((item, i) => (
-                  <View key={i} style={{ marginBottom: 10 }}>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Text style={boldStyles.expCompany}>
-                        {item.edu_center}
-                      </Text>
-                      {(item.start_date || item.end_date) && (
-                        <Text style={boldStyles.expDate}>
-                          {item.start_date && item.end_date
-                            ? `${item.start_date} – ${item.end_date}`
-                            : (item.start_date ?? item.end_date)}
-                        </Text>
-                      )}
-                    </View>
-                    {item.city && (
-                      <Text style={boldStyles.expCity}>{item.city}</Text>
-                    )}
-                  </View>
-                ))}
-              </View>
-            )}
-
-            {data.skills.length > 0 && (
-              <View style={{ marginBottom: 16 }}>
-                <Text style={boldStyles.sectionLabel}>Skills</Text>
-                <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-                  {data.skills.map((item, i) => (
-                    <Text
-                      key={i}
-                      style={[
-                        boldStyles.skillPill,
-                        i < Math.ceil(data.skills.length / 2)
-                          ? { backgroundColor: BOLD_INK, color: BOLD_BG }
-                          : {
-                              backgroundColor: "transparent",
-                              color: BOLD_INK,
-                              borderWidth: 1,
-                              borderColor: BOLD_INK,
-                            },
-                      ]}
-                    >
-                      {item.skill}
-                    </Text>
-                  ))}
+                  )}
                 </View>
               </View>
-            )}
-
-            {data.references.length > 0 && (
-              <View>
-                <Text style={boldStyles.sectionLabel}>References</Text>
-                <Text
-                  style={{ fontSize: 8, color: BOLD_MUTED, lineHeight: 1.5 }}
-                >
-                  {data.references}
-                </Text>
-              </View>
-            )}
+              <View style={boldStyles.fullRule} />
+            </>
+          )}
+          {gi > 0 && (
+            <View
+              style={{
+                marginTop: 24,
+                borderTopWidth: 1,
+                borderTopColor: "#e5e7eb",
+                borderTopStyle: "dashed",
+                paddingTop: 24,
+              }}
+            />
+          )}
+          <View style={boldStyles.bodyRow}>
+            <View style={boldStyles.bodyCol}>
+              {group
+                .filter((k) => k === "experience" || k === "languages")
+                .map((key) => (
+                  <View key={key}>{renderSection(key)}</View>
+                ))}
+            </View>
+            <View style={boldStyles.bodyCol}>
+              {group
+                .filter(
+                  (k) =>
+                    k === "education" || k === "skills" || k === "references",
+                )
+                .map((key) => (
+                  <View key={key}>{renderSection(key)}</View>
+                ))}
+            </View>
           </View>
-        </View>
-
-        <Text style={boldStyles.footerName}>{data.name}</Text>
-      </Page>
+          <Text style={boldStyles.footerName}>{data.name}</Text>
+        </Page>
+      ))}
     </Document>
   );
 }
