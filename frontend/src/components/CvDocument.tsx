@@ -6,6 +6,7 @@ import type {
 } from "@/lib/cv-templates";
 import { orderedSections, splitAtPageBreaks } from "@/lib/cv-templates";
 import { CVTextSection } from "./cv-render-helpers";
+import { GripVertical } from "lucide-react";
 
 export type EditableField =
   "name" | "title" | "summary" | "certifications" | "references" | "other";
@@ -21,6 +22,9 @@ type Props = {
     updatedItem: unknown,
   ) => void;
   sectionOrder?: SectionOrderItem[];
+  onDragSection?: (fromIndex: number, toIndex: number) => void;
+  activeDragIndex?: number | null;
+  setActiveDragIndex?: (index: number | null) => void;
 };
 
 export function Editable({
@@ -123,6 +127,79 @@ export function Section({
   );
 }
 
+let _dragFromIndex: number | null = null;
+let _dragOverIndex: number | null = null;
+
+function DragSection({
+  sectionKey,
+  sectionOrder,
+  activeDragIndex,
+  setActiveDragIndex,
+  onDragSection,
+  children,
+}: {
+  sectionKey: keyof StructuredCVData;
+  sectionOrder?: SectionOrderItem[];
+  activeDragIndex?: number | null;
+  setActiveDragIndex?: (index: number | null) => void;
+  onDragSection?: (fromIndex: number, toIndex: number) => void;
+  children: React.ReactNode;
+}) {
+  const idx = sectionOrder?.findIndex(
+    (item) => item.type === "section" && item.key === sectionKey,
+  );
+  if (idx == null || idx < 0) return <>{children}</>;
+
+  const isDragging = activeDragIndex === idx;
+
+  return (
+    <div
+      className="cv-section-wrapper"
+      style={{
+        position: "relative",
+        cursor: "grab",
+        opacity: isDragging ? 0.4 : undefined,
+        borderTop: "2px solid transparent",
+        transition: "border-color 0.15s",
+      }}
+      draggable
+      onDragStart={() => {
+        _dragFromIndex = idx;
+        setActiveDragIndex?.(idx);
+      }}
+      onDragOver={(e) => {
+        e.preventDefault();
+        _dragOverIndex = idx;
+        (e.currentTarget as HTMLElement).style.borderTopColor =
+          "rgba(0,0,0,0.15)";
+      }}
+      onDragLeave={(e) => {
+        (e.currentTarget as HTMLElement).style.borderTopColor = "transparent";
+      }}
+      onDrop={(e) => {
+        e.preventDefault();
+        (e.currentTarget as HTMLElement).style.borderTopColor = "transparent";
+        if (_dragFromIndex != null && _dragOverIndex != null) {
+          onDragSection?.(_dragFromIndex, _dragOverIndex);
+        }
+        _dragFromIndex = null;
+        _dragOverIndex = null;
+        setActiveDragIndex?.(null);
+      }}
+      onDragEnd={() => {
+        _dragFromIndex = null;
+        _dragOverIndex = null;
+        setActiveDragIndex?.(null);
+      }}
+    >
+      <div className="section-drag-handle">
+        <GripVertical className="h-3.5 w-3.5" />
+      </div>
+      {children}
+    </div>
+  );
+}
+
 function Terracotta({
   data,
   editable,
@@ -130,6 +207,9 @@ function Terracotta({
   onEditItem,
   sectionOrder,
   template: _template,
+  onDragSection,
+  activeDragIndex,
+  setActiveDragIndex,
 }: Props) {
   const TERRACOTTA = "#CB6843";
   const TERRACOTTA_LIGHT = "#FDE8E8";
@@ -362,7 +442,18 @@ function Terracotta({
                   )}
                 </div>
               )}
-              {group.map((key) => renderSidebarSection(key))}
+              {group.map((key) => (
+                <DragSection
+                  key={key}
+                  sectionKey={key}
+                  sectionOrder={sectionOrder}
+                  activeDragIndex={activeDragIndex}
+                  setActiveDragIndex={setActiveDragIndex}
+                  onDragSection={onDragSection}
+                >
+                  {renderSidebarSection(key)}
+                </DragSection>
+              ))}
             </div>
             <div className="p-7 flex flex-col gap-5">
               {gi === 0 && (/\S/.test(data.name ?? "") || e) && (
@@ -414,7 +505,18 @@ function Terracotta({
               {gi === 0 && (
                 <div className="h-px" style={{ backgroundColor: TERRACOTTA }} />
               )}
-              {group.map((key) => renderMainSection(key))}
+              {group.map((key) => (
+                <DragSection
+                  key={key}
+                  sectionKey={key}
+                  sectionOrder={sectionOrder}
+                  activeDragIndex={activeDragIndex}
+                  setActiveDragIndex={setActiveDragIndex}
+                  onDragSection={onDragSection}
+                >
+                  {renderMainSection(key)}
+                </DragSection>
+              ))}
             </div>
           </div>
         </div>
@@ -430,6 +532,9 @@ function Sage({
   onEditItem,
   sectionOrder,
   template: _template,
+  onDragSection,
+  activeDragIndex,
+  setActiveDragIndex,
 }: Props) {
   const SAGE = "#7B9E87";
   const SAGE_LIGHT = "#EAF0EC";
@@ -730,7 +835,18 @@ function Sage({
           </div>
           <div className="grid grid-cols-[1fr_200px]">
             <div className="p-8 pr-6">
-              {group.map((key) => renderMainSection(key))}
+              {group.map((key) => (
+                <DragSection
+                  key={key}
+                  sectionKey={key}
+                  sectionOrder={sectionOrder}
+                  activeDragIndex={activeDragIndex}
+                  setActiveDragIndex={setActiveDragIndex}
+                  onDragSection={onDragSection}
+                >
+                  {renderMainSection(key)}
+                </DragSection>
+              ))}
             </div>
             <div
               className="p-8 pl-6"
@@ -774,7 +890,18 @@ function Sage({
                   )}
                 </div>
               )}
-              {group.map((key) => renderSidebarSection(key))}
+              {group.map((key) => (
+                <DragSection
+                  key={key}
+                  sectionKey={key}
+                  sectionOrder={sectionOrder}
+                  activeDragIndex={activeDragIndex}
+                  setActiveDragIndex={setActiveDragIndex}
+                  onDragSection={onDragSection}
+                >
+                  {renderSidebarSection(key)}
+                </DragSection>
+              ))}
             </div>
           </div>
         </div>
@@ -790,6 +917,9 @@ function Classic({
   onEditItem,
   sectionOrder,
   template: _template,
+  onDragSection,
+  activeDragIndex,
+  setActiveDragIndex,
 }: Props) {
   const INK = "#111";
   const MUTED = "#666";
@@ -1056,13 +1186,20 @@ function Classic({
             />
           )}
           {group.map((key) => (
-            <div key={key as string}>
+            <DragSection
+              key={key as string}
+              sectionKey={key}
+              sectionOrder={sectionOrder}
+              activeDragIndex={activeDragIndex}
+              setActiveDragIndex={setActiveDragIndex}
+              onDragSection={onDragSection}
+            >
               {renderSection(key)}
               <div
                 className="h-px w-full my-5"
                 style={{ backgroundColor: RULE }}
               />
-            </div>
+            </DragSection>
           ))}
         </div>
       ))}
@@ -1077,6 +1214,9 @@ function Bold({
   onEditItem,
   sectionOrder,
   template: _template,
+  onDragSection,
+  activeDragIndex,
+  setActiveDragIndex,
 }: Props) {
   const INK = "#111";
   const MUTED = "#555";
@@ -1408,7 +1548,16 @@ function Bold({
           )}
           <div className="px-6 pb-4 mt-4">
             {group.map((key) => (
-              <div key={key as string}>{renderSection(key)}</div>
+              <DragSection
+                key={key as string}
+                sectionKey={key}
+                sectionOrder={sectionOrder}
+                activeDragIndex={activeDragIndex}
+                setActiveDragIndex={setActiveDragIndex}
+                onDragSection={onDragSection}
+              >
+                {renderSection(key)}
+              </DragSection>
             ))}
           </div>
           <div
@@ -1440,6 +1589,9 @@ function Minimal({
   onEditItem,
   sectionOrder,
   template: _template,
+  onDragSection,
+  activeDragIndex,
+  setActiveDragIndex,
 }: Props) {
   const INK = "#111";
   const MUTED = "#666";
@@ -1761,10 +1913,32 @@ function Minimal({
                 borderRight: "1px solid #e0e0e0",
               }}
             >
-              {group.map((key) => renderSidebarSection(key))}
+              {group.map((key) => (
+                <DragSection
+                  key={key}
+                  sectionKey={key}
+                  sectionOrder={sectionOrder}
+                  activeDragIndex={activeDragIndex}
+                  setActiveDragIndex={setActiveDragIndex}
+                  onDragSection={onDragSection}
+                >
+                  {renderSidebarSection(key)}
+                </DragSection>
+              ))}
             </div>
             <div className="px-8 py-7 flex flex-col gap-6">
-              {group.map((key) => renderMainSection(key))}
+              {group.map((key) => (
+                <DragSection
+                  key={key}
+                  sectionKey={key}
+                  sectionOrder={sectionOrder}
+                  activeDragIndex={activeDragIndex}
+                  setActiveDragIndex={setActiveDragIndex}
+                  onDragSection={onDragSection}
+                >
+                  {renderMainSection(key)}
+                </DragSection>
+              ))}
             </div>
           </div>
         </div>
@@ -1802,6 +1976,30 @@ export function CvDocument(props: Props) {
         .cv-editable[contenteditable="true"]:focus {
           background: rgba(254, 232, 231, 0.65);
           border-radius: 4px;
+        }
+        .cv-section-wrapper:hover .section-drag-handle {
+          opacity: 1;
+        }
+        .section-drag-handle {
+          position: absolute;
+          top: 4px;
+          left: 4px;
+          opacity: 0;
+          cursor: grab;
+          padding: 2px 3px;
+          border-radius: 4px;
+          background: rgba(255,255,255,0.8);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+          transition: opacity 0.15s;
+          z-index: 10;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #999;
+        }
+        .section-drag-handle:hover {
+          color: #333;
+          background: rgba(255,255,255,0.95);
         }
       `}</style>
     </div>

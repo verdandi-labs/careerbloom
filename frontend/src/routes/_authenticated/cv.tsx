@@ -18,7 +18,6 @@ import {
   ArrowLeft,
   BookMarked,
   Download,
-  GripVertical,
   Languages,
   LayoutList,
   Loader2,
@@ -362,8 +361,7 @@ function PreviewPage() {
     return saved ? JSON.parse(saved) : DEFAULT_SECTION_ORDER;
   });
   const [sectionsOpen, setSectionsOpen] = useState(false);
-  const [dragIndex, setDragIndex] = useState<number | null>(null);
-  const [dropIndex, setDropIndex] = useState<number | null>(null);
+  const [activeDragIndex, setActiveDragIndex] = useState<number | null>(null);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [saveName, setSaveName] = useState("");
   const [saveNameErr, setSaveNameErr] = useState("");
@@ -745,17 +743,6 @@ function PreviewPage() {
     return page1;
   }
 
-  function handleDrop(targetIndex: number) {
-    if (dragIndex === null || dragIndex === targetIndex) return;
-    const next = [...sectionOrder];
-    const [moved] = next.splice(dragIndex, 1);
-    next.splice(targetIndex, 0, moved);
-    setSectionOrder(next);
-    localStorage.setItem("cv-preview-section-order", JSON.stringify(next));
-    setDragIndex(null);
-    setDropIndex(null);
-  }
-
   return (
     <AppShell>
       <header className="bg-secondary/70 backdrop-blur-md rounded-[20px] px-7 py-7 shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)]">
@@ -927,6 +914,19 @@ function PreviewPage() {
                   setEditingItem({ field, index, item })
                 }
                 sectionOrder={sectionOrder}
+                onDragSection={(from, to) => {
+                  const next = [...sectionOrder];
+                  const [moved] = next.splice(from, 1);
+                  next.splice(to, 0, moved);
+                  setSectionOrder(next);
+                  localStorage.setItem(
+                    "cv-preview-section-order",
+                    JSON.stringify(next),
+                  );
+                  setActiveDragIndex(null);
+                }}
+                activeDragIndex={activeDragIndex}
+                setActiveDragIndex={setActiveDragIndex}
               />
             )}
           </div>
@@ -1070,7 +1070,8 @@ function PreviewPage() {
               </button>
             </div>
             <p className="text-sm text-foreground/50">
-              Drag to reorder. Add a page break to split across pages.
+              Drag sections on the CV to reorder. Use page breaks to split
+              across pages.
             </p>
             <button
               onClick={() => {
@@ -1086,20 +1087,15 @@ function PreviewPage() {
               Re-balance
             </button>
             <div className="flex flex-col gap-2 overflow-y-auto flex-1">
-              {sectionOrder.map((item, i) =>
-                item.type === "page-break" ? (
+              {sectionOrder
+                .map((item, i) => ({ item, i }))
+                .filter(({ item }) => item.type === "page-break")
+                .map(({ item, i }) => (
                   <div
                     key={`pb-${i}`}
-                    draggable
-                    onDragStart={() => setDragIndex(i)}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      setDropIndex(i);
-                    }}
-                    onDrop={() => handleDrop(i)}
-                    className="flex items-center gap-2 rounded-xl border border-dashed border-foreground/20 px-3 py-2 text-xs text-foreground/40 cursor-grab"
+                    className="flex items-center gap-2 rounded-xl border border-dashed border-foreground/20 px-3 py-2 text-xs text-foreground/40"
                   >
-                    <GripVertical className="h-3 w-3" />— Page break —
+                    — Page break —
                     <button
                       className="ml-auto text-foreground/30 hover:text-rose-400"
                       onClick={() => {
@@ -1114,25 +1110,7 @@ function PreviewPage() {
                       <X className="h-3 w-3" />
                     </button>
                   </div>
-                ) : (
-                  <div
-                    key={`${item.key}-${i}`}
-                    draggable
-                    onDragStart={() => setDragIndex(i)}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      setDropIndex(i);
-                    }}
-                    onDrop={() => handleDrop(i)}
-                    className="flex items-center gap-2 rounded-2xl bg-white/80 border border-pink-100 px-4 py-3 cursor-grab"
-                  >
-                    <GripVertical className="h-4 w-4 text-foreground/30" />
-                    <span className="text-sm font-medium text-foreground capitalize">
-                      {item.key}
-                    </span>
-                  </div>
-                ),
-              )}
+                ))}
             </div>
             <button
               onClick={() => {
