@@ -6,7 +6,12 @@ import {
   StyleSheet,
   Image,
 } from "@react-pdf/renderer";
-import type { CVTemplateId, StructuredCVData } from "@/lib/cv-templates";
+import type {
+  CVTemplateId,
+  StructuredCVData,
+  SectionOrderItem,
+} from "@/lib/cv-templates";
+import { orderedSections, splitAtPageBreaks } from "@/lib/cv-templates";
 
 const TERRACOTTA = "#CB6843";
 const TERRACOTTA_LIGHT = "#FDE8E8";
@@ -657,332 +662,387 @@ const minimalStyles = StyleSheet.create({
   },
 });
 
-function TerracottaPdfDocument({ data }: { data: StructuredCVData }) {
-  return (
-    <Document>
-      <Page size="A4" style={terracottaStyles.page}>
-        <View style={terracottaStyles.sidebar}>
-          <View
-            style={{
-              width: "100%",
-              height: 100,
-              marginBottom: 12,
-              backgroundColor: "#F5E6DF",
-              borderRadius: 3,
-            }}
-          >
-            {data.photo ? (
-              <Image
-                src={data.photo}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
-            ) : (
-              <View
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <View
-                  style={{
-                    width: 24,
-                    height: 24,
-                    borderRadius: 12,
-                    backgroundColor: "#CB6843",
-                    opacity: 0.3,
-                  }}
-                />
-              </View>
-            )}
+function TerracottaPdfDocument({
+  data,
+  sectionOrder,
+}: {
+  data: StructuredCVData;
+  sectionOrder?: SectionOrderItem[];
+}) {
+  const sidebarKeys = orderedSections(sectionOrder, [
+    "contact",
+    "skills",
+    "languages",
+    "education",
+  ]);
+  const sidebarGroups = splitAtPageBreaks(sectionOrder, sidebarKeys);
+
+  function renderSidebarSection(key: string) {
+    if (key === "contact" && data.contact.length > 0) {
+      return (
+        <View key="contact" style={terracottaStyles.sectionBlock}>
+          <Text style={terracottaStyles.sidebarLabel}>Contact</Text>
+          {data.contact.map((item, i) => (
+            <Text key={i} style={terracottaStyles.contactItem}>
+              {item.detail}
+            </Text>
+          ))}
+        </View>
+      );
+    }
+    if (key === "skills" && data.skills.length > 0) {
+      return (
+        <View key="skills" style={terracottaStyles.sectionBlock}>
+          <Text style={terracottaStyles.sidebarLabel}>Skills</Text>
+          <View style={terracottaStyles.skillsWrap}>
+            {data.skills.map((item, i) => (
+              <Text key={i} style={terracottaStyles.skillPill}>
+                {item.skill}
+              </Text>
+            ))}
           </View>
-          {data.contact.length > 0 && (
-            <View style={terracottaStyles.sectionBlock}>
-              <Text style={terracottaStyles.sidebarLabel}>Contact</Text>
-              {data.contact.map((item, i) => (
-                <Text key={i} style={terracottaStyles.contactItem}>
-                  {item.detail}
-                </Text>
-              ))}
+        </View>
+      );
+    }
+    if (key === "languages" && data.languages.length > 0) {
+      return (
+        <View key="languages" style={terracottaStyles.sectionBlock}>
+          <Text style={terracottaStyles.sidebarLabel}>Languages</Text>
+          {data.languages.map((item, i) => (
+            <View key={i} style={terracottaStyles.languageRow}>
+              <Text style={terracottaStyles.languageName}>{item.language}</Text>
+              {item.level && (
+                <Text style={terracottaStyles.languageLevel}>{item.level}</Text>
+              )}
             </View>
-          )}
-
-          {data.skills.length > 0 && (
-            <View style={terracottaStyles.sectionBlock}>
-              <Text style={terracottaStyles.sidebarLabel}>Skills</Text>
-              <View style={terracottaStyles.skillsWrap}>
-                {data.skills.map((item, i) => (
-                  <Text key={i} style={terracottaStyles.skillPill}>
-                    {item.skill}
-                  </Text>
-                ))}
-              </View>
+          ))}
+        </View>
+      );
+    }
+    if (key === "education" && data.education.length > 0) {
+      return (
+        <View key="education" style={terracottaStyles.sectionBlock}>
+          <Text style={terracottaStyles.sidebarLabel}>Education</Text>
+          {data.education.map((item, i) => (
+            <View key={i} style={{ marginBottom: 6 }}>
+              <Text style={terracottaStyles.eduCenter}>{item.edu_center}</Text>
+              <Text style={terracottaStyles.eduSub}>
+                {[item.city, item.end_date ?? item.start_date]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </Text>
+              {item.comments && (
+                <Text style={terracottaStyles.eduSub}>{item.comments}</Text>
+              )}
             </View>
-          )}
+          ))}
+        </View>
+      );
+    }
+    return null;
+  }
 
-          {data.languages.length > 0 && (
-            <View style={terracottaStyles.sectionBlock}>
-              <Text style={terracottaStyles.sidebarLabel}>Languages</Text>
-              {data.languages.map((item, i) => (
-                <View key={i} style={terracottaStyles.languageRow}>
-                  <Text style={terracottaStyles.languageName}>
-                    {item.language}
-                  </Text>
-                  {item.level && (
-                    <Text style={terracottaStyles.languageLevel}>
-                      {item.level}
+  function renderMainSection(key: string) {
+    if (key === "experience" && data.experience.length > 0) {
+      return (
+        <View key="experience">
+          <Text style={terracottaStyles.sidebarLabel}>Experience</Text>
+          <View style={terracottaStyles.experienceSection}>
+            {data.experience.map((item, i) => (
+              <View key={i} style={terracottaStyles.experienceItem}>
+                <View style={terracottaStyles.expHeader}>
+                  <View>
+                    <Text style={terracottaStyles.expCompany}>
+                      {item.company}
+                    </Text>
+                    {item.city && (
+                      <Text style={terracottaStyles.expCity}>{item.city}</Text>
+                    )}
+                  </View>
+                  {(item.start_date || item.end_date) && (
+                    <Text style={terracottaStyles.dateBadge}>
+                      {item.start_date && item.end_date
+                        ? `${item.start_date} – ${item.end_date}`
+                        : (item.start_date ?? item.end_date)}
                     </Text>
                   )}
                 </View>
-              ))}
-            </View>
-          )}
-
-          {data.education.length > 0 && (
-            <View style={terracottaStyles.sectionBlock}>
-              <Text style={terracottaStyles.sidebarLabel}>Education</Text>
-              {data.education.map((item, i) => (
-                <View key={i} style={{ marginBottom: 6 }}>
-                  <Text style={terracottaStyles.eduCenter}>
-                    {item.edu_center}
+                {item.comments && (
+                  <Text style={terracottaStyles.expComments}>
+                    {item.comments}
                   </Text>
-                  <Text style={terracottaStyles.eduSub}>
-                    {[item.city, item.end_date ?? item.start_date]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </Text>
-                  {item.comments && (
-                    <Text style={terracottaStyles.eduSub}>{item.comments}</Text>
-                  )}
-                </View>
-              ))}
-            </View>
-          )}
-        </View>
-
-        <View style={terracottaStyles.main}>
-          {data.name && (
-            <View>
-              <Text style={terracottaStyles.name}>{data.name}</Text>
-              {data.title && (
-                <Text style={terracottaStyles.jobTitle}>{data.title}</Text>
-              )}
-              {data.summary && (
-                <Text style={terracottaStyles.summary}>{data.summary}</Text>
-              )}
-            </View>
-          )}
-
-          <View style={terracottaStyles.divider} />
-
-          {data.experience.length > 0 && (
-            <View>
-              <Text style={terracottaStyles.sidebarLabel}>Experience</Text>
-              <View style={terracottaStyles.experienceSection}>
-                {data.experience.map((item, i) => (
-                  <View key={i} style={terracottaStyles.experienceItem}>
-                    <View style={terracottaStyles.expHeader}>
-                      <View>
-                        <Text style={terracottaStyles.expCompany}>
-                          {item.company}
-                        </Text>
-                        {item.city && (
-                          <Text style={terracottaStyles.expCity}>
-                            {item.city}
-                          </Text>
-                        )}
-                      </View>
-                      {(item.start_date || item.end_date) && (
-                        <Text style={terracottaStyles.dateBadge}>
-                          {item.start_date && item.end_date
-                            ? `${item.start_date} – ${item.end_date}`
-                            : (item.start_date ?? item.end_date)}
-                        </Text>
-                      )}
-                    </View>
-                    {item.comments && (
-                      <Text style={terracottaStyles.expComments}>
-                        {item.comments}
-                      </Text>
-                    )}
-                  </View>
-                ))}
+                )}
               </View>
-            </View>
-          )}
+            ))}
+          </View>
         </View>
-      </Page>
+      );
+    }
+    return null;
+  }
+
+  return (
+    <Document>
+      {sidebarGroups.map((group, gi) => (
+        <Page key={gi} size="A4" style={terracottaStyles.page}>
+          <View style={terracottaStyles.sidebar}>
+            {gi === 0 && (
+              <View
+                style={{
+                  width: "100%",
+                  height: 100,
+                  marginBottom: 12,
+                  backgroundColor: "#F5E6DF",
+                  borderRadius: 3,
+                }}
+              >
+                {data.photo ? (
+                  <Image
+                    src={data.photo}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  <View
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: 24,
+                        height: 24,
+                        borderRadius: 12,
+                        backgroundColor: "#CB6843",
+                        opacity: 0.3,
+                      }}
+                    />
+                  </View>
+                )}
+              </View>
+            )}
+            {group.map((key) => renderSidebarSection(key))}
+          </View>
+          <View style={terracottaStyles.main}>
+            {gi === 0 && data.name && (
+              <View>
+                <Text style={terracottaStyles.name}>{data.name}</Text>
+                {data.title && (
+                  <Text style={terracottaStyles.jobTitle}>{data.title}</Text>
+                )}
+                {data.summary && (
+                  <Text style={terracottaStyles.summary}>{data.summary}</Text>
+                )}
+              </View>
+            )}
+            {gi === 0 && <View style={terracottaStyles.divider} />}
+            {group.map((key) => renderMainSection(key))}
+          </View>
+        </Page>
+      ))}
     </Document>
   );
 }
 
-function SagePdfDocument({ data }: { data: StructuredCVData }) {
+function SagePdfDocument({
+  data,
+  sectionOrder,
+}: {
+  data: StructuredCVData;
+  sectionOrder?: SectionOrderItem[];
+}) {
   const contactText = data.contact
     .map((c) => c.detail)
     .filter(Boolean)
     .join(" · ");
 
+  const sidebarKeys = orderedSections(sectionOrder, ["skills", "languages"]);
+  const sidebarGroups = splitAtPageBreaks(sectionOrder, sidebarKeys);
+
+  function renderSidebarSection(key: string) {
+    if (key === "skills" && data.skills.length > 0) {
+      return (
+        <View key="skills" style={sageStyles.sectionBlock}>
+          <Text style={sageStyles.sectionLabel}>Skills</Text>
+          <View style={sageStyles.sectionRule} />
+          {data.skills.map((item, i) => (
+            <Text key={i} style={sageStyles.skillItem}>
+              {item.skill}
+            </Text>
+          ))}
+        </View>
+      );
+    }
+    if (key === "languages" && data.languages.length > 0) {
+      return (
+        <View key="languages" style={sageStyles.sectionBlock}>
+          <Text style={sageStyles.sectionLabel}>Languages</Text>
+          <View style={sageStyles.sectionRule} />
+          {data.languages.map((item, i) => (
+            <View key={i} style={sageStyles.languageRow}>
+              <Text style={sageStyles.languageName}>{item.language}</Text>
+              {item.level && (
+                <Text style={sageStyles.languageLevel}>{item.level}</Text>
+              )}
+            </View>
+          ))}
+        </View>
+      );
+    }
+    return null;
+  }
+
+  function renderMainSection(key: string) {
+    if (key === "experience" && data.experience.length > 0) {
+      return (
+        <View key="experience" style={sageStyles.sectionBlock}>
+          <Text style={sageStyles.sectionLabel}>Experience</Text>
+          <View style={sageStyles.sectionRule} />
+          {data.experience.map((item, i) => (
+            <View key={i} style={sageStyles.experienceItem}>
+              <View style={sageStyles.expHeader}>
+                <View>
+                  <Text style={sageStyles.expCompany}>{item.company}</Text>
+                  {item.city && (
+                    <Text style={sageStyles.expCity}>{item.city}</Text>
+                  )}
+                </View>
+                {(item.start_date || item.end_date) && (
+                  <Text style={sageStyles.dateBadge}>
+                    {item.start_date && item.end_date
+                      ? `${item.start_date} – ${item.end_date}`
+                      : (item.start_date ?? item.end_date)}
+                  </Text>
+                )}
+              </View>
+              {item.comments && (
+                <Text style={sageStyles.expComments}>{item.comments}</Text>
+              )}
+            </View>
+          ))}
+        </View>
+      );
+    }
+    if (key === "education" && data.education.length > 0) {
+      return (
+        <View key="education" style={sageStyles.sectionBlock}>
+          <Text style={sageStyles.sectionLabel}>Education</Text>
+          <View style={sageStyles.sectionRule} />
+          {data.education.map((item, i) => (
+            <View key={i} style={sageStyles.experienceItem}>
+              <View style={sageStyles.expHeader}>
+                <View>
+                  <Text style={sageStyles.eduCenter}>{item.edu_center}</Text>
+                  {item.city && (
+                    <Text style={sageStyles.eduSub}>{item.city}</Text>
+                  )}
+                </View>
+                {(item.start_date || item.end_date) && (
+                  <Text style={sageStyles.dateBadge}>
+                    {item.start_date && item.end_date
+                      ? `${item.start_date} – ${item.end_date}`
+                      : (item.start_date ?? item.end_date)}
+                  </Text>
+                )}
+              </View>
+              {item.comments && (
+                <Text style={sageStyles.expComments}>{item.comments}</Text>
+              )}
+            </View>
+          ))}
+        </View>
+      );
+    }
+    return null;
+  }
+
   return (
     <Document>
-      <Page size="A4" style={sageStyles.page}>
-        {/* Header */}
-        <View style={sageStyles.header}>
-          <Text style={sageStyles.cvLabel}>Curriculum Vitae</Text>
-          {data.name && <Text style={sageStyles.name}>{data.name}</Text>}
-          <Text style={sageStyles.contactLine}>
-            {data.title ? `${data.title}${contactText ? " · " : ""}` : ""}
-            {contactText}
-          </Text>
-          {data.summary && (
-            <View style={sageStyles.summaryBox}>
-              <Text style={sageStyles.summaryText}>{data.summary}</Text>
-            </View>
-          )}
-        </View>
-
-        {/* Body */}
-        <View style={sageStyles.body}>
-          {/* Left main */}
-          <View style={sageStyles.mainCol}>
-            {data.experience.length > 0 && (
-              <View style={sageStyles.sectionBlock}>
-                <Text style={sageStyles.sectionLabel}>Experience</Text>
-                <View style={sageStyles.sectionRule} />
-                {data.experience.map((item, i) => (
-                  <View key={i} style={sageStyles.experienceItem}>
-                    <View style={sageStyles.expHeader}>
-                      <View>
-                        <Text style={sageStyles.expCompany}>
-                          {item.company}
-                        </Text>
-                        {item.city && (
-                          <Text style={sageStyles.expCity}>{item.city}</Text>
-                        )}
-                      </View>
-                      {(item.start_date || item.end_date) && (
-                        <Text style={sageStyles.dateBadge}>
-                          {item.start_date && item.end_date
-                            ? `${item.start_date} – ${item.end_date}`
-                            : (item.start_date ?? item.end_date)}
-                        </Text>
-                      )}
-                    </View>
-                    {item.comments && (
-                      <Text style={sageStyles.expComments}>
-                        {item.comments}
-                      </Text>
-                    )}
-                  </View>
-                ))}
-              </View>
-            )}
-
-            {data.education.length > 0 && (
-              <View style={sageStyles.sectionBlock}>
-                <Text style={sageStyles.sectionLabel}>Education</Text>
-                <View style={sageStyles.sectionRule} />
-                {data.education.map((item, i) => (
-                  <View key={i} style={sageStyles.experienceItem}>
-                    <View style={sageStyles.expHeader}>
-                      <View>
-                        <Text style={sageStyles.eduCenter}>
-                          {item.edu_center}
-                        </Text>
-                        {item.city && (
-                          <Text style={sageStyles.eduSub}>{item.city}</Text>
-                        )}
-                      </View>
-                      {(item.start_date || item.end_date) && (
-                        <Text style={sageStyles.dateBadge}>
-                          {item.start_date && item.end_date
-                            ? `${item.start_date} – ${item.end_date}`
-                            : (item.start_date ?? item.end_date)}
-                        </Text>
-                      )}
-                    </View>
-                    {item.comments && (
-                      <Text style={sageStyles.expComments}>
-                        {item.comments}
-                      </Text>
-                    )}
-                  </View>
-                ))}
-              </View>
-            )}
-          </View>
-
-          {/* Right sidebar */}
-          <View style={sageStyles.sideCol}>
-            <View
-              style={{
-                width: "100%",
-                height: 100,
-                marginBottom: 12,
-                backgroundColor: "#EAF0EC",
-                borderRadius: 3,
-              }}
-            >
-              {data.photo ? (
-                <Image
-                  src={data.photo}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
-              ) : (
-                <View
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <View
-                    style={{
-                      width: 24,
-                      height: 24,
-                      borderRadius: 12,
-                      backgroundColor: "#7B9E87",
-                      opacity: 0.3,
-                    }}
-                  />
+      {sidebarGroups.map((group, gi) => (
+        <Page key={gi} size="A4" style={sageStyles.page}>
+          {gi === 0 && (
+            <View style={sageStyles.header}>
+              <Text style={sageStyles.cvLabel}>Curriculum Vitae</Text>
+              {data.name && <Text style={sageStyles.name}>{data.name}</Text>}
+              <Text style={sageStyles.contactLine}>
+                {data.title ? `${data.title}${contactText ? " · " : ""}` : ""}
+                {contactText}
+              </Text>
+              {data.summary && (
+                <View style={sageStyles.summaryBox}>
+                  <Text style={sageStyles.summaryText}>{data.summary}</Text>
                 </View>
               )}
             </View>
-            {data.skills.length > 0 && (
-              <View style={sageStyles.sectionBlock}>
-                <Text style={sageStyles.sectionLabel}>Skills</Text>
-                <View style={sageStyles.sectionRule} />
-                {data.skills.map((item, i) => (
-                  <Text key={i} style={sageStyles.skillItem}>
-                    {item.skill}
-                  </Text>
-                ))}
-              </View>
-            )}
-
-            {data.languages.length > 0 && (
-              <View style={sageStyles.sectionBlock}>
-                <Text style={sageStyles.sectionLabel}>Languages</Text>
-                <View style={sageStyles.sectionRule} />
-                {data.languages.map((item, i) => (
-                  <View key={i} style={sageStyles.languageRow}>
-                    <Text style={sageStyles.languageName}>{item.language}</Text>
-                    {item.level && (
-                      <Text style={sageStyles.languageLevel}>{item.level}</Text>
-                    )}
-                  </View>
-                ))}
-              </View>
-            )}
+          )}
+          <View style={sageStyles.body}>
+            <View style={sageStyles.mainCol}>
+              {group.map((key) => renderMainSection(key))}
+            </View>
+            <View style={sageStyles.sideCol}>
+              {gi === 0 && (
+                <View
+                  style={{
+                    width: "100%",
+                    height: 100,
+                    marginBottom: 12,
+                    backgroundColor: "#EAF0EC",
+                    borderRadius: 3,
+                  }}
+                >
+                  {data.photo ? (
+                    <Image
+                      src={data.photo}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  ) : (
+                    <View
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: 24,
+                          height: 24,
+                          borderRadius: 12,
+                          backgroundColor: "#7B9E87",
+                          opacity: 0.3,
+                        }}
+                      />
+                    </View>
+                  )}
+                </View>
+              )}
+              {group.map((key) => renderSidebarSection(key))}
+            </View>
           </View>
-        </View>
-      </Page>
+        </Page>
+      ))}
     </Document>
   );
 }
 
-function ClassicPdfDocument({ data }: { data: StructuredCVData }) {
+function ClassicPdfDocument({
+  data,
+  sectionOrder: _sectionOrder,
+}: {
+  data: StructuredCVData;
+  sectionOrder?: SectionOrderItem[];
+}) {
   const contactText = data.contact
     .map((c) => c.detail)
     .filter(Boolean)
@@ -1112,7 +1172,13 @@ function ClassicPdfDocument({ data }: { data: StructuredCVData }) {
   );
 }
 
-function BoldPdfDocument({ data }: { data: StructuredCVData }) {
+function BoldPdfDocument({
+  data,
+  sectionOrder: _sectionOrder,
+}: {
+  data: StructuredCVData;
+  sectionOrder?: SectionOrderItem[];
+}) {
   return (
     <Document>
       <Page
@@ -1314,157 +1380,183 @@ function BoldPdfDocument({ data }: { data: StructuredCVData }) {
   );
 }
 
-function MinimalPdfDocument({ data }: { data: StructuredCVData }) {
-  return (
-    <Document>
-      <Page size="A4" style={minimalStyles.page}>
-        <View style={minimalStyles.topRow}>
-          <View style={minimalStyles.photoCol}>
-            {data.photo ? (
-              <Image src={data.photo} style={minimalStyles.photo} />
-            ) : (
+function MinimalPdfDocument({
+  data,
+  sectionOrder,
+}: {
+  data: StructuredCVData;
+  sectionOrder?: SectionOrderItem[];
+}) {
+  const sidebarKeys = orderedSections(sectionOrder, [
+    "skills",
+    "languages",
+    "contact",
+  ]);
+  const sidebarGroups = splitAtPageBreaks(sectionOrder, sidebarKeys);
+
+  function renderSidebarSection(key: string) {
+    if (key === "skills" && data.skills.length > 0) {
+      return (
+        <View key="skills">
+          <Text style={minimalStyles.sectionLabel}>Skills</Text>
+          {data.skills.map((item, i) => (
+            <Text key={i} style={minimalStyles.skillItem}>
+              • {item.skill}
+            </Text>
+          ))}
+        </View>
+      );
+    }
+    if (key === "languages" && data.languages.length > 0) {
+      return (
+        <View key="languages">
+          <Text style={minimalStyles.sectionLabel}>Languages</Text>
+          {data.languages.map((item, i) => (
+            <Text key={i} style={minimalStyles.languageItem}>
+              • {item.language}
+              {item.level ? ` — ${item.level}` : ""}
+            </Text>
+          ))}
+        </View>
+      );
+    }
+    if (key === "contact" && data.contact.length > 0) {
+      return (
+        <View key="contact">
+          <Text style={minimalStyles.sectionLabel}>Contact</Text>
+          {data.contact.map((item, i) => (
+            <Text key={i} style={minimalStyles.contactItem}>
+              • {item.detail}
+            </Text>
+          ))}
+        </View>
+      );
+    }
+    return null;
+  }
+
+  function renderMainSection(key: string) {
+    if (key === "experience" && data.experience.length > 0) {
+      return (
+        <View key="experience">
+          <Text style={minimalStyles.sectionLabel}>Experience</Text>
+          {data.experience.map((item, i) => (
+            <View key={i} style={{ marginBottom: 10 }}>
               <View
                 style={{
-                  width: "100%",
-                  height: 180,
-                  alignItems: "center",
-                  justifyContent: "center",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
                 }}
               >
-                <View
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 16,
-                    backgroundColor: MINIMAL_INK,
-                    opacity: 0.15,
-                  }}
-                />
+                <Text style={minimalStyles.expCompany}>{item.company}</Text>
+                {(item.start_date || item.end_date) && (
+                  <Text style={minimalStyles.expDate}>
+                    {item.start_date && item.end_date
+                      ? `${item.start_date} – ${item.end_date}`
+                      : (item.start_date ?? item.end_date)}
+                  </Text>
+                )}
               </View>
-            )}
-          </View>
-          <View style={minimalStyles.infoCol}>
-            <Text style={minimalStyles.name}>{data.name}</Text>
-            {data.title && (
-              <Text style={minimalStyles.title}>{data.title}</Text>
-            )}
-            <View style={minimalStyles.shortRule} />
-            <Text style={minimalStyles.sectionLabel}>Summary</Text>
-            {data.summary && (
-              <Text style={minimalStyles.summaryText}>{data.summary}</Text>
-            )}
-          </View>
+              {item.city && (
+                <Text style={minimalStyles.expCity}>{item.city}</Text>
+              )}
+              {item.comments && (
+                <Text style={minimalStyles.expComment}>{item.comments}</Text>
+              )}
+            </View>
+          ))}
         </View>
+      );
+    }
+    if (key === "education" && data.education.length > 0) {
+      return (
+        <View key="education">
+          <Text style={minimalStyles.sectionLabel}>Education</Text>
+          {data.education.map((item, i) => (
+            <View key={i} style={{ marginBottom: 6 }}>
+              <Text style={minimalStyles.eduTitle}>{item.edu_center}</Text>
+              <Text style={minimalStyles.eduSub}>
+                {[item.start_date ?? item.end_date].filter(Boolean).join(" – ")}
+              </Text>
+              {item.comments && (
+                <Text style={minimalStyles.eduSub}>{item.comments}</Text>
+              )}
+            </View>
+          ))}
+        </View>
+      );
+    }
+    if (key === "references" && data.references) {
+      return (
+        <View key="references">
+          <Text style={minimalStyles.sectionLabel}>References</Text>
+          <Text style={{ fontSize: 8, color: MINIMAL_MUTED, lineHeight: 1.5 }}>
+            {data.references}
+          </Text>
+        </View>
+      );
+    }
+    return null;
+  }
 
-        <View style={minimalStyles.fullRule} />
-
-        <View style={minimalStyles.bodyRow}>
-          <View style={minimalStyles.sideCol}>
-            {data.contact.length > 0 && (
-              <View>
-                <Text style={minimalStyles.sectionLabel}>Contact</Text>
-                {data.contact.map((item, i) => (
-                  <Text key={i} style={minimalStyles.contactItem}>
-                    • {item.detail}
-                  </Text>
-                ))}
-              </View>
-            )}
-
-            {data.skills.length > 0 && (
-              <View>
-                <Text style={minimalStyles.sectionLabel}>Skills</Text>
-                {data.skills.map((item, i) => (
-                  <Text key={i} style={minimalStyles.skillItem}>
-                    • {item.skill}
-                  </Text>
-                ))}
-              </View>
-            )}
-
-            {data.education.length > 0 && (
-              <View>
-                <Text style={minimalStyles.sectionLabel}>Education</Text>
-                {data.education.map((item, i) => (
-                  <View key={i} style={{ marginBottom: 6 }}>
-                    <Text style={minimalStyles.eduTitle}>
-                      {item.edu_center}
-                    </Text>
-                    <Text style={minimalStyles.eduSub}>
-                      {[item.start_date ?? item.end_date]
-                        .filter(Boolean)
-                        .join(" – ")}
-                    </Text>
-                    {item.comments && (
-                      <Text style={minimalStyles.eduSub}>{item.comments}</Text>
-                    )}
-                  </View>
-                ))}
-              </View>
-            )}
-
-            {data.languages.length > 0 && (
-              <View>
-                <Text style={minimalStyles.sectionLabel}>Languages</Text>
-                {data.languages.map((item, i) => (
-                  <Text key={i} style={minimalStyles.languageItem}>
-                    • {item.language}
-                    {item.level ? ` — ${item.level}` : ""}
-                  </Text>
-                ))}
-              </View>
-            )}
-          </View>
-
-          <View style={minimalStyles.mainCol}>
-            {data.experience.length > 0 && (
-              <View>
-                <Text style={minimalStyles.sectionLabel}>Experience</Text>
-                {data.experience.map((item, i) => (
-                  <View key={i} style={{ marginBottom: 10 }}>
+  return (
+    <Document>
+      {sidebarGroups.map((group, gi) => (
+        <Page key={gi} size="A4" style={minimalStyles.page}>
+          {gi === 0 && (
+            <>
+              <View style={minimalStyles.topRow}>
+                <View style={minimalStyles.photoCol}>
+                  {data.photo ? (
+                    <Image src={data.photo} style={minimalStyles.photo} />
+                  ) : (
                     <View
                       style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
+                        width: "100%",
+                        height: 180,
+                        alignItems: "center",
+                        justifyContent: "center",
                       }}
                     >
-                      <Text style={minimalStyles.expCompany}>
-                        {item.company}
-                      </Text>
-                      {(item.start_date || item.end_date) && (
-                        <Text style={minimalStyles.expDate}>
-                          {item.start_date && item.end_date
-                            ? `${item.start_date} – ${item.end_date}`
-                            : (item.start_date ?? item.end_date)}
-                        </Text>
-                      )}
+                      <View
+                        style={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: 16,
+                          backgroundColor: MINIMAL_INK,
+                          opacity: 0.15,
+                        }}
+                      />
                     </View>
-                    {item.city && (
-                      <Text style={minimalStyles.expCity}>{item.city}</Text>
-                    )}
-                    {item.comments && (
-                      <Text style={minimalStyles.expComment}>
-                        {item.comments}
-                      </Text>
-                    )}
-                  </View>
-                ))}
+                  )}
+                </View>
+                <View style={minimalStyles.infoCol}>
+                  <Text style={minimalStyles.name}>{data.name}</Text>
+                  {data.title && (
+                    <Text style={minimalStyles.title}>{data.title}</Text>
+                  )}
+                  <View style={minimalStyles.shortRule} />
+                  <Text style={minimalStyles.sectionLabel}>Summary</Text>
+                  {data.summary && (
+                    <Text style={minimalStyles.summaryText}>
+                      {data.summary}
+                    </Text>
+                  )}
+                </View>
               </View>
-            )}
-
-            {data.references.length > 0 && (
-              <View>
-                <Text style={minimalStyles.sectionLabel}>References</Text>
-                <Text
-                  style={{ fontSize: 8, color: MINIMAL_MUTED, lineHeight: 1.5 }}
-                >
-                  {data.references}
-                </Text>
-              </View>
-            )}
+              <View style={minimalStyles.fullRule} />
+            </>
+          )}
+          <View style={minimalStyles.bodyRow}>
+            <View style={minimalStyles.sideCol}>
+              {group.map((key) => renderSidebarSection(key))}
+            </View>
+            <View style={minimalStyles.mainCol}>
+              {group.map((key) => renderMainSection(key))}
+            </View>
           </View>
-        </View>
-      </Page>
+        </Page>
+      ))}
     </Document>
   );
 }
@@ -1472,13 +1564,19 @@ function MinimalPdfDocument({ data }: { data: StructuredCVData }) {
 export function CvPdfDocument({
   data,
   template,
+  sectionOrder,
 }: {
   data: StructuredCVData;
   template: CVTemplateId;
+  sectionOrder?: SectionOrderItem[];
 }) {
-  if (template === "sage") return <SagePdfDocument data={data} />;
-  if (template === "classic") return <ClassicPdfDocument data={data} />;
-  if (template === "bold") return <BoldPdfDocument data={data} />;
-  if (template === "minimal") return <MinimalPdfDocument data={data} />;
-  return <TerracottaPdfDocument data={data} />;
+  if (template === "sage")
+    return <SagePdfDocument data={data} sectionOrder={sectionOrder} />;
+  if (template === "classic")
+    return <ClassicPdfDocument data={data} sectionOrder={sectionOrder} />;
+  if (template === "bold")
+    return <BoldPdfDocument data={data} sectionOrder={sectionOrder} />;
+  if (template === "minimal")
+    return <MinimalPdfDocument data={data} sectionOrder={sectionOrder} />;
+  return <TerracottaPdfDocument data={data} sectionOrder={sectionOrder} />;
 }

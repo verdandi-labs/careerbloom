@@ -177,3 +177,42 @@ export const DEFAULT_TEMPLATE: CVTemplateId = "terracotta";
 export function getTemplate(id?: string | null): CVTemplateMeta {
   return CV_TEMPLATES.find((t) => t.id === id) ?? CV_TEMPLATES[0];
 }
+
+export function orderedSections(
+  order: SectionOrderItem[] | undefined,
+  keys: (keyof StructuredCVData)[],
+): (keyof StructuredCVData)[] {
+  if (!order) return keys;
+  const ordered = order
+    .filter(
+      (item): item is { type: "section"; key: keyof StructuredCVData } =>
+        item.type === "section" &&
+        keys.includes(item.key as keyof StructuredCVData),
+    )
+    .map((item) => item.key);
+  const missing = keys.filter((k) => !ordered.includes(k));
+  return [...ordered, ...missing];
+}
+
+export function splitAtPageBreaks(
+  order: SectionOrderItem[] | undefined,
+  keys: (keyof StructuredCVData)[],
+): (keyof StructuredCVData)[][] {
+  if (!order) return [keys];
+  const groups: (keyof StructuredCVData)[][] = [[]];
+  for (const item of order) {
+    if (item.type === "page-break") {
+      groups.push([]);
+    } else if (
+      item.type === "section" &&
+      keys.includes(item.key as keyof StructuredCVData)
+    ) {
+      groups[groups.length - 1].push(item.key as keyof StructuredCVData);
+    }
+  }
+  const missing = keys.filter((k) => !groups.some((g) => g.includes(k)));
+  if (missing.length > 0) {
+    groups[groups.length - 1].push(...missing);
+  }
+  return groups.filter((g) => g.length > 0);
+}
