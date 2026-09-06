@@ -1,22 +1,29 @@
-import { Document, Page, View, Text, StyleSheet, Image } from "@react-pdf/renderer"
-import type { CVTemplateId, StructuredCVData } from "@/lib/cv-templates"
+import {
+  Document,
+  Page,
+  View,
+  Text,
+  StyleSheet,
+  Image,
+} from "@react-pdf/renderer";
+import type { CVTemplateId, StructuredCVData } from "@/lib/cv-templates";
 
-const TERRACOTTA = "#CB6843"
-const TERRACOTTA_LIGHT = "#FDE8E8"
-const SAGE = "#7B9E87"
-const SAGE_LIGHT = "#EAF0EC"
-const SAGE_MID = "#C5D8CB"
-const MUTED = "#9b8b86"
-const INK = "#1c1410"
-const CLASSIC_INK = "#111"
-const CLASSIC_MUTED = "#666"
-const CLASSIC_RULE = "#d0c8c4"
-const BOLD_INK = "#111"
-const BOLD_MUTED = "#555"
-const BOLD_BG = "#E8E5DC"
-const MINIMAL_INK = "#111"
-const MINIMAL_MUTED = "#666"
-const MINIMAL_LIGHT = "#f5f5f5"
+const TERRACOTTA = "#CB6843";
+const TERRACOTTA_LIGHT = "#FDE8E8";
+const SAGE = "#7B9E87";
+const SAGE_LIGHT = "#EAF0EC";
+const SAGE_MID = "#C5D8CB";
+const MUTED = "#9b8b86";
+const INK = "#1c1410";
+const CLASSIC_INK = "#111";
+const CLASSIC_MUTED = "#666";
+const CLASSIC_RULE = "#d0c8c4";
+const BOLD_INK = "#111";
+const BOLD_MUTED = "#555";
+const BOLD_BG = "#E8E5DC";
+const MINIMAL_INK = "#111";
+const MINIMAL_MUTED = "#666";
+const MINIMAL_LIGHT = "#f5f5f5";
 
 const terracottaStyles = StyleSheet.create({
   page: {
@@ -154,7 +161,7 @@ const terracottaStyles = StyleSheet.create({
   sectionBlock: {
     marginBottom: 4,
   },
-})
+});
 
 const sageStyles = StyleSheet.create({
   page: {
@@ -295,7 +302,7 @@ const sageStyles = StyleSheet.create({
   sectionBlock: {
     marginBottom: 12,
   },
-})
+});
 
 const classicStyles = StyleSheet.create({
   page: {
@@ -385,7 +392,7 @@ const classicStyles = StyleSheet.create({
     fontSize: 9,
     color: CLASSIC_MUTED,
   },
-})
+});
 
 const boldStyles = StyleSheet.create({
   topBar: {
@@ -520,7 +527,7 @@ const boldStyles = StyleSheet.create({
     marginHorizontal: 24,
     letterSpacing: -1,
   },
-})
+});
 
 const minimalStyles = StyleSheet.create({
   page: {
@@ -648,19 +655,45 @@ const minimalStyles = StyleSheet.create({
     lineHeight: 1.5,
     marginTop: 2,
   },
-})
+});
 
 function TerracottaPdfDocument({ data }: { data: StructuredCVData }) {
   return (
     <Document>
       <Page size="A4" style={terracottaStyles.page}>
         <View style={terracottaStyles.sidebar}>
-          <View style={{ width: "100%", height: 100, marginBottom: 12, backgroundColor: "#F5E6DF", borderRadius: 3 }}>
+          <View
+            style={{
+              width: "100%",
+              height: 100,
+              marginBottom: 12,
+              backgroundColor: "#F5E6DF",
+              borderRadius: 3,
+            }}
+          >
             {data.photo ? (
-              <Image src={data.photo} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <Image
+                src={data.photo}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
             ) : (
-              <View style={{ width: "100%", height: "100%", alignItems: "center", justifyContent: "center" }}>
-                <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: "#CB6843", opacity: 0.3 }} />
+              <View
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <View
+                  style={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: 12,
+                    backgroundColor: "#CB6843",
+                    opacity: 0.3,
+                  }}
+                />
               </View>
             )}
           </View>
@@ -668,7 +701,9 @@ function TerracottaPdfDocument({ data }: { data: StructuredCVData }) {
             <View style={terracottaStyles.sectionBlock}>
               <Text style={terracottaStyles.sidebarLabel}>Contact</Text>
               {data.contact.map((item, i) => (
-                <Text key={i} style={terracottaStyles.contactItem}>{item.detail}</Text>
+                <Text key={i} style={terracottaStyles.contactItem}>
+                  {item.detail}
+                </Text>
               ))}
             </View>
           )}
@@ -678,7 +713,9 @@ function TerracottaPdfDocument({ data }: { data: StructuredCVData }) {
               <Text style={terracottaStyles.sidebarLabel}>Skills</Text>
               <View style={terracottaStyles.skillsWrap}>
                 {data.skills.map((item, i) => (
-                  <Text key={i} style={terracottaStyles.skillPill}>{item.skill}</Text>
+                  <Text key={i} style={terracottaStyles.skillPill}>
+                    {item.skill}
+                  </Text>
                 ))}
               </View>
             </View>
@@ -689,8 +726,14 @@ function TerracottaPdfDocument({ data }: { data: StructuredCVData }) {
               <Text style={terracottaStyles.sidebarLabel}>Languages</Text>
               {data.languages.map((item, i) => (
                 <View key={i} style={terracottaStyles.languageRow}>
-                  <Text style={terracottaStyles.languageName}>{item.language}</Text>
-                  {item.level && <Text style={terracottaStyles.languageLevel}>{item.level}</Text>}
+                  <Text style={terracottaStyles.languageName}>
+                    {item.language}
+                  </Text>
+                  {item.level && (
+                    <Text style={terracottaStyles.languageLevel}>
+                      {item.level}
+                    </Text>
+                  )}
                 </View>
               ))}
             </View>
@@ -701,11 +744,17 @@ function TerracottaPdfDocument({ data }: { data: StructuredCVData }) {
               <Text style={terracottaStyles.sidebarLabel}>Education</Text>
               {data.education.map((item, i) => (
                 <View key={i} style={{ marginBottom: 6 }}>
-                  <Text style={terracottaStyles.eduCenter}>{item.edu_center}</Text>
-                  <Text style={terracottaStyles.eduSub}>
-                    {[item.city, item.end_date ?? item.start_date].filter(Boolean).join(" · ")}
+                  <Text style={terracottaStyles.eduCenter}>
+                    {item.edu_center}
                   </Text>
-                  {item.comments && <Text style={terracottaStyles.eduSub}>{item.comments}</Text>}
+                  <Text style={terracottaStyles.eduSub}>
+                    {[item.city, item.end_date ?? item.start_date]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </Text>
+                  {item.comments && (
+                    <Text style={terracottaStyles.eduSub}>{item.comments}</Text>
+                  )}
                 </View>
               ))}
             </View>
@@ -716,8 +765,12 @@ function TerracottaPdfDocument({ data }: { data: StructuredCVData }) {
           {data.name && (
             <View>
               <Text style={terracottaStyles.name}>{data.name}</Text>
-              {data.title && <Text style={terracottaStyles.jobTitle}>{data.title}</Text>}
-              {data.summary && <Text style={terracottaStyles.summary}>{data.summary}</Text>}
+              {data.title && (
+                <Text style={terracottaStyles.jobTitle}>{data.title}</Text>
+              )}
+              {data.summary && (
+                <Text style={terracottaStyles.summary}>{data.summary}</Text>
+              )}
             </View>
           )}
 
@@ -731,19 +784,27 @@ function TerracottaPdfDocument({ data }: { data: StructuredCVData }) {
                   <View key={i} style={terracottaStyles.experienceItem}>
                     <View style={terracottaStyles.expHeader}>
                       <View>
-                        <Text style={terracottaStyles.expCompany}>{item.company}</Text>
-                        {item.city && <Text style={terracottaStyles.expCity}>{item.city}</Text>}
+                        <Text style={terracottaStyles.expCompany}>
+                          {item.company}
+                        </Text>
+                        {item.city && (
+                          <Text style={terracottaStyles.expCity}>
+                            {item.city}
+                          </Text>
+                        )}
                       </View>
                       {(item.start_date || item.end_date) && (
                         <Text style={terracottaStyles.dateBadge}>
                           {item.start_date && item.end_date
                             ? `${item.start_date} – ${item.end_date}`
-                            : item.start_date ?? item.end_date}
+                            : (item.start_date ?? item.end_date)}
                         </Text>
                       )}
                     </View>
                     {item.comments && (
-                      <Text style={terracottaStyles.expComments}>{item.comments}</Text>
+                      <Text style={terracottaStyles.expComments}>
+                        {item.comments}
+                      </Text>
                     )}
                   </View>
                 ))}
@@ -753,11 +814,14 @@ function TerracottaPdfDocument({ data }: { data: StructuredCVData }) {
         </View>
       </Page>
     </Document>
-  )
+  );
 }
 
 function SagePdfDocument({ data }: { data: StructuredCVData }) {
-  const contactText = data.contact.map((c) => c.detail).filter(Boolean).join(" · ")
+  const contactText = data.contact
+    .map((c) => c.detail)
+    .filter(Boolean)
+    .join(" · ");
 
   return (
     <Document>
@@ -767,7 +831,8 @@ function SagePdfDocument({ data }: { data: StructuredCVData }) {
           <Text style={sageStyles.cvLabel}>Curriculum Vitae</Text>
           {data.name && <Text style={sageStyles.name}>{data.name}</Text>}
           <Text style={sageStyles.contactLine}>
-            {data.title ? `${data.title}${contactText ? " · " : ""}` : ""}{contactText}
+            {data.title ? `${data.title}${contactText ? " · " : ""}` : ""}
+            {contactText}
           </Text>
           {data.summary && (
             <View style={sageStyles.summaryBox}>
@@ -788,19 +853,25 @@ function SagePdfDocument({ data }: { data: StructuredCVData }) {
                   <View key={i} style={sageStyles.experienceItem}>
                     <View style={sageStyles.expHeader}>
                       <View>
-                        <Text style={sageStyles.expCompany}>{item.company}</Text>
-                        {item.city && <Text style={sageStyles.expCity}>{item.city}</Text>}
+                        <Text style={sageStyles.expCompany}>
+                          {item.company}
+                        </Text>
+                        {item.city && (
+                          <Text style={sageStyles.expCity}>{item.city}</Text>
+                        )}
                       </View>
                       {(item.start_date || item.end_date) && (
                         <Text style={sageStyles.dateBadge}>
                           {item.start_date && item.end_date
                             ? `${item.start_date} – ${item.end_date}`
-                            : item.start_date ?? item.end_date}
+                            : (item.start_date ?? item.end_date)}
                         </Text>
                       )}
                     </View>
                     {item.comments && (
-                      <Text style={sageStyles.expComments}>{item.comments}</Text>
+                      <Text style={sageStyles.expComments}>
+                        {item.comments}
+                      </Text>
                     )}
                   </View>
                 ))}
@@ -815,19 +886,25 @@ function SagePdfDocument({ data }: { data: StructuredCVData }) {
                   <View key={i} style={sageStyles.experienceItem}>
                     <View style={sageStyles.expHeader}>
                       <View>
-                        <Text style={sageStyles.eduCenter}>{item.edu_center}</Text>
-                        {item.city && <Text style={sageStyles.eduSub}>{item.city}</Text>}
+                        <Text style={sageStyles.eduCenter}>
+                          {item.edu_center}
+                        </Text>
+                        {item.city && (
+                          <Text style={sageStyles.eduSub}>{item.city}</Text>
+                        )}
                       </View>
                       {(item.start_date || item.end_date) && (
                         <Text style={sageStyles.dateBadge}>
                           {item.start_date && item.end_date
                             ? `${item.start_date} – ${item.end_date}`
-                            : item.start_date ?? item.end_date}
+                            : (item.start_date ?? item.end_date)}
                         </Text>
                       )}
                     </View>
                     {item.comments && (
-                      <Text style={sageStyles.expComments}>{item.comments}</Text>
+                      <Text style={sageStyles.expComments}>
+                        {item.comments}
+                      </Text>
                     )}
                   </View>
                 ))}
@@ -837,12 +914,38 @@ function SagePdfDocument({ data }: { data: StructuredCVData }) {
 
           {/* Right sidebar */}
           <View style={sageStyles.sideCol}>
-            <View style={{ width: "100%", height: 100, marginBottom: 12, backgroundColor: "#EAF0EC", borderRadius: 3 }}>
+            <View
+              style={{
+                width: "100%",
+                height: 100,
+                marginBottom: 12,
+                backgroundColor: "#EAF0EC",
+                borderRadius: 3,
+              }}
+            >
               {data.photo ? (
-                <Image src={data.photo} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                <Image
+                  src={data.photo}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
               ) : (
-                <View style={{ width: "100%", height: "100%", alignItems: "center", justifyContent: "center" }}>
-                  <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: "#7B9E87", opacity: 0.3 }} />
+                <View
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 24,
+                      height: 24,
+                      borderRadius: 12,
+                      backgroundColor: "#7B9E87",
+                      opacity: 0.3,
+                    }}
+                  />
                 </View>
               )}
             </View>
@@ -851,7 +954,9 @@ function SagePdfDocument({ data }: { data: StructuredCVData }) {
                 <Text style={sageStyles.sectionLabel}>Skills</Text>
                 <View style={sageStyles.sectionRule} />
                 {data.skills.map((item, i) => (
-                  <Text key={i} style={sageStyles.skillItem}>{item.skill}</Text>
+                  <Text key={i} style={sageStyles.skillItem}>
+                    {item.skill}
+                  </Text>
                 ))}
               </View>
             )}
@@ -863,7 +968,9 @@ function SagePdfDocument({ data }: { data: StructuredCVData }) {
                 {data.languages.map((item, i) => (
                   <View key={i} style={sageStyles.languageRow}>
                     <Text style={sageStyles.languageName}>{item.language}</Text>
-                    {item.level && <Text style={sageStyles.languageLevel}>{item.level}</Text>}
+                    {item.level && (
+                      <Text style={sageStyles.languageLevel}>{item.level}</Text>
+                    )}
                   </View>
                 ))}
               </View>
@@ -872,18 +979,22 @@ function SagePdfDocument({ data }: { data: StructuredCVData }) {
         </View>
       </Page>
     </Document>
-  )
+  );
 }
 
 function ClassicPdfDocument({ data }: { data: StructuredCVData }) {
-  const contactText = data.contact.map((c) => c.detail).filter(Boolean).join(" · ")
+  const contactText = data.contact
+    .map((c) => c.detail)
+    .filter(Boolean)
+    .join(" · ");
 
   return (
     <Document>
       <Page size="A4" style={classicStyles.page}>
         <Text style={classicStyles.name}>{data.name}</Text>
         <Text style={classicStyles.contactLine}>
-          {data.title ? `${data.title}${contactText ? " · " : ""}` : ""}{contactText}
+          {data.title ? `${data.title}${contactText ? " · " : ""}` : ""}
+          {contactText}
         </Text>
 
         <View style={classicStyles.rule} />
@@ -902,17 +1013,25 @@ function ClassicPdfDocument({ data }: { data: StructuredCVData }) {
             <Text style={classicStyles.sectionLabel}>Experience</Text>
             {data.experience.map((item, i) => (
               <View key={i} style={{ marginBottom: 8 }}>
-                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 2 }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    marginBottom: 2,
+                  }}
+                >
                   <Text style={classicStyles.expRole}>{item.company}</Text>
                   {(item.start_date || item.end_date) && (
                     <Text style={classicStyles.expDate}>
                       {item.start_date && item.end_date
                         ? `${item.start_date} – ${item.end_date}`
-                        : item.start_date ?? item.end_date}
+                        : (item.start_date ?? item.end_date)}
                     </Text>
                   )}
                 </View>
-                {item.city && <Text style={classicStyles.expCompany}>{item.city}</Text>}
+                {item.city && (
+                  <Text style={classicStyles.expCompany}>{item.city}</Text>
+                )}
                 {item.comments && (
                   <Text style={classicStyles.expComment}>{item.comments}</Text>
                 )}
@@ -928,17 +1047,25 @@ function ClassicPdfDocument({ data }: { data: StructuredCVData }) {
             <Text style={classicStyles.sectionLabel}>Education</Text>
             {data.education.map((item, i) => (
               <View key={i} style={{ marginBottom: 6 }}>
-                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 2 }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    marginBottom: 2,
+                  }}
+                >
                   <Text style={classicStyles.expRole}>{item.edu_center}</Text>
                   {(item.start_date || item.end_date) && (
                     <Text style={classicStyles.expDate}>
                       {item.start_date && item.end_date
                         ? `${item.start_date} – ${item.end_date}`
-                        : item.start_date ?? item.end_date}
+                        : (item.start_date ?? item.end_date)}
                     </Text>
                   )}
                 </View>
-                {item.city && <Text style={classicStyles.expCompany}>{item.city}</Text>}
+                {item.city && (
+                  <Text style={classicStyles.expCompany}>{item.city}</Text>
+                )}
               </View>
             ))}
           </View>
@@ -952,7 +1079,10 @@ function ClassicPdfDocument({ data }: { data: StructuredCVData }) {
               <View>
                 <Text style={classicStyles.sectionLabel}>Skills</Text>
                 <Text style={classicStyles.skillText}>
-                  {data.skills.map((item) => item.skill).filter(Boolean).join(", ")}
+                  {data.skills
+                    .map((item) => item.skill)
+                    .filter(Boolean)
+                    .join(", ")}
                 </Text>
               </View>
             )}
@@ -963,8 +1093,14 @@ function ClassicPdfDocument({ data }: { data: StructuredCVData }) {
                 <Text style={classicStyles.sectionLabel}>Languages</Text>
                 {data.languages.map((item, i) => (
                   <View key={i} style={classicStyles.languageRow}>
-                    <Text style={classicStyles.languageName}>{item.language}</Text>
-                    {item.level && <Text style={classicStyles.languageLevel}>{item.level}</Text>}
+                    <Text style={classicStyles.languageName}>
+                      {item.language}
+                    </Text>
+                    {item.level && (
+                      <Text style={classicStyles.languageLevel}>
+                        {item.level}
+                      </Text>
+                    )}
                   </View>
                 ))}
               </View>
@@ -973,13 +1109,16 @@ function ClassicPdfDocument({ data }: { data: StructuredCVData }) {
         </View>
       </Page>
     </Document>
-  )
+  );
 }
 
 function BoldPdfDocument({ data }: { data: StructuredCVData }) {
   return (
     <Document>
-      <Page size="A4" style={{ backgroundColor: BOLD_BG, fontFamily: "DM Sans" }}>
+      <Page
+        size="A4"
+        style={{ backgroundColor: BOLD_BG, fontFamily: "DM Sans" }}
+      >
         <View style={boldStyles.topBar}>
           <Text>{data.name}</Text>
           <Text>{data.contact[0]?.detail}</Text>
@@ -991,14 +1130,34 @@ function BoldPdfDocument({ data }: { data: StructuredCVData }) {
             <Text style={boldStyles.heroTitle}>RESUME</Text>
             <Text style={boldStyles.heroSubtitle}>{data.title}</Text>
             <Text style={boldStyles.heroName}>{data.name}</Text>
-            {data.summary && <Text style={boldStyles.heroSummary}>{data.summary}</Text>}
+            {data.summary && (
+              <Text style={boldStyles.heroSummary}>{data.summary}</Text>
+            )}
           </View>
           <View style={boldStyles.heroPhoto}>
             {data.photo ? (
-              <Image src={data.photo} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <Image
+                src={data.photo}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
             ) : (
-              <View style={{ width: "100%", height: "100%", alignItems: "center", justifyContent: "center" }}>
-                <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: BOLD_INK, opacity: 0.15 }} />
+              <View
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <View
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 16,
+                    backgroundColor: BOLD_INK,
+                    opacity: 0.15,
+                  }}
+                />
               </View>
             )}
           </View>
@@ -1012,16 +1171,27 @@ function BoldPdfDocument({ data }: { data: StructuredCVData }) {
               <View style={{ marginBottom: 16 }}>
                 {data.experience.map((item, i) => (
                   <View key={i} style={{ marginBottom: 10 }}>
-                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                      }}
+                    >
                       <Text style={boldStyles.expCompany}>{item.company}</Text>
                       {(item.start_date || item.end_date) && (
                         <Text style={boldStyles.expDate}>
-                          {item.start_date && item.end_date ? `${item.start_date} – ${item.end_date}` : item.start_date ?? item.end_date}
+                          {item.start_date && item.end_date
+                            ? `${item.start_date} – ${item.end_date}`
+                            : (item.start_date ?? item.end_date)}
                         </Text>
                       )}
                     </View>
-                    {item.city && <Text style={boldStyles.expCity}>{item.city}</Text>}
-                    {item.comments && <Text style={boldStyles.expComment}>{item.comments}</Text>}
+                    {item.city && (
+                      <Text style={boldStyles.expCity}>{item.city}</Text>
+                    )}
+                    {item.comments && (
+                      <Text style={boldStyles.expComment}>{item.comments}</Text>
+                    )}
                   </View>
                 ))}
               </View>
@@ -1032,14 +1202,35 @@ function BoldPdfDocument({ data }: { data: StructuredCVData }) {
                 <Text style={boldStyles.sectionLabel}>Languages</Text>
                 {data.languages.map((item, i) => (
                   <View key={i} style={boldStyles.languageRow}>
-                    <Text style={boldStyles.languageName}>{item.language}{item.level ? ` — ${item.level}` : ""}</Text>
+                    <Text style={boldStyles.languageName}>
+                      {item.language}
+                      {item.level ? ` — ${item.level}` : ""}
+                    </Text>
                     <View style={{ flexDirection: "row", gap: 3 }}>
                       {Array.from({ length: 5 }).map((_, di) => {
-                        const map: Record<string, number> = { native: 5, fluent: 4, advanced: 3, intermediate: 2, basic: 1 }
-                        const filled = map[(item.level ?? "").toLowerCase()] ?? 3
+                        const map: Record<string, number> = {
+                          native: 5,
+                          fluent: 4,
+                          advanced: 3,
+                          intermediate: 2,
+                          basic: 1,
+                        };
+                        const filled =
+                          map[(item.level ?? "").toLowerCase()] ?? 3;
                         return (
-                          <View key={di} style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: di < filled ? BOLD_INK : "transparent", borderWidth: 1, borderColor: BOLD_INK }} />
-                        )
+                          <View
+                            key={di}
+                            style={{
+                              width: 8,
+                              height: 8,
+                              borderRadius: 4,
+                              backgroundColor:
+                                di < filled ? BOLD_INK : "transparent",
+                              borderWidth: 1,
+                              borderColor: BOLD_INK,
+                            }}
+                          />
+                        );
                       })}
                     </View>
                   </View>
@@ -1053,15 +1244,26 @@ function BoldPdfDocument({ data }: { data: StructuredCVData }) {
               <View style={{ marginBottom: 16 }}>
                 {data.education.map((item, i) => (
                   <View key={i} style={{ marginBottom: 10 }}>
-                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                      <Text style={boldStyles.expCompany}>{item.edu_center}</Text>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Text style={boldStyles.expCompany}>
+                        {item.edu_center}
+                      </Text>
                       {(item.start_date || item.end_date) && (
                         <Text style={boldStyles.expDate}>
-                          {item.start_date && item.end_date ? `${item.start_date} – ${item.end_date}` : item.start_date ?? item.end_date}
+                          {item.start_date && item.end_date
+                            ? `${item.start_date} – ${item.end_date}`
+                            : (item.start_date ?? item.end_date)}
                         </Text>
                       )}
                     </View>
-                    {item.city && <Text style={boldStyles.expCity}>{item.city}</Text>}
+                    {item.city && (
+                      <Text style={boldStyles.expCity}>{item.city}</Text>
+                    )}
                   </View>
                 ))}
               </View>
@@ -1072,10 +1274,22 @@ function BoldPdfDocument({ data }: { data: StructuredCVData }) {
                 <Text style={boldStyles.sectionLabel}>Skills</Text>
                 <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
                   {data.skills.map((item, i) => (
-                    <Text key={i} style={[boldStyles.skillPill, i < Math.ceil(data.skills.length / 2)
-                      ? { backgroundColor: BOLD_INK, color: BOLD_BG }
-                      : { backgroundColor: "transparent", color: BOLD_INK, borderWidth: 1, borderColor: BOLD_INK }
-                    ]}>{item.skill}</Text>
+                    <Text
+                      key={i}
+                      style={[
+                        boldStyles.skillPill,
+                        i < Math.ceil(data.skills.length / 2)
+                          ? { backgroundColor: BOLD_INK, color: BOLD_BG }
+                          : {
+                              backgroundColor: "transparent",
+                              color: BOLD_INK,
+                              borderWidth: 1,
+                              borderColor: BOLD_INK,
+                            },
+                      ]}
+                    >
+                      {item.skill}
+                    </Text>
                   ))}
                 </View>
               </View>
@@ -1084,7 +1298,11 @@ function BoldPdfDocument({ data }: { data: StructuredCVData }) {
             {data.references.length > 0 && (
               <View>
                 <Text style={boldStyles.sectionLabel}>References</Text>
-                <Text style={{ fontSize: 8, color: BOLD_MUTED, lineHeight: 1.5 }}>{data.references}</Text>
+                <Text
+                  style={{ fontSize: 8, color: BOLD_MUTED, lineHeight: 1.5 }}
+                >
+                  {data.references}
+                </Text>
               </View>
             )}
           </View>
@@ -1093,7 +1311,7 @@ function BoldPdfDocument({ data }: { data: StructuredCVData }) {
         <Text style={boldStyles.footerName}>{data.name}</Text>
       </Page>
     </Document>
-  )
+  );
 }
 
 function MinimalPdfDocument({ data }: { data: StructuredCVData }) {
@@ -1105,17 +1323,36 @@ function MinimalPdfDocument({ data }: { data: StructuredCVData }) {
             {data.photo ? (
               <Image src={data.photo} style={minimalStyles.photo} />
             ) : (
-              <View style={{ width: "100%", height: 180, alignItems: "center", justifyContent: "center" }}>
-                <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: MINIMAL_INK, opacity: 0.15 }} />
+              <View
+                style={{
+                  width: "100%",
+                  height: 180,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <View
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 16,
+                    backgroundColor: MINIMAL_INK,
+                    opacity: 0.15,
+                  }}
+                />
               </View>
             )}
           </View>
           <View style={minimalStyles.infoCol}>
             <Text style={minimalStyles.name}>{data.name}</Text>
-            {data.title && <Text style={minimalStyles.title}>{data.title}</Text>}
+            {data.title && (
+              <Text style={minimalStyles.title}>{data.title}</Text>
+            )}
             <View style={minimalStyles.shortRule} />
             <Text style={minimalStyles.sectionLabel}>Summary</Text>
-            {data.summary && <Text style={minimalStyles.summaryText}>{data.summary}</Text>}
+            {data.summary && (
+              <Text style={minimalStyles.summaryText}>{data.summary}</Text>
+            )}
           </View>
         </View>
 
@@ -1127,7 +1364,9 @@ function MinimalPdfDocument({ data }: { data: StructuredCVData }) {
               <View>
                 <Text style={minimalStyles.sectionLabel}>Contact</Text>
                 {data.contact.map((item, i) => (
-                  <Text key={i} style={minimalStyles.contactItem}>• {item.detail}</Text>
+                  <Text key={i} style={minimalStyles.contactItem}>
+                    • {item.detail}
+                  </Text>
                 ))}
               </View>
             )}
@@ -1136,7 +1375,9 @@ function MinimalPdfDocument({ data }: { data: StructuredCVData }) {
               <View>
                 <Text style={minimalStyles.sectionLabel}>Skills</Text>
                 {data.skills.map((item, i) => (
-                  <Text key={i} style={minimalStyles.skillItem}>• {item.skill}</Text>
+                  <Text key={i} style={minimalStyles.skillItem}>
+                    • {item.skill}
+                  </Text>
                 ))}
               </View>
             )}
@@ -1146,11 +1387,17 @@ function MinimalPdfDocument({ data }: { data: StructuredCVData }) {
                 <Text style={minimalStyles.sectionLabel}>Education</Text>
                 {data.education.map((item, i) => (
                   <View key={i} style={{ marginBottom: 6 }}>
-                    <Text style={minimalStyles.eduTitle}>{item.edu_center}</Text>
-                    <Text style={minimalStyles.eduSub}>
-                      {[item.start_date ?? item.end_date].filter(Boolean).join(" – ")}
+                    <Text style={minimalStyles.eduTitle}>
+                      {item.edu_center}
                     </Text>
-                    {item.comments && <Text style={minimalStyles.eduSub}>{item.comments}</Text>}
+                    <Text style={minimalStyles.eduSub}>
+                      {[item.start_date ?? item.end_date]
+                        .filter(Boolean)
+                        .join(" – ")}
+                    </Text>
+                    {item.comments && (
+                      <Text style={minimalStyles.eduSub}>{item.comments}</Text>
+                    )}
                   </View>
                 ))}
               </View>
@@ -1160,7 +1407,10 @@ function MinimalPdfDocument({ data }: { data: StructuredCVData }) {
               <View>
                 <Text style={minimalStyles.sectionLabel}>Languages</Text>
                 {data.languages.map((item, i) => (
-                  <Text key={i} style={minimalStyles.languageItem}>• {item.language}{item.level ? ` — ${item.level}` : ""}</Text>
+                  <Text key={i} style={minimalStyles.languageItem}>
+                    • {item.language}
+                    {item.level ? ` — ${item.level}` : ""}
+                  </Text>
                 ))}
               </View>
             )}
@@ -1172,16 +1422,31 @@ function MinimalPdfDocument({ data }: { data: StructuredCVData }) {
                 <Text style={minimalStyles.sectionLabel}>Experience</Text>
                 {data.experience.map((item, i) => (
                   <View key={i} style={{ marginBottom: 10 }}>
-                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                      <Text style={minimalStyles.expCompany}>{item.company}</Text>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Text style={minimalStyles.expCompany}>
+                        {item.company}
+                      </Text>
                       {(item.start_date || item.end_date) && (
                         <Text style={minimalStyles.expDate}>
-                          {item.start_date && item.end_date ? `${item.start_date} – ${item.end_date}` : item.start_date ?? item.end_date}
+                          {item.start_date && item.end_date
+                            ? `${item.start_date} – ${item.end_date}`
+                            : (item.start_date ?? item.end_date)}
                         </Text>
                       )}
                     </View>
-                    {item.city && <Text style={minimalStyles.expCity}>{item.city}</Text>}
-                    {item.comments && <Text style={minimalStyles.expComment}>{item.comments}</Text>}
+                    {item.city && (
+                      <Text style={minimalStyles.expCity}>{item.city}</Text>
+                    )}
+                    {item.comments && (
+                      <Text style={minimalStyles.expComment}>
+                        {item.comments}
+                      </Text>
+                    )}
                   </View>
                 ))}
               </View>
@@ -1190,26 +1455,30 @@ function MinimalPdfDocument({ data }: { data: StructuredCVData }) {
             {data.references.length > 0 && (
               <View>
                 <Text style={minimalStyles.sectionLabel}>References</Text>
-                <Text style={{ fontSize: 8, color: MINIMAL_MUTED, lineHeight: 1.5 }}>{data.references}</Text>
+                <Text
+                  style={{ fontSize: 8, color: MINIMAL_MUTED, lineHeight: 1.5 }}
+                >
+                  {data.references}
+                </Text>
               </View>
             )}
           </View>
         </View>
       </Page>
     </Document>
-  )
+  );
 }
 
 export function CvPdfDocument({
   data,
   template,
 }: {
-  data: StructuredCVData
-  template: CVTemplateId
+  data: StructuredCVData;
+  template: CVTemplateId;
 }) {
-  if (template === "sage") return <SagePdfDocument data={data} />
-  if (template === "classic") return <ClassicPdfDocument data={data} />
-  if (template === "bold") return <BoldPdfDocument data={data} />
-  if (template === "minimal") return <MinimalPdfDocument data={data} />
-  return <TerracottaPdfDocument data={data} />
+  if (template === "sage") return <SagePdfDocument data={data} />;
+  if (template === "classic") return <ClassicPdfDocument data={data} />;
+  if (template === "bold") return <BoldPdfDocument data={data} />;
+  if (template === "minimal") return <MinimalPdfDocument data={data} />;
+  return <TerracottaPdfDocument data={data} />;
 }

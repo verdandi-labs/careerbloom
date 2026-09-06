@@ -1,29 +1,29 @@
-import type { CSSProperties } from "react"
-import { Editable, Section, type EditableField } from "./CvDocument"
+import type { CSSProperties } from "react";
+import { Editable, Section, type EditableField } from "./CvDocument";
 
-export type { EditableField }
+export type { EditableField };
 
 export const hasContent = (value: unknown): boolean => {
-  if (typeof value === "string") return /\S/.test(value)
-  if (Array.isArray(value)) return value.length > 0
-  return !!value
-}
+  if (typeof value === "string") return /\S/.test(value);
+  if (Array.isArray(value)) return value.length > 0;
+  return !!value;
+};
 
-type SectionStyleFlag = "serif" | "small" | "bold" | "mono" | "thin"
+type SectionStyleFlag = "serif" | "small" | "bold" | "mono" | "thin";
 
 interface CVTextSectionProps {
-  data?: string | null
-  field: EditableField
-  title: string
-  accent: string
-  editable: boolean
-  onChange?: (field: EditableField, value: string) => void
-  className?: string
-  placeholder?: string
-  multiline?: boolean
-  style?: CSSProperties
-  as?: "div" | "h1" | "h2" | "p" | "span"
-  sectionStyle?: SectionStyleFlag
+  data?: string | null;
+  field: EditableField;
+  title: string;
+  accent: string;
+  editable: boolean;
+  onChange?: (field: EditableField, value: string) => void;
+  className?: string;
+  placeholder?: string;
+  multiline?: boolean;
+  style?: CSSProperties;
+  as?: "div" | "h1" | "h2" | "p" | "span";
+  sectionStyle?: SectionStyleFlag;
 }
 
 export function CVTextSection({
@@ -40,7 +40,7 @@ export function CVTextSection({
   as = "div",
   sectionStyle,
 }: CVTextSectionProps) {
-  if (!hasContent(data) && !editable) return null
+  if (!hasContent(data) && !editable) return null;
   return (
     <Section
       title={title}
@@ -59,5 +59,5 @@ export function CVTextSection({
         style={style}
       />
     </Section>
-  )
+  );
 }

@@ -7,12 +7,7 @@ import { useSession } from "@/features/auth";
 
 const background = "/blossom.jpg";
 
-import {
-  ArrowUpRight,
-  Sparkles,
-  Mail,
-  Loader2,
-} from "lucide-react";
+import { ArrowUpRight, Sparkles, Mail, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -98,8 +93,13 @@ function Dashboard() {
           <div className="flex items-center gap-3">
             <span className="text-2xl">✨</span>
             <div>
-              <h2 className="font-semibold text-foreground">Build your CV with Bloom</h2>
-              <p className="text-sm text-foreground/60">Chat with Bloom to update your experience, skills, and more. Your CV updates automatically.</p>
+              <h2 className="font-semibold text-foreground">
+                Build your CV with Bloom
+              </h2>
+              <p className="text-sm text-foreground/60">
+                Chat with Bloom to update your experience, skills, and more.
+                Your CV updates automatically.
+              </p>
             </div>
           </div>
           <div className="flex gap-2">

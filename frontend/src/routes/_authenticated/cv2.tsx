@@ -200,7 +200,11 @@ type Draft =
 
 type TranslatedCv = { data: CvData; code: string; label: string };
 
-type VersionListItem = { version_id: string; cv_name: string; created_at: string };
+type VersionListItem = {
+  version_id: string;
+  cv_name: string;
+  created_at: string;
+};
 
 const listText = (data: CvData, key: ListKey) =>
   (data[key] ?? [])
@@ -279,9 +283,13 @@ function CVPage() {
   const [saveLoading, setSaveLoading] = useState(false);
   const [replaceTarget, setReplaceTarget] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState("");
-  const [deletingVersionId, setDeletingVersionId] = useState<string | null>(null);
+  const [deletingVersionId, setDeletingVersionId] = useState<string | null>(
+    null,
+  );
   const [saveFromTranslate, setSaveFromTranslate] = useState(false);
-  const [saveModalMode, setSaveModalMode] = useState<"save" | "replace">("save");
+  const [saveModalMode, setSaveModalMode] = useState<"save" | "replace">(
+    "save",
+  );
 
   async function save(field: string, value: string | CvRow[] | null) {
     setSaving(true);
@@ -377,7 +385,8 @@ function CVPage() {
     setSaveNameErr("");
     setSaveLoading(true);
     try {
-      const dataToSave = saveFromTranslate && translated ? translated.data : undefined;
+      const dataToSave =
+        saveFromTranslate && translated ? translated.data : undefined;
       if (replaceTarget) {
         await replaceVersion(replaceTarget, saveName.trim(), dataToSave);
       } else {
@@ -392,7 +401,9 @@ function CVPage() {
         setSaveModalOpen(false);
       }, 1200);
     } catch (e) {
-      setSaveNameErr(errorMessage(e, "Could not save version, please try again"));
+      setSaveNameErr(
+        errorMessage(e, "Could not save version, please try again"),
+      );
     } finally {
       setSaveLoading(false);
     }
@@ -839,7 +850,9 @@ function CVPage() {
                 disabled={versions.length >= 6}
                 className="flex-1 rounded-full bg-foreground px-4 py-2 text-xs text-background disabled:opacity-40"
               >
-                {versions.length >= 6 ? "Max versions reached" : "Save as new version"}
+                {versions.length >= 6
+                  ? "Max versions reached"
+                  : "Save as new version"}
               </button>
               <button
                 onClick={() => {
@@ -893,7 +906,10 @@ function CVPage() {
                 <p className="mb-3 text-xs text-foreground/50">
                   Replacing:{" "}
                   <span className="font-medium text-foreground/70">
-                    {versions.find((v) => v.version_id === replaceTarget)?.cv_name}
+                    {
+                      versions.find((v) => v.version_id === replaceTarget)
+                        ?.cv_name
+                    }
                   </span>
                 </p>
                 <input
@@ -928,7 +944,8 @@ function CVPage() {
             ) : versions.length >= 6 ? (
               <>
                 <p className="mb-3 text-xs text-foreground/50">
-                  You have 6 saved versions. Which one would you like to replace?
+                  You have 6 saved versions. Which one would you like to
+                  replace?
                 </p>
                 <div className="flex flex-col gap-2">
                   {versions.map((v) => (

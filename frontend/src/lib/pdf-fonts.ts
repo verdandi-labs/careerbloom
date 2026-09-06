@@ -1,10 +1,10 @@
-import { Font } from "@react-pdf/renderer"
+import { Font } from "@react-pdf/renderer";
 
-let registered = false
+let registered = false;
 
 export async function registerFonts() {
-  if (registered) return
-  registered = true
+  if (registered) return;
+  registered = true;
 
   Font.register({
     family: "DM Sans",
@@ -22,7 +22,7 @@ export async function registerFonts() {
         fontWeight: 700,
       },
     ],
-  })
+  });
 
   Font.register({
     family: "Playfair Display",
@@ -36,9 +36,9 @@ export async function registerFonts() {
         fontWeight: 700,
       },
     ],
-  })
+  });
 
-  Font.registerHyphenationCallback((word) => [word])
+  Font.registerHyphenationCallback((word) => [word]);
 }
 
-Font.registerHyphenationCallback((word) => [word])
+Font.registerHyphenationCallback((word) => [word]);

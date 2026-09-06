@@ -199,13 +199,19 @@ function ChatLayout() {
                         Delete?
                       </span>
                       <button
-                        onClick={(e) => { e.stopPropagation(); setDeletingId(null) }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeletingId(null);
+                        }}
                         className="grid h-6 w-6 place-items-center rounded-full text-xs text-foreground/40 hover:text-foreground hover:bg-white"
                       >
                         No
                       </button>
                       <button
-                        onClick={(e) => { e.stopPropagation(); handleDelete(c.id) }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(c.id);
+                        }}
                         className="grid h-6 w-6 place-items-center rounded-full bg-rose-50 text-xs font-medium text-rose-500 hover:bg-rose-100"
                       >
                         Yes
@@ -244,7 +250,10 @@ function ChatLayout() {
                             <Pencil className="h-3 w-3" />
                           </button>
                           <button
-                            onClick={(e) => { e.stopPropagation(); setDeletingId(c.id) }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeletingId(c.id);
+                            }}
                             className="grid h-6 w-6 place-items-center rounded-full text-foreground/50 opacity-70 transition hover:bg-white hover:text-foreground md:opacity-0 md:group-hover:opacity-100"
                             title="Delete"
                           >
