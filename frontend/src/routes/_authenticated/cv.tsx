@@ -403,6 +403,25 @@ function PreviewPage() {
       saveLocalEdits(next);
       return next;
     });
+    const structuredFieldMap: Partial<
+      Record<EditableField, keyof StructuredCVData>
+    > = {
+      name: "name",
+      title: "title",
+      summary: "summary",
+    };
+    const structuredField = structuredFieldMap[field];
+    if (structuredField) {
+      setStructuredData((prev) => {
+        if (!prev) return prev;
+        const next = { ...prev, [structuredField]: value };
+        localStorage.setItem(
+          "cv-preview-structured-edits",
+          JSON.stringify(next),
+        );
+        return next;
+      });
+    }
   }
 
   function handleReset() {
