@@ -723,24 +723,30 @@ function PreviewPage() {
       projects: 2,
     };
 
-    let colA = 0;
-    let colB = 0;
-    const page1: SectionOrderItem[] = [];
-    const page2: SectionOrderItem[] = [];
+    const colA: SectionOrderItem[] = [];
+    const colB: SectionOrderItem[] = [];
+    let scoreA = 0;
+    let scoreB = 0;
 
     for (const item of sections) {
       if (item.type !== "section") continue;
       const score = scores[item.key as string] ?? 1;
-      if (colA <= colB) {
-        page1.push(item);
-        colA += score;
+      if (scoreA <= scoreB) {
+        colA.push(item);
+        scoreA += score;
       } else {
-        page2.push(item);
-        colB += score;
+        colB.push(item);
+        scoreB += score;
       }
     }
 
-    return page1;
+    const result: SectionOrderItem[] = [];
+    const maxLen = Math.max(colA.length, colB.length);
+    for (let i = 0; i < maxLen; i++) {
+      if (colA[i]) result.push(colA[i]);
+      if (colB[i]) result.push(colB[i]);
+    }
+    return result;
   }
 
   return (
