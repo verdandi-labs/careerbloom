@@ -7,7 +7,14 @@ import { useSession } from "@/features/auth";
 
 const background = "/blossom.jpg";
 
-import { ArrowUpRight, Sparkles, Mail, Loader2 } from "lucide-react";
+import {
+  ArrowUpRight,
+  Sparkles,
+  FileText,
+  Mail,
+  Globe2,
+  Loader2,
+} from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -89,34 +96,26 @@ function Dashboard() {
           </div>
         </article>
 
-        <div className="rounded-2xl bg-white/70 p-6 flex flex-col gap-4 lg:col-span-4">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">✨</span>
+        <article className="bg-secondary/70 backdrop-blur-md flex flex-col p-6 rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] lg:col-span-4">
+          <div className="flex items-start justify-between">
             <div>
-              <h2 className="font-semibold text-foreground">
-                Build your CV with Bloom
+              <h2 className="font-display text-2xl">
+                Improve your CV with Bloom
               </h2>
-              <p className="text-sm text-foreground/60">
-                Chat with Bloom to update your experience, skills, and more.
-                Your CV updates automatically.
+              <p className="mt-0.5 text-xs text-foreground/70">
+                Chat with Bloom to tailor your CV. It will update automatically.
               </p>
             </div>
+            <FileText className="h-5 w-5 text-foreground/70" />
           </div>
-          <div className="flex gap-2">
-            <Link
-              to="/chat"
-              className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-xs text-background hover:opacity-80 transition"
-            >
-              Chat with Bloom →
-            </Link>
-            <Link
-              to="/cv"
-              className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs text-foreground hover:bg-white transition"
-            >
-              View my CV
-            </Link>
-          </div>
-        </div>
+
+          <Link
+            to="/chat"
+            className="mt-5 flex items-center justify-center gap-2 rounded-2xl bg-foreground py-3 text-sm font-medium text-background"
+          >
+            Chat with Bloom → <ArrowUpRight className="h-4 w-4" />
+          </Link>
+        </article>
 
         <article className="glass flex flex-col p-6 lg:col-span-4">
           <div className="flex items-center justify-between">
