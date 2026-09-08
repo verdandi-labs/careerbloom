@@ -19,7 +19,6 @@ import {
   BookMarked,
   Download,
   Languages,
-  LayoutList,
   Loader2,
   Save,
   X,
@@ -360,7 +359,6 @@ function PreviewPage() {
     const saved = localStorage.getItem("cv-preview-section-order");
     return saved ? JSON.parse(saved) : DEFAULT_SECTION_ORDER;
   });
-  const [sectionsOpen, setSectionsOpen] = useState(false);
   const [activeDragIndex, setActiveDragIndex] = useState<number | null>(null);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [saveName, setSaveName] = useState("");
@@ -890,12 +888,6 @@ function PreviewPage() {
             >
               <Save className="h-3 w-3" /> Save CV
             </button>
-            <button
-              onClick={() => setSectionsOpen(true)}
-              className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs text-foreground hover:bg-white"
-            >
-              <LayoutList className="h-3 w-3" /> Sections
-            </button>
           </div>
         </div>
         <p className="mt-3 text-sm text-muted-foreground">
@@ -1073,83 +1065,6 @@ function PreviewPage() {
                 Save locally
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {sectionsOpen && (
-        <div
-          className="fixed inset-0 z-50"
-          onClick={() => setSectionsOpen(false)}
-        >
-          <div
-            className="absolute right-0 top-0 h-full w-80 bg-pink-50/95 backdrop-blur-md shadow-2xl flex flex-col p-6 gap-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold text-foreground">
-                Sections
-              </h2>
-              <button onClick={() => setSectionsOpen(false)}>
-                <X className="h-4 w-4 text-foreground/50 hover:text-foreground" />
-              </button>
-            </div>
-            <p className="text-sm text-foreground/50">
-              Drag sections on the CV to reorder. Use page breaks to split
-              across pages.
-            </p>
-            <button
-              onClick={() => {
-                const balanced = autoBalance(structuredData!);
-                setSectionOrder(balanced);
-                localStorage.setItem(
-                  "cv-preview-section-order",
-                  JSON.stringify(balanced),
-                );
-              }}
-              className="rounded-full bg-white/70 px-4 py-2 text-xs text-foreground hover:bg-white"
-            >
-              Re-balance
-            </button>
-            <div className="flex flex-col gap-2 overflow-y-auto flex-1">
-              {sectionOrder
-                .map((item, i) => ({ item, i }))
-                .filter(({ item }) => item.type === "page-break")
-                .map(({ item, i }) => (
-                  <div
-                    key={`pb-${i}`}
-                    className="flex items-center gap-2 rounded-xl border border-dashed border-foreground/20 px-3 py-2 text-xs text-foreground/40"
-                  >
-                    — Page break —
-                    <button
-                      className="ml-auto text-foreground/30 hover:text-rose-400"
-                      onClick={() => {
-                        const next = sectionOrder.filter((_, j) => j !== i);
-                        setSectionOrder(next);
-                        localStorage.setItem(
-                          "cv-preview-section-order",
-                          JSON.stringify(next),
-                        );
-                      }}
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                ))}
-            </div>
-            <button
-              onClick={() => {
-                const next = [...sectionOrder, { type: "page-break" as const }];
-                setSectionOrder(next);
-                localStorage.setItem(
-                  "cv-preview-section-order",
-                  JSON.stringify(next),
-                );
-              }}
-              className="rounded-full border border-dashed border-foreground/20 px-4 py-2 text-xs text-foreground/50 hover:border-foreground/40 hover:text-foreground"
-            >
-              + Add page break
-            </button>
           </div>
         </div>
       )}
