@@ -1,7 +1,16 @@
+from enum import Enum
+
 from pydantic import BaseModel, Field, field_validator
 
 MAX_EXPORT_STRING = 20_000
 MAX_EXPORT_SECTIONS = 50
+
+
+class LanguageLevel(str, Enum):
+    native = "native"
+    proficient = "proficient"
+    conversational = "conversational"
+    basic = "basic"
 
 
 class _RawEntry(BaseModel):
@@ -66,7 +75,7 @@ class ProjectRaw(_RawEntry):
 
 class LanguageRaw(_RawEntry):
     language: str | None = None
-    level: str | None = None
+    level: LanguageLevel | None = None
     comments: str | None = None
 
 
