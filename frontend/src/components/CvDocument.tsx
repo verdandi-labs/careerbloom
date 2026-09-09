@@ -280,13 +280,16 @@ function Terracotta({
             <div
               key={item.line_num}
               onClick={() => onEditItem?.("languages", i, item)}
-              className="flex justify-between cursor-pointer hover:bg-black/5 rounded transition"
+              className="flex items-start justify-between gap-3 cursor-pointer hover:bg-black/5 rounded transition"
             >
-              <span className="text-xs" style={{ color: INK }}>
+              <span className="text-xs" style={{ color: INK, flexShrink: 0 }}>
                 {item.language}
               </span>
               {item.level && (
-                <span className="text-xs" style={{ color: MUTED }}>
+                <span
+                  className="text-xs"
+                  style={{ color: MUTED, textAlign: "right", flexShrink: 0 }}
+                >
                   {item.level}
                 </span>
               )}
@@ -637,13 +640,16 @@ function Sage({
               <div
                 key={item.line_num}
                 onClick={() => onEditItem?.("languages", i, item)}
-                className="flex justify-between cursor-pointer hover:bg-black/5 rounded transition"
+                className="flex items-start justify-between gap-3 cursor-pointer hover:bg-black/5 rounded transition"
               >
-                <span className="text-xs" style={{ color: INK }}>
+                <span className="text-xs" style={{ color: INK, flexShrink: 0 }}>
                   {item.language}
                 </span>
                 {item.level && (
-                  <span className="text-xs" style={{ color: MUTED }}>
+                  <span
+                    className="text-xs"
+                    style={{ color: MUTED, textAlign: "right", flexShrink: 0 }}
+                  >
                     {item.level}
                   </span>
                 )}
