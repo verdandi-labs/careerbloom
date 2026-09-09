@@ -285,10 +285,10 @@ function Terracotta({
               <span className="text-xs" style={{ color: INK, flexShrink: 0 }}>
                 {item.language}
               </span>
-              {item.level && (
+                {item.level && (
                 <span
                   className="text-xs"
-                  style={{ color: MUTED, textAlign: "right", flexShrink: 0 }}
+                  style={{ color: MUTED, textAlign: "right", flexShrink: 1, wordBreak: "break-word", minWidth: 0 }}
                 >
                   {item.level}
                 </span>
@@ -646,20 +646,20 @@ function Sage({
                   {item.language}
                 </span>
                 {item.level && (
-                  <span
-                    className="text-xs"
-                    style={{ color: MUTED, textAlign: "right", flexShrink: 0 }}
-                  >
-                    {item.level}
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
-        </SageSection>
-      );
-    }
-    return null;
+                <span
+                  className="text-xs"
+                  style={{ color: MUTED, textAlign: "right", flexShrink: 1, wordBreak: "break-word", minWidth: 0 }}
+                >
+                  {item.level}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      </SageSection>
+    );
+  }
+  return null;
   }
 
   function renderMainSection(key: keyof StructuredCVData) {
