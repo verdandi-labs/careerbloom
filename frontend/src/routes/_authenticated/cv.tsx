@@ -347,7 +347,10 @@ function PreviewPage() {
     null,
   );
   const [exporting, setExporting] = useState(false);
-  const [photo, setPhoto] = useState<string | null>(null);
+  const [photo, setPhoto] = useState<string | null>(() =>
+    localStorage.getItem("cv-preview-photo"),
+  );
+  const [photoUploading, setPhotoUploading] = useState(false);
   const photoInputRef = useRef<HTMLInputElement>(null);
   const [editingItem, setEditingItem] = useState<{
     field: keyof StructuredCVData;
@@ -373,11 +376,6 @@ function PreviewPage() {
   const [translateOpen, setTranslateOpen] = useState(false);
   const [translating, setTranslating] = useState(false);
   const [translated, setTranslated] = useState<TranslatedCv | null>(null);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("cv-preview-photo");
-    if (saved) setPhoto(saved);
-  }, []);
 
   useEffect(() => {
     if (!cv) return;
@@ -660,37 +658,42 @@ function PreviewPage() {
       return;
     }
 
-    const arrayBuffer = await file.arrayBuffer();
-    const bytes = new Uint8Array(arrayBuffer);
-    const isJpeg = bytes[0] === 0xff && bytes[1] === 0xd8;
-    const isPng = bytes[0] === 0x89 && bytes[1] === 0x50;
-    const isWebp = bytes[8] === 0x57 && bytes[9] === 0x45;
-    if (!isJpeg && !isPng && !isWebp) {
-      setActionErr("Invalid image file");
-      return;
+    setPhotoUploading(true);
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(arrayBuffer);
+      const isJpeg = bytes[0] === 0xff && bytes[1] === 0xd8;
+      const isPng = bytes[0] === 0x89 && bytes[1] === 0x50;
+      const isWebp = bytes[8] === 0x57 && bytes[9] === 0x45;
+      if (!isJpeg && !isPng && !isWebp) {
+        setActionErr("Invalid image file");
+        return;
+      }
+
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      img.src = objectUrl;
+
+      await new Promise<void>((resolve) => {
+        img.onload = () => resolve();
+      });
+
+      const MAX_W = 400;
+      const MAX_H = 500;
+      const ratio = Math.min(MAX_W / img.width, MAX_H / img.height, 1);
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * ratio);
+      canvas.height = Math.round(img.height * ratio);
+      const ctx = canvas.getContext("2d")!;
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(objectUrl);
+
+      const compressed = canvas.toDataURL("image/jpeg", 0.8);
+      localStorage.setItem("cv-preview-photo", compressed);
+      setPhoto(compressed);
+    } finally {
+      setPhotoUploading(false);
     }
-
-    const img = new Image();
-    const objectUrl = URL.createObjectURL(file);
-    img.src = objectUrl;
-
-    await new Promise<void>((resolve) => {
-      img.onload = () => resolve();
-    });
-
-    const MAX_W = 400;
-    const MAX_H = 500;
-    const ratio = Math.min(MAX_W / img.width, MAX_H / img.height, 1);
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.round(img.width * ratio);
-    canvas.height = Math.round(img.height * ratio);
-    const ctx = canvas.getContext("2d")!;
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    URL.revokeObjectURL(objectUrl);
-
-    const compressed = canvas.toDataURL("image/jpeg", 0.8);
-    localStorage.setItem("cv-preview-photo", compressed);
-    setPhoto(compressed);
   }
 
   async function handleExportPdf() {
@@ -944,6 +947,7 @@ function PreviewPage() {
                 }}
                 activeDragIndex={activeDragIndex}
                 setActiveDragIndex={setActiveDragIndex}
+                photoUploading={photoUploading}
               />
             )}
           </div>

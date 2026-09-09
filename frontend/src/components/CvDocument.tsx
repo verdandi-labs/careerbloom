@@ -25,6 +25,7 @@ type Props = {
   onDragSection?: (fromIndex: number, toIndex: number) => void;
   activeDragIndex?: number | null;
   setActiveDragIndex?: (index: number | null) => void;
+  photoUploading?: boolean;
 };
 
 export function Editable({
@@ -209,6 +210,7 @@ function Terracotta({
   onDragSection,
   activeDragIndex,
   setActiveDragIndex,
+  photoUploading,
 }: Props) {
   const TERRACOTTA = "#CB6843";
   const TERRACOTTA_LIGHT = "#FDE8E8";
@@ -285,10 +287,16 @@ function Terracotta({
               <span className="text-xs" style={{ color: INK, flexShrink: 0 }}>
                 {item.language}
               </span>
-                {item.level && (
+              {item.level && (
                 <span
                   className="text-xs"
-                  style={{ color: MUTED, textAlign: "right", flexShrink: 1, wordBreak: "break-word", minWidth: 0 }}
+                  style={{
+                    color: MUTED,
+                    textAlign: "right",
+                    flexShrink: 1,
+                    wordBreak: "break-word",
+                    minWidth: 0,
+                  }}
                 >
                   {item.level}
                 </span>
@@ -426,7 +434,19 @@ function Terracotta({
                     className="w-full overflow-hidden rounded-sm"
                     style={{ height: 120, backgroundColor: "#F5E6DF" }}
                   >
-                    {data.photo ? (
+                    {photoUploading ? (
+                      <div className="w-full h-full flex items-center justify-center animate-pulse">
+                        <div
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: "50%",
+                            backgroundColor: "#CB6843",
+                            opacity: 0.3,
+                          }}
+                        />
+                      </div>
+                    ) : data.photo ? (
                       <img
                         src={data.photo}
                         alt="Profile"
@@ -566,6 +586,7 @@ function Sage({
   onDragSection,
   activeDragIndex,
   setActiveDragIndex,
+  photoUploading,
 }: Props) {
   const SAGE = "#7B9E87";
   const SAGE_LIGHT = "#EAF0EC";
@@ -646,20 +667,26 @@ function Sage({
                   {item.language}
                 </span>
                 {item.level && (
-                <span
-                  className="text-xs"
-                  style={{ color: MUTED, textAlign: "right", flexShrink: 1, wordBreak: "break-word", minWidth: 0 }}
-                >
-                  {item.level}
-                </span>
-              )}
-            </div>
-          ))}
-        </div>
-      </SageSection>
-    );
-  }
-  return null;
+                  <span
+                    className="text-xs"
+                    style={{
+                      color: MUTED,
+                      textAlign: "right",
+                      flexShrink: 1,
+                      wordBreak: "break-word",
+                      minWidth: 0,
+                    }}
+                  >
+                    {item.level}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </SageSection>
+      );
+    }
+    return null;
   }
 
   function renderMainSection(key: keyof StructuredCVData) {
@@ -905,7 +932,19 @@ function Sage({
                     className="w-full overflow-hidden rounded-sm mb-5"
                     style={{ height: 120, backgroundColor: "#EAF0EC" }}
                   >
-                    {data.photo ? (
+                    {photoUploading ? (
+                      <div className="w-full h-full flex items-center justify-center animate-pulse">
+                        <div
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: "50%",
+                            backgroundColor: "#7B9E87",
+                            opacity: 0.3,
+                          }}
+                        />
+                      </div>
+                    ) : data.photo ? (
                       <img
                         src={data.photo}
                         alt="Profile"
@@ -974,6 +1013,7 @@ function Classic({
   onDragSection,
   activeDragIndex,
   setActiveDragIndex,
+  photoUploading,
 }: Props) {
   const INK = "#111";
   const MUTED = "#666";
@@ -1566,7 +1606,19 @@ function Bold({
                   className="aspect-[3/4] rounded-sm overflow-hidden"
                   style={{ backgroundColor: "#C8C5BC" }}
                 >
-                  {data.photo ? (
+                  {photoUploading ? (
+                    <div className="w-full h-full flex items-center justify-center animate-pulse">
+                      <div
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: "50%",
+                          backgroundColor: INK,
+                          opacity: 0.15,
+                        }}
+                      />
+                    </div>
+                  ) : data.photo ? (
                     <img
                       src={data.photo}
                       alt="Profile"
@@ -1652,6 +1704,7 @@ function Minimal({
   onDragSection,
   activeDragIndex,
   setActiveDragIndex,
+  photoUploading,
 }: Props) {
   const INK = "#111";
   const MUTED = "#666";
@@ -1883,7 +1936,22 @@ function Minimal({
                     className="min-h-[240px]"
                     style={{ backgroundColor: "#C8C8C6" }}
                   >
-                    {data.photo ? (
+                    {photoUploading ? (
+                      <div
+                        className="w-full h-full flex items-center justify-center animate-pulse"
+                        style={{ minHeight: 240 }}
+                      >
+                        <div
+                          style={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: "50%",
+                            backgroundColor: INK,
+                            opacity: 0.15,
+                          }}
+                        />
+                      </div>
+                    ) : data.photo ? (
                       <img
                         src={data.photo}
                         alt="Profile"
