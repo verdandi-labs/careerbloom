@@ -1554,19 +1554,8 @@ function Bold({
                   {data.contact[1]?.detail || " "}
                 </div>
               </div>
-              <div className="grid grid-cols-[1fr_180px] px-6 py-6">
+              <div className="grid grid-cols-[1fr_144px] px-6 py-6">
                 <div>
-                  <div
-                    className="font-black uppercase text-center"
-                    style={{
-                      fontSize: 72,
-                      letterSpacing: -2,
-                      color: INK,
-                      lineHeight: 1,
-                    }}
-                  >
-                    RESUME
-                  </div>
                   <div
                     className="text-[11px] uppercase tracking-widest mt-3"
                     style={{ color: INK }}
@@ -1575,7 +1564,7 @@ function Bold({
                   </div>
                   {(/\S/.test(data.name ?? "") || e) && (
                     <div
-                      className="text-[11px] uppercase tracking-widest mt-1"
+                      className="text-[13px] font-bold uppercase tracking-widest mt-1"
                       style={{ color: INK }}
                     >
                       <Editable
@@ -1590,7 +1579,7 @@ function Bold({
                   )}
                   {(/\S/.test(data.summary ?? "") || e) && (
                     <div
-                      className="text-[11px] leading-relaxed mt-4 max-w-xs"
+                      className="text-[13px] leading-relaxed mt-4 max-w-xs"
                       style={{ color: MUTED }}
                     >
                       <Editable
@@ -1598,7 +1587,7 @@ function Bold({
                         field="summary"
                         editable={e}
                         onChange={onChange}
-                        className="text-[11px] leading-relaxed"
+                        className="text-[13px] leading-relaxed"
                       />
                     </div>
                   )}
