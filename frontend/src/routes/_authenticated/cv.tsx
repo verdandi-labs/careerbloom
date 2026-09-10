@@ -829,7 +829,7 @@ function PreviewPage() {
             <button
               onClick={() => void handleExportPdf()}
               disabled={exporting || !structuredData}
-              className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-xs text-background hover:opacity-90 disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-xs text-background hover:opacity-50 transition-opacity duration-150 disabled:opacity-50"
             >
               {exporting ? (
                 <Loader2 className="h-3 w-3 animate-spin" />
