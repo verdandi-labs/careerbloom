@@ -593,6 +593,7 @@ const minimalStyles = StyleSheet.create({
   },
   bodyRow: {
     flexDirection: "row",
+    alignItems: "stretch",
   },
   sideCol: {
     width: 180,
@@ -817,6 +818,7 @@ function TerracottaPdfDocument({
                         width: "100%",
                         height: "100%",
                         objectFit: "cover",
+                        borderRadius: 4,
                       }}
                     />
                   ) : (
@@ -1402,6 +1404,7 @@ function BoldPdfDocument({
                         width: "100%",
                         height: "100%",
                         objectFit: "cover",
+                        borderRadius: 4,
                       }}
                     />
                   ) : (

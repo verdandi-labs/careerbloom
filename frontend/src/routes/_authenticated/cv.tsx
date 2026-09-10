@@ -716,7 +716,9 @@ function PreviewPage() {
       URL.revokeObjectURL(url);
     } catch (e) {
       console.error("PDF export failed", e);
-      setActionErr(`PDF export failed: ${e instanceof Error ? e.message : "unknown error"}`);
+      setActionErr(
+        `PDF export failed: ${e instanceof Error ? `${e.message}\n${e.stack}` : "unknown error"}`,
+      );
     } finally {
       setExporting(false);
     }
