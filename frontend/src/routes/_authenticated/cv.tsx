@@ -691,6 +691,7 @@ function PreviewPage() {
       const compressed = canvas.toDataURL("image/jpeg", 0.8);
       localStorage.setItem("cv-preview-photo", compressed);
       setPhoto(compressed);
+      console.log("photo set:", compressed?.slice(0, 50), "length:", compressed?.length);
     } finally {
       setPhotoUploading(false);
     }
