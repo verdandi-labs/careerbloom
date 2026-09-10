@@ -408,6 +408,8 @@ const boldStyles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: BOLD_INK,
     borderBottomStyle: "solid",
+  },
+  topBarText: {
     fontSize: 7,
     textTransform: "uppercase",
     letterSpacing: 2,
@@ -448,7 +450,7 @@ const boldStyles = StyleSheet.create({
     fontSize: 9,
     lineHeight: 1.6,
     color: BOLD_MUTED,
-    maxWidth: 280,
+    width: 280,
   },
   heroPhoto: {
     width: 140,
@@ -1340,17 +1342,17 @@ function BoldPdfDocument({
             {data.skills.map((item, i) => (
               <Text
                 key={i}
-                style={[
-                  boldStyles.skillPill,
-                  i < Math.ceil(data.skills.length / 2)
+                style={{
+                  ...boldStyles.skillPill,
+                  ...(i < Math.ceil(data.skills.length / 2)
                     ? { backgroundColor: BOLD_INK, color: BOLD_BG }
                     : {
                         backgroundColor: "transparent",
                         color: BOLD_INK,
                         borderWidth: 1,
                         borderColor: BOLD_INK,
-                      },
-                ]}
+                      }),
+                }}
               >
                 {item.skill}
               </Text>
@@ -1383,9 +1385,13 @@ function BoldPdfDocument({
           {gi === 0 && (
             <>
               <View style={boldStyles.topBar}>
-                <Text>{data.name}</Text>
-                <Text>{data.contact[0]?.detail}</Text>
-                <Text>{data.contact[1]?.detail}</Text>
+                <Text style={boldStyles.topBarText}>{data.name}</Text>
+                <Text style={boldStyles.topBarText}>
+                  {data.contact[0]?.detail}
+                </Text>
+                <Text style={boldStyles.topBarText}>
+                  {data.contact[1]?.detail}
+                </Text>
               </View>
               <View style={boldStyles.heroRow}>
                 <View style={boldStyles.heroLeft}>
