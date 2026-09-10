@@ -363,7 +363,7 @@ const classicStyles = StyleSheet.create({
   },
   expCompany: {
     fontSize: 8,
-    fontStyle: "italic",
+    fontStyle: "normal",
     color: CLASSIC_MUTED,
     marginBottom: 2,
   },
@@ -491,7 +491,7 @@ const boldStyles = StyleSheet.create({
   },
   expCity: {
     fontSize: 8,
-    fontStyle: "italic",
+    fontStyle: "normal",
     color: BOLD_MUTED,
   },
   expComment: {
@@ -550,6 +550,7 @@ const minimalStyles = StyleSheet.create({
   photo: {
     width: "100%",
     height: 180,
+    objectFit: "cover",
   },
   infoCol: {
     flex: 1,
@@ -675,7 +676,17 @@ function TerracottaPdfDocument({
     "languages",
     "education",
   ]);
-  const sidebarGroups = splitAtPageBreaks(sectionOrder, sidebarKeys);
+  const mainKeys = orderedSections(sectionOrder, [
+    "experience",
+    "awards",
+    "publications",
+    "volunteer",
+    "projects",
+  ]);
+  const pageGroups = splitAtPageBreaks(sectionOrder, [
+    ...sidebarKeys,
+    ...mainKeys,
+  ]);
 
   function renderSidebarSection(key: string) {
     if (key === "contact" && data.contact.length > 0) {
@@ -783,69 +794,73 @@ function TerracottaPdfDocument({
 
   return (
     <Document>
-      {sidebarGroups.map((group, gi) => (
-        <Page key={gi} size="A4" style={terracottaStyles.page}>
-          <View style={terracottaStyles.sidebar}>
-            {gi === 0 && (
-              <View
-                style={{
-                  width: "100%",
-                  height: 100,
-                  marginBottom: 12,
-                  backgroundColor: "#F5E6DF",
-                  borderRadius: 3,
-                }}
-              >
-                {data.photo ? (
-                  <Image
-                    src={data.photo}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
-                ) : (
-                  <View
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <View
+      {pageGroups.map((pageKeys, gi) => {
+        const pageSidebarKeys = pageKeys.filter((k) => sidebarKeys.includes(k));
+        const pageMainKeys = pageKeys.filter((k) => mainKeys.includes(k));
+        return (
+          <Page key={gi} size="A4" style={terracottaStyles.page}>
+            <View style={terracottaStyles.sidebar}>
+              {gi === 0 && (
+                <View
+                  style={{
+                    width: "100%",
+                    height: 100,
+                    marginBottom: 12,
+                    backgroundColor: "#F5E6DF",
+                    borderRadius: 3,
+                  }}
+                >
+                  {data.photo ? (
+                    <Image
+                      src={data.photo}
                       style={{
-                        width: 24,
-                        height: 24,
-                        borderRadius: 12,
-                        backgroundColor: "#CB6843",
-                        opacity: 0.3,
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
                       }}
                     />
-                  </View>
-                )}
-              </View>
-            )}
-            {group.map((key) => renderSidebarSection(key))}
-          </View>
-          <View style={terracottaStyles.main}>
-            {gi === 0 && data.name && (
-              <View>
-                <Text style={terracottaStyles.name}>{data.name}</Text>
-                {data.title && (
-                  <Text style={terracottaStyles.jobTitle}>{data.title}</Text>
-                )}
-                {data.summary && (
-                  <Text style={terracottaStyles.summary}>{data.summary}</Text>
-                )}
-              </View>
-            )}
-            {gi === 0 && <View style={terracottaStyles.divider} />}
-            {group.map((key) => renderMainSection(key))}
-          </View>
-        </Page>
-      ))}
+                  ) : (
+                    <View
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: 24,
+                          height: 24,
+                          borderRadius: 12,
+                          backgroundColor: "#CB6843",
+                          opacity: 0.3,
+                        }}
+                      />
+                    </View>
+                  )}
+                </View>
+              )}
+              {pageSidebarKeys.map((key) => renderSidebarSection(key))}
+            </View>
+            <View style={terracottaStyles.main}>
+              {gi === 0 && data.name && (
+                <View>
+                  <Text style={terracottaStyles.name}>{data.name}</Text>
+                  {data.title && (
+                    <Text style={terracottaStyles.jobTitle}>{data.title}</Text>
+                  )}
+                  {data.summary && (
+                    <Text style={terracottaStyles.summary}>{data.summary}</Text>
+                  )}
+                </View>
+              )}
+              {gi === 0 && <View style={terracottaStyles.divider} />}
+              {pageMainKeys.map((key) => renderMainSection(key))}
+            </View>
+          </Page>
+        );
+      })}
     </Document>
   );
 }
@@ -863,7 +878,11 @@ function SagePdfDocument({
     .join(" · ");
 
   const sidebarKeys = orderedSections(sectionOrder, ["skills", "languages"]);
-  const sidebarGroups = splitAtPageBreaks(sectionOrder, sidebarKeys);
+  const mainKeys = orderedSections(sectionOrder, ["experience", "education"]);
+  const pageGroups = splitAtPageBreaks(sectionOrder, [
+    ...sidebarKeys,
+    ...mainKeys,
+  ]);
 
   function renderSidebarSection(key: string) {
     if (key === "skills" && data.skills.length > 0) {
@@ -964,74 +983,78 @@ function SagePdfDocument({
 
   return (
     <Document>
-      {sidebarGroups.map((group, gi) => (
-        <Page key={gi} size="A4" style={sageStyles.page}>
-          {gi === 0 && (
-            <View style={sageStyles.header}>
-              <Text style={sageStyles.cvLabel}>Curriculum Vitae</Text>
-              {data.name && <Text style={sageStyles.name}>{data.name}</Text>}
-              <Text style={sageStyles.contactLine}>
-                {data.title ? `${data.title}${contactText ? " · " : ""}` : ""}
-                {contactText}
-              </Text>
-              {data.summary && (
-                <View style={sageStyles.summaryBox}>
-                  <Text style={sageStyles.summaryText}>{data.summary}</Text>
-                </View>
-              )}
-            </View>
-          )}
-          <View style={sageStyles.body}>
-            <View style={sageStyles.mainCol}>
-              {group.map((key) => renderMainSection(key))}
-            </View>
-            <View style={sageStyles.sideCol}>
-              {gi === 0 && (
-                <View
-                  style={{
-                    width: "100%",
-                    height: 100,
-                    marginBottom: 12,
-                    backgroundColor: "#EAF0EC",
-                    borderRadius: 3,
-                  }}
-                >
-                  {data.photo ? (
-                    <Image
-                      src={data.photo}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
-                    />
-                  ) : (
-                    <View
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <View
+      {pageGroups.map((pageKeys, gi) => {
+        const pageSidebarKeys = pageKeys.filter((k) => sidebarKeys.includes(k));
+        const pageMainKeys = pageKeys.filter((k) => mainKeys.includes(k));
+        return (
+          <Page key={gi} size="A4" style={sageStyles.page}>
+            {gi === 0 && (
+              <View style={sageStyles.header}>
+                <Text style={sageStyles.cvLabel}>Curriculum Vitae</Text>
+                {data.name && <Text style={sageStyles.name}>{data.name}</Text>}
+                <Text style={sageStyles.contactLine}>
+                  {data.title ? `${data.title}${contactText ? " · " : ""}` : ""}
+                  {contactText}
+                </Text>
+                {data.summary && (
+                  <View style={sageStyles.summaryBox}>
+                    <Text style={sageStyles.summaryText}>{data.summary}</Text>
+                  </View>
+                )}
+              </View>
+            )}
+            <View style={sageStyles.body}>
+              <View style={sageStyles.mainCol}>
+                {pageMainKeys.map((key) => renderMainSection(key))}
+              </View>
+              <View style={sageStyles.sideCol}>
+                {gi === 0 && (
+                  <View
+                    style={{
+                      width: "100%",
+                      height: 100,
+                      marginBottom: 12,
+                      backgroundColor: "#EAF0EC",
+                      borderRadius: 3,
+                    }}
+                  >
+                    {data.photo ? (
+                      <Image
+                        src={data.photo}
                         style={{
-                          width: 24,
-                          height: 24,
-                          borderRadius: 12,
-                          backgroundColor: "#7B9E87",
-                          opacity: 0.3,
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
                         }}
                       />
-                    </View>
-                  )}
-                </View>
-              )}
-              {group.map((key) => renderSidebarSection(key))}
+                    ) : (
+                      <View
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <View
+                          style={{
+                            width: 24,
+                            height: 24,
+                            borderRadius: 12,
+                            backgroundColor: "#7B9E87",
+                            opacity: 0.3,
+                          }}
+                        />
+                      </View>
+                    )}
+                  </View>
+                )}
+                {pageSidebarKeys.map((key) => renderSidebarSection(key))}
+              </View>
             </View>
-          </View>
-        </Page>
-      ))}
+          </Page>
+        );
+      })}
     </Document>
   );
 }
@@ -1451,11 +1474,16 @@ function MinimalPdfDocument({
   sectionOrder?: SectionOrderItem[];
 }) {
   const sidebarKeys = orderedSections(sectionOrder, [
-    "skills",
-    "languages",
     "contact",
+    "skills",
+    "education",
+    "languages",
   ]);
-  const sidebarGroups = splitAtPageBreaks(sectionOrder, sidebarKeys);
+  const mainKeys = orderedSections(sectionOrder, ["experience", "references"]);
+  const pageGroups = splitAtPageBreaks(sectionOrder, [
+    ...sidebarKeys,
+    ...mainKeys,
+  ]);
 
   function renderSidebarSection(key: string) {
     if (key === "skills" && data.skills.length > 0) {
@@ -1564,62 +1592,66 @@ function MinimalPdfDocument({
 
   return (
     <Document>
-      {sidebarGroups.map((group, gi) => (
-        <Page key={gi} size="A4" style={minimalStyles.page}>
-          {gi === 0 && (
-            <>
-              <View style={minimalStyles.topRow}>
-                <View style={minimalStyles.photoCol}>
-                  {data.photo ? (
-                    <Image src={data.photo} style={minimalStyles.photo} />
-                  ) : (
-                    <View
-                      style={{
-                        width: "100%",
-                        height: 180,
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
+      {pageGroups.map((pageKeys, gi) => {
+        const pageSidebarKeys = pageKeys.filter((k) => sidebarKeys.includes(k));
+        const pageMainKeys = pageKeys.filter((k) => mainKeys.includes(k));
+        return (
+          <Page key={gi} size="A4" style={minimalStyles.page}>
+            {gi === 0 && (
+              <>
+                <View style={minimalStyles.topRow}>
+                  <View style={minimalStyles.photoCol}>
+                    {data.photo ? (
+                      <Image src={data.photo} style={minimalStyles.photo} />
+                    ) : (
                       <View
                         style={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: 16,
-                          backgroundColor: MINIMAL_INK,
-                          opacity: 0.15,
+                          width: "100%",
+                          height: 180,
+                          alignItems: "center",
+                          justifyContent: "center",
                         }}
-                      />
-                    </View>
-                  )}
+                      >
+                        <View
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: 16,
+                            backgroundColor: MINIMAL_INK,
+                            opacity: 0.15,
+                          }}
+                        />
+                      </View>
+                    )}
+                  </View>
+                  <View style={minimalStyles.infoCol}>
+                    <Text style={minimalStyles.name}>{data.name}</Text>
+                    {data.title && (
+                      <Text style={minimalStyles.title}>{data.title}</Text>
+                    )}
+                    <View style={minimalStyles.shortRule} />
+                    <Text style={minimalStyles.sectionLabel}>Summary</Text>
+                    {data.summary && (
+                      <Text style={minimalStyles.summaryText}>
+                        {data.summary}
+                      </Text>
+                    )}
+                  </View>
                 </View>
-                <View style={minimalStyles.infoCol}>
-                  <Text style={minimalStyles.name}>{data.name}</Text>
-                  {data.title && (
-                    <Text style={minimalStyles.title}>{data.title}</Text>
-                  )}
-                  <View style={minimalStyles.shortRule} />
-                  <Text style={minimalStyles.sectionLabel}>Summary</Text>
-                  {data.summary && (
-                    <Text style={minimalStyles.summaryText}>
-                      {data.summary}
-                    </Text>
-                  )}
-                </View>
+                <View style={minimalStyles.fullRule} />
+              </>
+            )}
+            <View style={minimalStyles.bodyRow}>
+              <View style={minimalStyles.sideCol}>
+                {pageSidebarKeys.map((key) => renderSidebarSection(key))}
               </View>
-              <View style={minimalStyles.fullRule} />
-            </>
-          )}
-          <View style={minimalStyles.bodyRow}>
-            <View style={minimalStyles.sideCol}>
-              {group.map((key) => renderSidebarSection(key))}
+              <View style={minimalStyles.mainCol}>
+                {pageMainKeys.map((key) => renderMainSection(key))}
+              </View>
             </View>
-            <View style={minimalStyles.mainCol}>
-              {group.map((key) => renderMainSection(key))}
-            </View>
-          </View>
-        </Page>
-      ))}
+          </Page>
+        );
+      })}
     </Document>
   );
 }
