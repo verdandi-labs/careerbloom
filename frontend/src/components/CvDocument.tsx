@@ -1314,6 +1314,7 @@ function Bold({
   onDragSection,
   activeDragIndex,
   setActiveDragIndex,
+  photoUploading,
 }: Props) {
   const INK = "#111";
   const MUTED = "#555";
