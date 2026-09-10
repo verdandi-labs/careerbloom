@@ -926,7 +926,7 @@ function PreviewPage() {
             </button>
           </div>
         ) : mergedData ? (
-          <div className="w-full flex justify-center overflow-x-auto py-8">
+          <div className="w-full flex flex-col items-center overflow-x-auto py-8 gap-6">
             {structuredData && (
               <CvDocument
                 data={{ ...structuredData, photo: photo ?? undefined }}

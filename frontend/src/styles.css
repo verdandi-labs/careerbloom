@@ -257,6 +257,9 @@
 
 .cv-page {
   width: 794px;
-  min-height: 1123px;
+  height: 1123px;
   box-sizing: border-box;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
