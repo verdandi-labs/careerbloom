@@ -954,14 +954,8 @@ function PreviewPage() {
                     +
                   </button>
                 </div>
-                <div
-                  className="relative"
-                  style={{
-                    transform: `scale(${pdfScale})`,
-                    transformOrigin: "top center",
-                  }}
-                >
-                  <CvDocument
+                <CvDocument
+                    pdfScale={pdfScale}
                     data={{ ...structuredData, photo: photo ?? undefined }}
                     template={selectedTemplate}
                     editable={true}
@@ -985,7 +979,6 @@ function PreviewPage() {
                     setActiveDragIndex={setActiveDragIndex}
                     photoUploading={photoUploading}
                   />
-                </div>
               </>
             )}
           </div>
