@@ -1975,7 +1975,7 @@ function Minimal({
                           fontFamily: "Playfair Display, serif",
                           color: INK,
                         }}
-                        className="text-4xl font-bold leading-tight"
+                        className="text-[30px] font-bold leading-tight"
                       >
                         <Editable
                           value={data.name}
