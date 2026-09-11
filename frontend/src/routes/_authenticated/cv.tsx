@@ -931,29 +931,6 @@ function PreviewPage() {
           <div className="w-full flex flex-col items-center overflow-x-auto py-8 gap-6">
             {structuredData && (
               <div className="relative">
-                <div className="absolute -top-10 right-0 flex items-center gap-2">
-                  <button
-                    onClick={() =>
-                      setPdfScale((s) => Math.max(0.85, +(s - 0.05).toFixed(2)))
-                    }
-                    disabled={pdfScale <= 0.85}
-                    className="inline-flex items-center justify-center rounded-full bg-white px-4 py-2 text-sm text-foreground hover:bg-white/80 disabled:opacity-50"
-                  >
-                    −
-                  </button>
-                  <span className="text-sm text-muted-foreground">
-                    {Math.round(pdfScale * 100)}%
-                  </span>
-                  <button
-                    onClick={() =>
-                      setPdfScale((s) => Math.min(1.1, +(s + 0.05).toFixed(2)))
-                    }
-                    disabled={pdfScale >= 1.1}
-                    className="inline-flex items-center justify-center rounded-full bg-white px-4 py-2 text-sm text-foreground hover:bg-white/80 disabled:opacity-50"
-                  >
-                    +
-                  </button>
-                </div>
                 <CvDocument
                   data={{ ...structuredData, photo: photo ?? undefined }}
                   template={selectedTemplate}
@@ -978,6 +955,29 @@ function PreviewPage() {
                   setActiveDragIndex={setActiveDragIndex}
                   photoUploading={photoUploading}
                 />
+                <div className="absolute top-2 right-2 flex items-center gap-2 z-10">
+                  <button
+                    onClick={() =>
+                      setPdfScale((s) => Math.max(0.85, +(s - 0.05).toFixed(2)))
+                    }
+                    disabled={pdfScale <= 0.85}
+                    className="inline-flex items-center justify-center rounded-full bg-white px-4 py-2 text-sm text-foreground hover:bg-white/80 disabled:opacity-50 shadow-sm"
+                  >
+                    −
+                  </button>
+                  <span className="text-sm text-muted-foreground">
+                    {Math.round(pdfScale * 100)}%
+                  </span>
+                  <button
+                    onClick={() =>
+                      setPdfScale((s) => Math.min(1.1, +(s + 0.05).toFixed(2)))
+                    }
+                    disabled={pdfScale >= 1.1}
+                    className="inline-flex items-center justify-center rounded-full bg-white px-4 py-2 text-sm text-foreground hover:bg-white/80 disabled:opacity-50 shadow-sm"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
             )}
           </div>
