@@ -930,32 +930,8 @@ function PreviewPage() {
         ) : mergedData ? (
           <div className="w-full flex flex-col items-center overflow-x-auto py-8 gap-6">
             {structuredData && (
-              <div className="relative">
-                <CvDocument
-                  data={{ ...structuredData, photo: photo ?? undefined }}
-                  template={selectedTemplate}
-                  editable={true}
-                  onChange={handleChange}
-                  onEditItem={(field, index, item) =>
-                    setEditingItem({ field, index, item })
-                  }
-                  sectionOrder={sectionOrder}
-                  onDragSection={(from, to) => {
-                    const next = [...sectionOrder];
-                    const [moved] = next.splice(from, 1);
-                    next.splice(to, 0, moved);
-                    setSectionOrder(next);
-                    localStorage.setItem(
-                      "cv-preview-section-order",
-                      JSON.stringify(next),
-                    );
-                    setActiveDragIndex(null);
-                  }}
-                  activeDragIndex={activeDragIndex}
-                  setActiveDragIndex={setActiveDragIndex}
-                  photoUploading={photoUploading}
-                />
-                <div className="absolute top-2 right-2 flex items-center gap-2 z-10">
+              <>
+                <div className="flex items-center gap-2 self-end">
                   <button
                     onClick={() =>
                       setPdfScale((s) => Math.max(0.85, +(s - 0.05).toFixed(2)))
@@ -978,7 +954,39 @@ function PreviewPage() {
                     +
                   </button>
                 </div>
-              </div>
+                <div
+                  className="relative"
+                  style={{
+                    transform: `scale(${pdfScale})`,
+                    transformOrigin: "top center",
+                  }}
+                >
+                  <CvDocument
+                    data={{ ...structuredData, photo: photo ?? undefined }}
+                    template={selectedTemplate}
+                    editable={true}
+                    onChange={handleChange}
+                    onEditItem={(field, index, item) =>
+                      setEditingItem({ field, index, item })
+                    }
+                    sectionOrder={sectionOrder}
+                    onDragSection={(from, to) => {
+                      const next = [...sectionOrder];
+                      const [moved] = next.splice(from, 1);
+                      next.splice(to, 0, moved);
+                      setSectionOrder(next);
+                      localStorage.setItem(
+                        "cv-preview-section-order",
+                        JSON.stringify(next),
+                      );
+                      setActiveDragIndex(null);
+                    }}
+                    activeDragIndex={activeDragIndex}
+                    setActiveDragIndex={setActiveDragIndex}
+                    photoUploading={photoUploading}
+                  />
+                </div>
+              </>
             )}
           </div>
         ) : null}
