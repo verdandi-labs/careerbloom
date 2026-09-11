@@ -497,7 +497,7 @@ function Terracotta({
                   </DragSection>
                 ))}
               </div>
-              <div className="p-7 flex flex-col gap-5">
+              <div className="p-6 flex flex-col gap-5">
                 {gi === 0 && (/\S/.test(data.name ?? "") || e) && (
                   <div className="relative group">
                     <h1
