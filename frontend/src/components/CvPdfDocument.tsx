@@ -669,9 +669,11 @@ const minimalStyles = StyleSheet.create({
 function TerracottaPdfDocument({
   data,
   sectionOrder,
+  pdfScale = 1.0,
 }: {
   data: StructuredCVData;
   sectionOrder?: SectionOrderItem[];
+  pdfScale?: number;
 }) {
   const sidebarKeys = orderedSections(sectionOrder, [
     "contact",
@@ -801,7 +803,11 @@ function TerracottaPdfDocument({
         const pageSidebarKeys = pageKeys.filter((k) => sidebarKeys.includes(k));
         const pageMainKeys = pageKeys.filter((k) => mainKeys.includes(k));
         return (
-          <Page key={gi} size="A4" style={terracottaStyles.page}>
+          <Page
+            key={gi}
+            size="A4"
+            style={{ ...terracottaStyles.page, fontSize: 10 * pdfScale }}
+          >
             <View style={terracottaStyles.sidebar}>
               {gi === 0 && (
                 <View
@@ -872,9 +878,11 @@ function TerracottaPdfDocument({
 function SagePdfDocument({
   data,
   sectionOrder,
+  pdfScale = 1.0,
 }: {
   data: StructuredCVData;
   sectionOrder?: SectionOrderItem[];
+  pdfScale?: number;
 }) {
   const contactText = data.contact
     .map((c) => c.detail)
@@ -991,7 +999,11 @@ function SagePdfDocument({
         const pageSidebarKeys = pageKeys.filter((k) => sidebarKeys.includes(k));
         const pageMainKeys = pageKeys.filter((k) => mainKeys.includes(k));
         return (
-          <Page key={gi} size="A4" style={sageStyles.page}>
+          <Page
+            key={gi}
+            size="A4"
+            style={{ ...sageStyles.page, fontSize: 10 * pdfScale }}
+          >
             {gi === 0 && (
               <View style={sageStyles.header}>
                 <Text style={sageStyles.cvLabel}>Curriculum Vitae</Text>
@@ -1066,9 +1078,11 @@ function SagePdfDocument({
 function ClassicPdfDocument({
   data,
   sectionOrder,
+  pdfScale = 1.0,
 }: {
   data: StructuredCVData;
   sectionOrder?: SectionOrderItem[];
+  pdfScale?: number;
 }) {
   const contactText = data.contact
     .map((c) => c.detail)
@@ -1181,7 +1195,11 @@ function ClassicPdfDocument({
   return (
     <Document>
       {groups.map((group, gi) => (
-        <Page key={gi} size="A4" style={classicStyles.page}>
+        <Page
+          key={gi}
+          size="A4"
+          style={{ ...classicStyles.page, fontSize: 10 * pdfScale }}
+        >
           {gi === 0 && (
             <>
               <Text style={classicStyles.name}>{data.name}</Text>
@@ -1225,9 +1243,11 @@ function ClassicPdfDocument({
 function BoldPdfDocument({
   data,
   sectionOrder,
+  pdfScale = 1.0,
 }: {
   data: StructuredCVData;
   sectionOrder?: SectionOrderItem[];
+  pdfScale?: number;
 }) {
   const allKeys = orderedSections(sectionOrder, [
     "experience",
@@ -1380,7 +1400,11 @@ function BoldPdfDocument({
         <Page
           key={gi}
           size="A4"
-          style={{ backgroundColor: BOLD_BG, fontFamily: "DM Sans" }}
+          style={{
+            backgroundColor: BOLD_BG,
+            fontFamily: "DM Sans",
+            fontSize: 10 * pdfScale,
+          }}
         >
           {gi === 0 && (
             <>
@@ -1478,9 +1502,11 @@ function BoldPdfDocument({
 function MinimalPdfDocument({
   data,
   sectionOrder,
+  pdfScale = 1.0,
 }: {
   data: StructuredCVData;
   sectionOrder?: SectionOrderItem[];
+  pdfScale?: number;
 }) {
   const sidebarKeys = orderedSections(sectionOrder, [
     "contact",
@@ -1605,7 +1631,11 @@ function MinimalPdfDocument({
         const pageSidebarKeys = pageKeys.filter((k) => sidebarKeys.includes(k));
         const pageMainKeys = pageKeys.filter((k) => mainKeys.includes(k));
         return (
-          <Page key={gi} size="A4" style={minimalStyles.page}>
+          <Page
+            key={gi}
+            size="A4"
+            style={{ ...minimalStyles.page, fontSize: 10 * pdfScale }}
+          >
             {gi === 0 && (
               <>
                 <View style={minimalStyles.topRow}>
@@ -1669,18 +1699,50 @@ export function CvPdfDocument({
   data,
   template,
   sectionOrder,
+  pdfScale = 1.0,
 }: {
   data: StructuredCVData;
   template: CVTemplateId;
   sectionOrder?: SectionOrderItem[];
+  pdfScale?: number;
 }) {
   if (template === "sage")
-    return <SagePdfDocument data={data} sectionOrder={sectionOrder} />;
+    return (
+      <SagePdfDocument
+        data={data}
+        sectionOrder={sectionOrder}
+        pdfScale={pdfScale}
+      />
+    );
   if (template === "classic")
-    return <ClassicPdfDocument data={data} sectionOrder={sectionOrder} />;
+    return (
+      <ClassicPdfDocument
+        data={data}
+        sectionOrder={sectionOrder}
+        pdfScale={pdfScale}
+      />
+    );
   if (template === "bold")
-    return <BoldPdfDocument data={data} sectionOrder={sectionOrder} />;
+    return (
+      <BoldPdfDocument
+        data={data}
+        sectionOrder={sectionOrder}
+        pdfScale={pdfScale}
+      />
+    );
   if (template === "minimal")
-    return <MinimalPdfDocument data={data} sectionOrder={sectionOrder} />;
-  return <TerracottaPdfDocument data={data} sectionOrder={sectionOrder} />;
+    return (
+      <MinimalPdfDocument
+        data={data}
+        sectionOrder={sectionOrder}
+        pdfScale={pdfScale}
+      />
+    );
+  return (
+    <TerracottaPdfDocument
+      data={data}
+      sectionOrder={sectionOrder}
+      pdfScale={pdfScale}
+    />
+  );
 }

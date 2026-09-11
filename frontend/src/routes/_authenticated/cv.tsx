@@ -376,6 +376,7 @@ function PreviewPage() {
   const [translateOpen, setTranslateOpen] = useState(false);
   const [translating, setTranslating] = useState(false);
   const [translated, setTranslated] = useState<TranslatedCv | null>(null);
+  const [pdfScale, setPdfScale] = useState(1.0);
 
   useEffect(() => {
     if (!cv) return;
@@ -706,6 +707,7 @@ function PreviewPage() {
           data={{ ...structuredData, photo: photo ?? undefined }}
           template={selectedTemplate}
           sectionOrder={sectionOrder}
+          pdfScale={pdfScale}
         />,
       ).toBlob();
       const url = URL.createObjectURL(blob);
@@ -828,6 +830,27 @@ function PreviewPage() {
                 </div>
               )}
             </div>
+            <button
+              onClick={() =>
+                setPdfScale((s) => Math.max(0.85, +(s - 0.05).toFixed(2)))
+              }
+              disabled={pdfScale <= 0.85}
+              className="inline-flex items-center justify-center rounded-full bg-white/70 px-3 py-2 text-xs text-foreground hover:bg-white disabled:opacity-50"
+            >
+              −
+            </button>
+            <span className="text-xs text-muted-foreground">
+              {Math.round(pdfScale * 100)}%
+            </span>
+            <button
+              onClick={() =>
+                setPdfScale((s) => Math.min(1.1, +(s + 0.05).toFixed(2)))
+              }
+              disabled={pdfScale >= 1.1}
+              className="inline-flex items-center justify-center rounded-full bg-white/70 px-3 py-2 text-xs text-foreground hover:bg-white disabled:opacity-50"
+            >
+              +
+            </button>
             <button
               onClick={() => void handleExportPdf()}
               disabled={exporting || !structuredData}
