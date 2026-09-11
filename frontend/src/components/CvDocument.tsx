@@ -1192,7 +1192,7 @@ function Classic({
       {groups.map((group, gi) => (
         <div
           key={gi}
-          className="cv-page px-12 py-10"
+          className="cv-page px-12 pt-[30px] pb-10"
           style={{
             fontFamily: "DM Sans, sans-serif",
             backgroundColor: "#ffffff",
