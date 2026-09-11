@@ -342,7 +342,7 @@ function Terracotta({
       return (
         <div key="experience">
           <SidebarLabel color={TERRACOTTA}>Experience</SidebarLabel>
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-3.5">
             {data.experience.map((item, i) => (
               <div
                 key={item.line_num}
