@@ -244,8 +244,12 @@ export function Classic({
                     <span className="mx-2">·</span>
                   )}
                   {data.contact.map((item, i) => (
-                    <span key={item.line_num}>
-                      {item.detail}
+                    <span
+                      key={item.line_num}
+                      onClick={() => onEditItem?.("contact", i, item)}
+                      className="cursor-pointer"
+                    >
+                      {item.detail || " "}
                       {i < data.contact.length - 1 && (
                         <span className="mx-2">·</span>
                       )}
