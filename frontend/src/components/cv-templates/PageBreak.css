@@ -1,46 +1,15 @@
 .cv-page-break-label {
-  --text-color: #9aaa91;
-  --page-background: #ffffff;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 12px;
   z-index: 21;
   pointer-events: none;
 }
 
-.cv-page-break-label__logo,
-.cv-page-break-label__text {
-  position: relative;
-  background: var(--page-background);
-}
-
 .cv-page-break-label__logo {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   object-fit: contain;
-  opacity: 0.82;
-  flex: 0 0 auto;
-  padding: 0 4px;
-}
-
-.cv-page-break-label__logo--right {
-  transform: scaleX(-1);
-}
-
-.cv-page-break-label__text {
-  padding: 0 10px;
-  color: var(--text-color);
-  font-family: "Cormorant Garamond", Georgia, serif;
-  font-size: 13px;
-  font-weight: 400;
-  line-height: 1;
-  letter-spacing: 0.08em;
-  white-space: nowrap;
-}
-
-.cv-page.bold .cv-page-break-label {
-  --page-background: #E8E5DC;
+  opacity: 0.6;
+  display: block;
 }
