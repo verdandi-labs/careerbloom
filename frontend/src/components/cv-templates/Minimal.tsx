@@ -42,7 +42,7 @@ export function Minimal({
         <div key="contact">
           <p
             className="text-[9px] uppercase tracking-widest font-semibold mb-2"
-            style={{ color: INK }}
+            style={{ color: "#ffffff" }}
           >
             Contact
           </p>
@@ -50,8 +50,8 @@ export function Minimal({
             <p
               key={item.line_num}
               onClick={() => onEditItem?.("contact", i, item)}
-              className="text-[10px] leading-relaxed flex items-start gap-2 cursor-pointer hover:bg-black/5 rounded transition"
-              style={{ color: MUTED }}
+              className="text-[10px] leading-relaxed flex items-start gap-2 cursor-pointer hover:bg-white/10 rounded transition"
+              style={{ color: "rgba(255,255,255,0.65)" }}
             >
               <span className="shrink-0">•</span>
               {item.detail}
@@ -65,7 +65,7 @@ export function Minimal({
         <div key="skills">
           <p
             className="text-[9px] uppercase tracking-widest font-semibold mb-2"
-            style={{ color: INK }}
+            style={{ color: "#ffffff" }}
           >
             Skills
           </p>
@@ -73,8 +73,8 @@ export function Minimal({
             <p
               key={item.line_num}
               onClick={() => onEditItem?.("skills", i, item)}
-              className="text-[10px] leading-relaxed flex items-start gap-2 cursor-pointer hover:bg-black/5 rounded transition"
-              style={{ color: MUTED }}
+              className="text-[10px] leading-relaxed flex items-start gap-2 cursor-pointer hover:bg-white/10 rounded transition"
+              style={{ color: "rgba(255,255,255,0.65)" }}
             >
               <span className="shrink-0">•</span>
               {item.skill}
@@ -88,7 +88,7 @@ export function Minimal({
         <div key="education">
           <p
             className="text-[9px] uppercase tracking-widest font-semibold mb-2"
-            style={{ color: INK }}
+            style={{ color: "#ffffff" }}
           >
             Education
           </p>
@@ -96,19 +96,19 @@ export function Minimal({
             <div
               key={item.line_num}
               onClick={() => onEditItem?.("education", i, item)}
-              className="mb-2 cursor-pointer hover:bg-black/5 rounded transition"
+              className="mb-2 cursor-pointer hover:bg-white/10 rounded transition"
             >
               <p
                 className="text-[10px] font-bold uppercase"
-                style={{ color: INK }}
+                style={{ color: "#ffffff" }}
               >
                 {item.edu_center}
               </p>
-              <p className="text-[9px]" style={{ color: MUTED }}>
+              <p className="text-[9px]" style={{ color: "rgba(255,255,255,0.65)" }}>
                 {[item.start_date ?? item.end_date].filter(Boolean).join(" – ")}
               </p>
               {item.comments && (
-                <p className="text-[9px]" style={{ color: MUTED }}>
+                <p className="text-[9px]" style={{ color: "rgba(255,255,255,0.65)" }}>
                   {item.comments}
                 </p>
               )}
@@ -122,7 +122,7 @@ export function Minimal({
         <div key="languages">
           <p
             className="text-[9px] uppercase tracking-widest font-semibold mb-2"
-            style={{ color: INK }}
+            style={{ color: "#ffffff" }}
           >
             Languages
           </p>
@@ -130,8 +130,8 @@ export function Minimal({
             <p
               key={item.line_num}
               onClick={() => onEditItem?.("languages", i, item)}
-              className="text-[10px] leading-relaxed flex items-start gap-2 cursor-pointer hover:bg-black/5 rounded transition"
-              style={{ color: MUTED }}
+              className="text-[10px] leading-relaxed flex items-start gap-2 cursor-pointer hover:bg-white/10 rounded transition"
+              style={{ color: "rgba(255,255,255,0.65)" }}
             >
               <span className="shrink-0">•</span>
               {item.language}
@@ -249,7 +249,7 @@ export function Minimal({
                 <div className="grid grid-cols-[220px_1fr]">
                   <div
                     className="min-h-[240px]"
-                    style={{ backgroundColor: "#C8C8C6" }}
+                    style={{ backgroundColor: "#333333" }}
                   >
                     {photoUploading ? (
                       <div
@@ -350,12 +350,13 @@ export function Minimal({
               </>
             )}
 
-            <div className="grid grid-cols-[220px_1fr]">
+            <div className="grid grid-cols-[220px_1fr] items-stretch" style={{ minHeight: "100%" }}>
               <div
-                className="px-6 py-7 flex flex-col gap-6"
+                className="px-6 py-7 flex flex-col gap-6 self-stretch min-h-full"
                 style={{
-                  backgroundColor: LIGHT,
+                  backgroundColor: INK,
                   borderRight: "1px solid #e0e0e0",
+                  alignSelf: "stretch",
                 }}
               >
                 {pageSidebarKeys.map((key) => {
