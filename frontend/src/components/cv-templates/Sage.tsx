@@ -327,7 +327,7 @@ export function Sage({
                 </div>
               )}
             </div>
-            <div className="grid grid-cols-[1fr_200px]">
+            <div className="grid grid-cols-[1fr_200px] items-stretch">
               <div className="p-8 pr-6">
                 {pageMainKeys.map((key) => (
                   <DragSection
@@ -348,8 +348,8 @@ export function Sage({
                 ))}
               </div>
               <div
-                className="p-8 pl-6"
-                style={{ borderLeft: `1px solid ${SAGE_LIGHT}` }}
+                className="p-8 pl-6 self-stretch"
+                style={{ borderLeft: `1px solid ${SAGE_LIGHT}`, minHeight: "100%" }}
               >
                 {gi === 0 && (
                   <div
