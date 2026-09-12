@@ -350,12 +350,9 @@ export function Minimal({
               </>
             )}
             {gi > 0 && <PageBreak />}
-            <div
-              className="grid grid-cols-[220px_1fr]"
-              style={{ alignItems: "stretch" }}
-            >
+            <div className="grid grid-cols-[220px_1fr]">
               <div
-                className="px-6 py-7 flex flex-col gap-6 h-full"
+                className="px-6 py-7 flex flex-col gap-6"
                 style={{
                   backgroundColor: LIGHT,
                   borderRight: "1px solid #e0e0e0",
@@ -377,7 +374,7 @@ export function Minimal({
                   );
                 })}
               </div>
-              <div className="px-8 py-7 flex flex-col gap-6 h-full">
+              <div className="px-8 py-7 flex flex-col gap-6">
                 {pageMainKeys.map((key) => {
                   const idx = sectionOrder.findIndex(
                     (s) => s.type === "section" && s.key === key,

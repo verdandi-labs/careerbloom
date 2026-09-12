@@ -328,11 +328,8 @@ export function Sage({
                 </div>
               )}
             </div>
-            <div
-              className="grid grid-cols-[1fr_200px]"
-              style={{ alignItems: "stretch" }}
-            >
-              <div className="p-8 pr-6 h-full">
+            <div className="grid grid-cols-[1fr_200px]">
+              <div className="p-8 pr-6">
                 {pageMainKeys.map((key) => (
                   <DragSection
                     key={key}
@@ -352,7 +349,7 @@ export function Sage({
                 ))}
               </div>
               <div
-                className="p-8 pl-6 h-full"
+                className="p-8 pl-6"
                 style={{ borderLeft: `1px solid ${SAGE_LIGHT}` }}
               >
                 {gi === 0 && (

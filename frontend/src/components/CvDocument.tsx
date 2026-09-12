@@ -10,6 +10,7 @@ import { Sage } from "./cv-templates/Sage";
 import { Classic } from "./cv-templates/Classic";
 import { Bold } from "./cv-templates/Bold";
 import { Minimal } from "./cv-templates/Minimal";
+import "./cv-templates/common.css";
 
 export type EditableField =
   "name" | "title" | "summary" | "certifications" | "references" | "other";
