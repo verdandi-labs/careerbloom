@@ -928,7 +928,7 @@ function PreviewPage() {
             </button>
           </div>
         ) : mergedData ? (
-          <div className="w-full flex flex-col items-center overflow-x-auto py-8 gap-6">
+          <div className="w-full flex flex-col items-center overflow-x-clip py-8 gap-6">
             {structuredData && (
               <>
                 <div className="flex items-center gap-2 self-end">

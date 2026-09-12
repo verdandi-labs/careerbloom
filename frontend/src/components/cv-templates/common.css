@@ -1,5 +1,5 @@
 .cv-page {
-  min-height: 1123px;
+  min-height: 1123px !important;
   width: 100%;
   box-sizing: border-box;
 }

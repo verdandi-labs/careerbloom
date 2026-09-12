@@ -207,7 +207,7 @@ export function CvDocument(props: Props) {
     );
 
   return (
-    <div className="mx-auto w-full max-w-[820px] overflow-hidden rounded-md shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)] ring-1 ring-black/5">
+    <div className="mx-auto w-full max-w-[820px] rounded-md shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)] ring-1 ring-black/5">
       {inner}
       <style>{`
         .cv-editable[contenteditable="true"]:empty::before {
