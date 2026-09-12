@@ -2,6 +2,7 @@ import React, { type CSSProperties } from "react";
 import type { StructuredCVData } from "@/lib/cv-templates";
 import { splitAtPageBreaks } from "@/lib/cv-templates";
 import { Editable, DragSection, type Props } from "../CvDocument";
+import { PageBreak } from "./PageBreak";
 import "./Sage.css";
 
 export function Sage({
@@ -262,15 +263,7 @@ export function Sage({
               } as CSSProperties
             }
           >
-            {gi > 0 && (
-              <div
-                style={{
-                  marginTop: 32,
-                  borderTop: "2px dashed #e5e7eb",
-                  paddingTop: 32,
-                }}
-              />
-            )}
+            {gi > 0 && <PageBreak />}
             <div
               className="relative group px-8 pt-8 pb-5"
               style={{ borderBottom: `1px solid ${SAGE_LIGHT}` }}
@@ -335,8 +328,11 @@ export function Sage({
                 </div>
               )}
             </div>
-            <div className="grid grid-cols-[1fr_200px]">
-              <div className="p-8 pr-6">
+            <div
+              className="grid grid-cols-[1fr_200px]"
+              style={{ alignItems: "stretch" }}
+            >
+              <div className="p-8 pr-6 h-full">
                 {pageMainKeys.map((key) => (
                   <DragSection
                     key={key}
@@ -356,7 +352,7 @@ export function Sage({
                 ))}
               </div>
               <div
-                className="p-8 pl-6"
+                className="p-8 pl-6 h-full"
                 style={{ borderLeft: `1px solid ${SAGE_LIGHT}` }}
               >
                 {gi === 0 && (

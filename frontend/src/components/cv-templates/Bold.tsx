@@ -2,6 +2,7 @@ import React, { type CSSProperties } from "react";
 import type { StructuredCVData } from "@/lib/cv-templates";
 import { orderedSections, splitAtPageBreaks } from "@/lib/cv-templates";
 import { Editable, DragSection, type Props } from "../CvDocument";
+import { PageBreak } from "./PageBreak";
 import "./Bold.css";
 
 export function Bold({
@@ -340,15 +341,7 @@ export function Bold({
               <div className="h-px mx-6" style={{ backgroundColor: INK }} />
             </>
           )}
-          {gi > 0 && (
-            <div
-              style={{
-                marginTop: 32,
-                borderTop: "2px dashed #e5e7eb",
-                paddingTop: 32,
-              }}
-            />
-          )}
+          {gi > 0 && <PageBreak background={BG} />}
           <div className="px-6 pb-4 mt-4">
             {group.map((key) => {
               const idx = sectionOrder.findIndex(

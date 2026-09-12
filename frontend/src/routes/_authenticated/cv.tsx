@@ -955,30 +955,30 @@ function PreviewPage() {
                   </button>
                 </div>
                 <CvDocument
-                    pdfScale={pdfScale}
-                    data={{ ...structuredData, photo: photo ?? undefined }}
-                    template={selectedTemplate}
-                    editable={true}
-                    onChange={handleChange}
-                    onEditItem={(field, index, item) =>
-                      setEditingItem({ field, index, item })
-                    }
-                    sectionOrder={sectionOrder}
-                    onDragSection={(from, to) => {
-                      const next = [...sectionOrder];
-                      const [moved] = next.splice(from, 1);
-                      next.splice(to, 0, moved);
-                      setSectionOrder(next);
-                      localStorage.setItem(
-                        "cv-preview-section-order",
-                        JSON.stringify(next),
-                      );
-                      setActiveDragIndex(null);
-                    }}
-                    activeDragIndex={activeDragIndex}
-                    setActiveDragIndex={setActiveDragIndex}
-                    photoUploading={photoUploading}
-                  />
+                  pdfScale={pdfScale}
+                  data={{ ...structuredData, photo: photo ?? undefined }}
+                  template={selectedTemplate}
+                  editable={true}
+                  onChange={handleChange}
+                  onEditItem={(field, index, item) =>
+                    setEditingItem({ field, index, item })
+                  }
+                  sectionOrder={sectionOrder}
+                  onDragSection={(from, to) => {
+                    const next = [...sectionOrder];
+                    const [moved] = next.splice(from, 1);
+                    next.splice(to, 0, moved);
+                    setSectionOrder(next);
+                    localStorage.setItem(
+                      "cv-preview-section-order",
+                      JSON.stringify(next),
+                    );
+                    setActiveDragIndex(null);
+                  }}
+                  activeDragIndex={activeDragIndex}
+                  setActiveDragIndex={setActiveDragIndex}
+                  photoUploading={photoUploading}
+                />
               </>
             )}
           </div>

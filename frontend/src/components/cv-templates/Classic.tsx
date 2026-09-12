@@ -2,6 +2,7 @@ import React, { type CSSProperties } from "react";
 import type { StructuredCVData } from "@/lib/cv-templates";
 import { orderedSections, splitAtPageBreaks } from "@/lib/cv-templates";
 import { Editable, DragSection, type Props } from "../CvDocument";
+import { PageBreak } from "./PageBreak";
 import "./Classic.css";
 
 export function Classic({
@@ -275,15 +276,7 @@ export function Classic({
               />
             </>
           )}
-          {gi > 0 && (
-            <div
-              style={{
-                marginTop: 32,
-                borderTop: "2px dashed #e5e7eb",
-                paddingTop: 32,
-              }}
-            />
-          )}
+          {gi > 0 && <PageBreak />}
           {group.map((key) => {
             const idx = sectionOrder.findIndex(
               (s) => s.type === "section" && s.key === key,

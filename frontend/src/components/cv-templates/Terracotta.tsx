@@ -2,6 +2,7 @@ import React, { type CSSProperties } from "react";
 import type { StructuredCVData } from "@/lib/cv-templates";
 import { splitAtPageBreaks } from "@/lib/cv-templates";
 import { Editable, DragSection, type Props } from "../CvDocument";
+import { PageBreak } from "./PageBreak";
 import "./Terracotta.css";
 
 function SidebarLabel({
@@ -237,18 +238,13 @@ export function Terracotta({
               } as CSSProperties
             }
           >
-            {gi > 0 && (
+            {gi > 0 && <PageBreak />}
+            <div
+              className="grid grid-cols-[180px_1fr]"
+              style={{ alignItems: "stretch" }}
+            >
               <div
-                style={{
-                  marginTop: 32,
-                  borderTop: "2px dashed #e5e7eb",
-                  paddingTop: 32,
-                }}
-              />
-            )}
-            <div className="grid grid-cols-[180px_1fr]">
-              <div
-                className="p-5 flex flex-col gap-5"
+                className="p-5 flex flex-col gap-5 h-full"
                 style={{ borderRight: `1px solid ${TERRACOTTA}` }}
               >
                 {gi === 0 && (
@@ -319,7 +315,7 @@ export function Terracotta({
                   </DragSection>
                 ))}
               </div>
-              <div className="p-6 flex flex-col gap-5">
+              <div className="p-6 flex flex-col gap-5 h-full">
                 {gi === 0 && (/\S/.test(data.name ?? "") || e) && (
                   <div className="relative group">
                     <h1

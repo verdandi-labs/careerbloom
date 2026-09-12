@@ -2,6 +2,7 @@ import React, { type CSSProperties } from "react";
 import type { StructuredCVData } from "@/lib/cv-templates";
 import { splitAtPageBreaks } from "@/lib/cv-templates";
 import { Editable, DragSection, type Props } from "../CvDocument";
+import { PageBreak } from "./PageBreak";
 import "./Minimal.css";
 
 export function Minimal({
@@ -348,18 +349,13 @@ export function Minimal({
                 <div className="h-px" style={{ backgroundColor: "#ddd" }} />
               </>
             )}
-            {gi > 0 && (
+            {gi > 0 && <PageBreak />}
+            <div
+              className="grid grid-cols-[220px_1fr]"
+              style={{ alignItems: "stretch" }}
+            >
               <div
-                style={{
-                  marginTop: 32,
-                  borderTop: "2px dashed #e5e7eb",
-                  paddingTop: 32,
-                }}
-              />
-            )}
-            <div className="grid grid-cols-[220px_1fr]">
-              <div
-                className="px-6 py-7 flex flex-col gap-6"
+                className="px-6 py-7 flex flex-col gap-6 h-full"
                 style={{
                   backgroundColor: LIGHT,
                   borderRight: "1px solid #e0e0e0",
@@ -381,7 +377,7 @@ export function Minimal({
                   );
                 })}
               </div>
-              <div className="px-8 py-7 flex flex-col gap-6">
+              <div className="px-8 py-7 flex flex-col gap-6 h-full">
                 {pageMainKeys.map((key) => {
                   const idx = sectionOrder.findIndex(
                     (s) => s.type === "section" && s.key === key,
