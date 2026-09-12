@@ -325,7 +325,7 @@ export function Minimal({
                       </p>
                     )}
                     <div
-                      className="w-6 h-0.5 my-3"
+                      className="w-full h-0.5 my-3"
                       style={{ backgroundColor: INK }}
                     />
                     <p
