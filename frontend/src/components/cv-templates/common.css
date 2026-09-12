@@ -2,22 +2,19 @@
   min-height: 1123px !important;
   width: 100%;
   box-sizing: border-box;
-}
-
-.cv-page .grid {
-  align-items: stretch;
-  min-height: 100%;
-}
-
-.cv-page .grid > div {
-  min-height: 100%;
-}
-
-/* A4 page boundary indicators — purely decorative, no effect on content */
-.cv-page {
   position: relative;
 }
 
+.cv-page > .grid {
+  align-items: stretch;
+  min-height: 1123px;
+}
+
+.cv-page > .grid > div {
+  align-self: stretch;
+}
+
+/* A4 page boundary indicators — purely decorative, no effect on content */
 .cv-page::before,
 .cv-page::after {
   content: "";

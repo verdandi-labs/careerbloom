@@ -246,7 +246,7 @@ export function Minimal({
           >
             {gi === 0 && (
               <>
-                <div className="grid grid-cols-[220px_1fr]">
+                <div className="grid grid-cols-[220px_1fr] items-stretch">
                   <div
                     className="min-h-[240px]"
                     style={{ backgroundColor: "#333333" }}
@@ -352,11 +352,11 @@ export function Minimal({
 
             <div className="grid grid-cols-[220px_1fr] items-stretch" style={{ minHeight: "100%" }}>
               <div
-                className="px-6 py-7 flex flex-col gap-6 self-stretch min-h-full"
+                className="px-6 py-7 flex flex-col gap-6 self-stretch"
                 style={{
                   backgroundColor: INK,
                   borderRight: "1px solid #e0e0e0",
-                  alignSelf: "stretch",
+                  minHeight: "100%",
                 }}
               >
                 {pageSidebarKeys.map((key) => {
