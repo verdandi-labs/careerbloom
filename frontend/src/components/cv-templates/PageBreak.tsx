@@ -1,22 +1,18 @@
 import "./PageBreak.css";
 
-interface PageBreakProps {
-  background?: string;
+interface PageBreakLabelProps {
+  top: number;
 }
 
-export function PageBreak({ background }: PageBreakProps) {
-  const style = background
-    ? ({ "--page-background": background } as React.CSSProperties)
-    : undefined;
-
+export function PageBreakLabel({ top }: PageBreakLabelProps) {
   return (
-    <div className="cv-page-break" style={style}>
-      <img src="/logo.png" alt="" className="cv-page-break__logo" />
-      <span className="cv-page-break__text">page break</span>
+    <div className="cv-page-break-label" style={{ top: top - 10 }}>
+      <img src="/logo.png" alt="" className="cv-page-break-label__logo" />
+      <span className="cv-page-break-label__text">page break</span>
       <img
         src="/logo.png"
         alt=""
-        className="cv-page-break__logo cv-page-break__logo--right"
+        className="cv-page-break-label__logo cv-page-break-label__logo--right"
       />
     </div>
   );

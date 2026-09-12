@@ -2,7 +2,7 @@ import React, { type CSSProperties } from "react";
 import type { StructuredCVData } from "@/lib/cv-templates";
 import { splitAtPageBreaks } from "@/lib/cv-templates";
 import { Editable, DragSection, type Props } from "../CvDocument";
-import { PageBreak } from "./PageBreak";
+
 import "./Terracotta.css";
 
 function SidebarLabel({
@@ -238,7 +238,6 @@ export function Terracotta({
               } as CSSProperties
             }
           >
-            {gi > 0 && <PageBreak />}
             <div className="grid grid-cols-[180px_1fr]">
               <div
                 className="p-5 flex flex-col gap-5"

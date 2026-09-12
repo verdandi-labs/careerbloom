@@ -2,7 +2,7 @@ import React, { type CSSProperties } from "react";
 import type { StructuredCVData } from "@/lib/cv-templates";
 import { splitAtPageBreaks } from "@/lib/cv-templates";
 import { Editable, DragSection, type Props } from "../CvDocument";
-import { PageBreak } from "./PageBreak";
+
 import "./Sage.css";
 
 export function Sage({
@@ -263,7 +263,6 @@ export function Sage({
               } as CSSProperties
             }
           >
-            {gi > 0 && <PageBreak />}
             <div
               className="relative group px-8 pt-8 pb-5"
               style={{ borderBottom: `1px solid ${SAGE_LIGHT}` }}

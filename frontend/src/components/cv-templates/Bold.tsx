@@ -2,7 +2,7 @@ import React, { type CSSProperties } from "react";
 import type { StructuredCVData } from "@/lib/cv-templates";
 import { orderedSections, splitAtPageBreaks } from "@/lib/cv-templates";
 import { Editable, DragSection, type Props } from "../CvDocument";
-import { PageBreak } from "./PageBreak";
+
 import "./Bold.css";
 
 export function Bold({
@@ -84,7 +84,7 @@ export function Bold({
             <div
               key={item.line_num}
               onClick={() => onEditItem?.("experience", i, item)}
-              className="mb-4 cursor-pointer hover:bg-black/5 rounded transition"
+              className="mb-4 cursor-pointer"
             >
               <div className="flex justify-between items-start">
                 <p
@@ -369,7 +369,7 @@ export function Bold({
               <div className="h-px mx-6" style={{ backgroundColor: INK }} />
             </>
           )}
-          {gi > 0 && <PageBreak background={BG} />}
+
           <div className="px-6 pb-4 mt-4">
             {group.map((key) => {
               const idx = sectionOrder.findIndex(

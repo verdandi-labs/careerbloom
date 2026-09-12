@@ -12,3 +12,33 @@
 .cv-page .grid > div {
   min-height: 100%;
 }
+
+/* A4 page boundary indicators — purely decorative, no effect on content */
+.cv-page {
+  position: relative;
+}
+
+.cv-page::before,
+.cv-page::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(248, 211, 220, 0.85);
+  box-shadow:
+    0 2px 10px rgba(235, 170, 187, 0.45),
+    0 0 20px rgba(248, 211, 220, 0.55),
+    0 0 3px rgba(235, 170, 187, 0.7);
+  filter: blur(0.6px);
+  pointer-events: none;
+  z-index: 20;
+}
+
+.cv-page::before {
+  top: 1123px;
+}
+
+.cv-page::after {
+  top: 2246px;
+}

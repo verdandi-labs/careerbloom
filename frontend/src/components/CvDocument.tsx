@@ -10,6 +10,7 @@ import { Sage } from "./cv-templates/Sage";
 import { Classic } from "./cv-templates/Classic";
 import { Bold } from "./cv-templates/Bold";
 import { Minimal } from "./cv-templates/Minimal";
+import { PageBreakLabel } from "./cv-templates/PageBreak";
 import "./cv-templates/common.css";
 
 export type EditableField =
@@ -208,7 +209,11 @@ export function CvDocument(props: Props) {
 
   return (
     <div className="mx-auto w-full max-w-[820px] rounded-md shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)] ring-1 ring-black/5">
-      {inner}
+      <div style={{ position: "relative" }}>
+        {inner}
+        <PageBreakLabel top={1123} />
+        <PageBreakLabel top={2246} />
+      </div>
       <style>{`
         .cv-editable[contenteditable="true"]:empty::before {
           content: attr(data-placeholder);

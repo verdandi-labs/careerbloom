@@ -2,7 +2,7 @@ import React, { type CSSProperties } from "react";
 import type { StructuredCVData } from "@/lib/cv-templates";
 import { splitAtPageBreaks } from "@/lib/cv-templates";
 import { Editable, DragSection, type Props } from "../CvDocument";
-import { PageBreak } from "./PageBreak";
+
 import "./Minimal.css";
 
 export function Minimal({
@@ -349,7 +349,7 @@ export function Minimal({
                 <div className="h-px" style={{ backgroundColor: "#ddd" }} />
               </>
             )}
-            {gi > 0 && <PageBreak />}
+
             <div className="grid grid-cols-[220px_1fr]">
               <div
                 className="px-6 py-7 flex flex-col gap-6"
