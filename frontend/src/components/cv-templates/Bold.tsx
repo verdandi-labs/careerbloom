@@ -251,11 +251,32 @@ export function Bold({
                 className="grid grid-cols-3 text-[9px] uppercase tracking-widest px-6 py-3"
                 style={{ borderBottom: `1px solid ${INK}` }}
               >
-                <div>{data.name || " "}</div>
-                <div className="text-center">
+                <div>
+                  <Editable
+                    value={data.name}
+                    field="name"
+                    editable={e}
+                    onChange={onChange}
+                    as="span"
+                    multiline={false}
+                  />
+                </div>
+                <div
+                  className="text-center cursor-pointer hover:bg-black/5 rounded transition"
+                  onClick={() =>
+                    data.contact[0] &&
+                    onEditItem?.("contact", 0, data.contact[0])
+                  }
+                >
                   {data.contact[0]?.detail || " "}
                 </div>
-                <div className="text-right">
+                <div
+                  className="text-right cursor-pointer hover:bg-black/5 rounded transition"
+                  onClick={() =>
+                    data.contact[1] &&
+                    onEditItem?.("contact", 1, data.contact[1])
+                  }
+                >
                   {data.contact[1]?.detail || " "}
                 </div>
               </div>
@@ -265,7 +286,14 @@ export function Bold({
                     className="text-[11px] uppercase tracking-widest mt-3"
                     style={{ color: INK }}
                   >
-                    {data.title}
+                    <Editable
+                      value={data.title}
+                      field="title"
+                      editable={e}
+                      onChange={onChange}
+                      as="span"
+                      multiline={false}
+                    />
                   </div>
                   {(/\S/.test(data.name ?? "") || e) && (
                     <div
@@ -372,7 +400,14 @@ export function Bold({
                 lineHeight: 1,
               }}
             >
-              {data.name}
+              <Editable
+                value={data.name}
+                field="name"
+                editable={e}
+                onChange={onChange}
+                as="span"
+                multiline={false}
+              />
             </div>
           </div>
         </div>
