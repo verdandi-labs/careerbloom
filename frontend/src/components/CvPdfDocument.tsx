@@ -468,7 +468,7 @@ const boldStyles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 16,
     paddingBottom: 16,
-    gap: 24,
+    gap: 30,
   },
   bodyCol: {
     flex: 1,
@@ -1261,7 +1261,7 @@ function BoldPdfDocument({
   function renderSection(key: string) {
     if (key === "experience" && data.experience.length > 0) {
       return (
-        <View key="experience" style={{ marginBottom: 16 }}>
+        <View key="experience" style={{ marginBottom: 30 }}>
           <Text style={boldStyles.sectionLabel}>Experience</Text>
           {data.experience.map((item, i) => (
             <View key={i} style={{ marginBottom: 10 }}>
@@ -1331,7 +1331,7 @@ function BoldPdfDocument({
     }
     if (key === "education" && data.education.length > 0) {
       return (
-        <View key="education" style={{ marginBottom: 16 }}>
+        <View key="education" style={{ marginBottom: 30 }}>
           <Text style={boldStyles.sectionLabel}>Education</Text>
           {data.education.map((item, i) => (
             <View key={i} style={{ marginBottom: 10 }}>
@@ -1358,7 +1358,7 @@ function BoldPdfDocument({
     }
     if (key === "skills" && data.skills.length > 0) {
       return (
-        <View key="skills" style={{ marginBottom: 16 }}>
+        <View key="skills" style={{ marginBottom: 30 }}>
           <Text style={boldStyles.sectionLabel}>Skills</Text>
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             {data.skills.map((item, i) => (

@@ -79,7 +79,7 @@ export function Bold({
   function renderSection(key: keyof StructuredCVData) {
     if (key === "experience" && data.experience.length > 0) {
       return (
-        <div className="mb-5">
+        <div className="mb-[30px]">
           <p
             className="text-[11px] uppercase tracking-widest font-semibold mb-3"
             style={{ color: INK }}
@@ -152,7 +152,7 @@ export function Bold({
     }
     if (key === "education" && data.education.length > 0) {
       return (
-        <div className="mb-5">
+        <div className="mb-[30px]">
           <p
             className="text-[11px] uppercase tracking-widest font-semibold mb-3"
             style={{ color: INK }}
@@ -195,7 +195,7 @@ export function Bold({
     }
     if (key === "skills" && data.skills.length > 0) {
       return (
-        <div className="mb-5">
+        <div className="mb-[30px]">
           <p
             className="text-[11px] uppercase tracking-widest font-semibold mb-3"
             style={{ color: INK }}
@@ -387,7 +387,7 @@ export function Bold({
             </>
           )}
 
-          <div className="grid grid-cols-[2fr_1fr] gap-6 px-6 pb-4 mt-4">
+          <div className="grid grid-cols-[2fr_1fr] gap-[30px] px-6 pb-4 mt-4">
             <div>
               {group
                 .filter((k) => ["experience"].includes(k as string))
