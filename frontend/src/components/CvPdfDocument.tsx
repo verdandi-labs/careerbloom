@@ -81,40 +81,40 @@ const terracottaStyles = StyleSheet.create({
   },
   sidebar: {
     width: 150,
-    padding: 15,
+    padding: 20,
     borderRightWidth: 1,
     borderRightColor: TERRACOTTA,
     borderRightStyle: "solid",
     flexDirection: "column",
-    gap: 15,
+    gap: 20,
   },
   main: {
     flex: 1,
-    padding: 18,
+    padding: 24,
     flexDirection: "column",
-    gap: 15,
+    gap: 20,
   },
   sidebarLabel: {
     fontSize: 7.5,
     textTransform: "uppercase",
     letterSpacing: 1.5,
     color: TERRACOTTA,
-    marginBottom: 4,
+    marginBottom: 6,
     fontWeight: 700,
   },
   contactItem: {
     fontSize: 9,
     color: MUTED,
     lineHeight: 1.5,
-    marginBottom: 1.5,
+    marginBottom: 2,
   },
   skillPill: {
     fontSize: 7.5,
     color: TERRACOTTA,
     backgroundColor: TERRACOTTA_LIGHT,
-    paddingHorizontal: 4.5,
-    paddingVertical: 2.25,
-    borderRadius: 3,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 4,
     marginRight: 4,
     marginBottom: 4,
   },
@@ -139,24 +139,24 @@ const terracottaStyles = StyleSheet.create({
     fontSize: 9,
     fontWeight: 500,
     color: INK,
-    marginBottom: 0.75,
+    marginBottom: 1,
   },
   eduSub: {
     fontSize: 7.5,
     color: MUTED,
-    marginBottom: 0.75,
+    marginBottom: 1,
   },
   name: {
     fontFamily: "Playfair Display",
     fontSize: 27,
     fontWeight: 700,
     color: INK,
-    marginBottom: 3,
+    marginBottom: 4,
   },
   jobTitle: {
     fontSize: 10.5,
     color: TERRACOTTA,
-    marginBottom: 4.5,
+    marginBottom: 6,
   },
   summary: {
     fontSize: 9,
@@ -171,7 +171,7 @@ const terracottaStyles = StyleSheet.create({
   },
   experienceSection: {
     flexDirection: "column",
-    gap: 10.5,
+    gap: 14,
   },
   experienceItem: {
     marginBottom: 4,
@@ -191,15 +191,15 @@ const terracottaStyles = StyleSheet.create({
   expCity: {
     fontSize: 7.5,
     color: TERRACOTTA,
-    marginTop: 0.75,
+    marginTop: 1,
   },
   dateBadge: {
     fontSize: 7.5,
     color: MUTED,
     backgroundColor: TERRACOTTA_LIGHT,
-    paddingHorizontal: 3.75,
-    paddingVertical: 1.5,
-    borderRadius: 3,
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    borderRadius: 4,
   },
   expComments: {
     fontSize: 9,
@@ -207,7 +207,7 @@ const terracottaStyles = StyleSheet.create({
     lineHeight: 1.5,
   },
   sectionBlock: {
-    marginBottom: 3,
+    marginBottom: 4,
   },
 });
 
@@ -218,9 +218,9 @@ const sageStyles = StyleSheet.create({
     flexDirection: "column",
   },
   header: {
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 11.25,
+    paddingHorizontal: 32,
+    paddingTop: 32,
+    paddingBottom: 15,
     borderBottomWidth: 1,
     borderBottomColor: SAGE_LIGHT,
     borderBottomStyle: "solid",
@@ -230,24 +230,24 @@ const sageStyles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 1.5,
     color: SAGE,
-    marginBottom: 6,
+    marginBottom: 8,
   },
   name: {
     fontFamily: "Playfair Display",
     fontSize: 36,
     fontWeight: 700,
     color: INK,
-    marginBottom: 3,
+    marginBottom: 4,
   },
   contactLine: {
     fontSize: 7.5,
     color: MUTED,
-    marginBottom: 7.5,
+    marginBottom: 10,
   },
   summaryBox: {
     backgroundColor: SAGE_LIGHT,
-    paddingHorizontal: 12,
-    paddingVertical: 9,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderRadius: 4,
   },
   summaryText: {
@@ -261,13 +261,13 @@ const sageStyles = StyleSheet.create({
   },
   mainCol: {
     flex: 1,
-    padding: 15,
-    paddingRight: 18,
+    padding: 20,
+    paddingRight: 24,
   },
   sideCol: {
     width: 150,
-    padding: 24,
-    paddingLeft: 18,
+    padding: 32,
+    paddingLeft: 24,
     borderLeftWidth: 1,
     borderLeftColor: SAGE_LIGHT,
     borderLeftStyle: "solid",
@@ -278,12 +278,12 @@ const sageStyles = StyleSheet.create({
     letterSpacing: 1.35,
     color: SAGE,
     fontWeight: 700,
-    marginBottom: 3,
+    marginBottom: 4,
   },
   sectionRule: {
     height: 1,
     backgroundColor: SAGE_MID,
-    marginBottom: 7.5,
+    marginBottom: 10,
   },
   expCompany: {
     fontFamily: "Playfair Display",
@@ -294,24 +294,24 @@ const sageStyles = StyleSheet.create({
   expCity: {
     fontSize: 7.5,
     color: SAGE,
-    marginTop: 0.75,
+    marginTop: 1,
   },
   dateBadge: {
     fontSize: 6.75,
     color: SAGE,
     backgroundColor: SAGE_LIGHT,
-    paddingHorizontal: 3.75,
-    paddingVertical: 1.5,
+    paddingHorizontal: 5,
+    paddingVertical: 2,
     borderRadius: 9999,
   },
   expComments: {
     fontSize: 8.25,
     color: MUTED,
     lineHeight: 1.5,
-    marginTop: 1.5,
+    marginTop: 2,
   },
   experienceItem: {
-    marginBottom: 6,
+    marginBottom: 8,
   },
   expHeader: {
     flexDirection: "row",
@@ -328,12 +328,12 @@ const sageStyles = StyleSheet.create({
   eduSub: {
     fontSize: 7.5,
     color: MUTED,
-    marginBottom: 0.75,
+    marginBottom: 1,
   },
   skillItem: {
     fontSize: 9,
     color: INK,
-    marginBottom: 1.5,
+    marginBottom: 2,
   },
   languageRow: {
     flexDirection: "row",
@@ -349,7 +349,7 @@ const sageStyles = StyleSheet.create({
     color: MUTED,
   },
   sectionBlock: {
-    marginBottom: 15,
+    marginBottom: 20,
   },
 });
 
@@ -357,9 +357,9 @@ const classicStyles = StyleSheet.create({
   page: {
     fontFamily: "DM Sans",
     backgroundColor: "#ffffff",
-    paddingHorizontal: 36,
-    paddingTop: 22.5,
-    paddingBottom: 30,
+    paddingHorizontal: 48,
+    paddingTop: 30,
+    paddingBottom: 40,
     flexDirection: "column",
   },
   name: {
@@ -368,7 +368,7 @@ const classicStyles = StyleSheet.create({
     fontWeight: 700,
     color: CLASSIC_INK,
     textAlign: "center",
-    marginBottom: 4.5,
+    marginBottom: 6,
   },
   contactLine: {
     fontSize: 9,
@@ -376,12 +376,12 @@ const classicStyles = StyleSheet.create({
     textAlign: "center",
     letterSpacing: 1.5,
     textTransform: "uppercase",
-    marginBottom: 12,
+    marginBottom: 16,
   },
   rule: {
     height: 1,
     backgroundColor: CLASSIC_RULE,
-    marginVertical: 12,
+    marginVertical: 16,
   },
   sectionLabel: {
     fontFamily: "Playfair Display",
@@ -390,7 +390,7 @@ const classicStyles = StyleSheet.create({
     letterSpacing: 2,
     color: CLASSIC_INK,
     fontWeight: 600,
-    marginBottom: 9,
+    marginBottom: 12,
   },
   summaryText: {
     fontSize: 9,
@@ -411,7 +411,7 @@ const classicStyles = StyleSheet.create({
     fontSize: 7.5,
     fontStyle: "normal",
     color: CLASSIC_MUTED,
-    marginBottom: 1.5,
+    marginBottom: 2,
   },
   expComment: {
     fontSize: 8.25,
@@ -420,7 +420,7 @@ const classicStyles = StyleSheet.create({
   },
   bottomRow: {
     flexDirection: "row",
-    gap: 24,
+    gap: 32,
   },
   bottomCol: {
     flex: 1,
@@ -449,8 +449,8 @@ const boldStyles = StyleSheet.create({
   topBar: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 18,
-    paddingVertical: 9,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: BOLD_INK,
     borderBottomStyle: "solid",
@@ -463,9 +463,9 @@ const boldStyles = StyleSheet.create({
   },
   heroRow: {
     flexDirection: "row",
-    paddingHorizontal: 18,
-    paddingVertical: 18,
-    gap: 12,
+    paddingHorizontal: 24,
+    paddingVertical: 24,
+    gap: 16,
   },
   heroLeft: {
     flex: 1,
@@ -476,20 +476,20 @@ const boldStyles = StyleSheet.create({
     textTransform: "uppercase",
     color: BOLD_INK,
     letterSpacing: -0.75,
-    marginBottom: 6,
+    marginBottom: 8,
   },
   heroSubtitle: {
     fontSize: 8.25,
     textTransform: "uppercase",
     letterSpacing: 1.5,
     color: BOLD_INK,
-    marginBottom: 3,
+    marginBottom: 4,
   },
   heroSummary: {
     fontSize: 9.75,
     lineHeight: 1.6,
     color: BOLD_MUTED,
-    width: 210,
+    width: 280,
   },
   heroPhoto: {
     width: 108,
@@ -500,14 +500,14 @@ const boldStyles = StyleSheet.create({
   fullRule: {
     height: 1,
     backgroundColor: BOLD_INK,
-    marginHorizontal: 18,
+    marginHorizontal: 24,
   },
   bodyRow: {
     flexDirection: "row",
-    paddingHorizontal: 18,
-    paddingTop: 12,
-    paddingBottom: 12,
-    gap: 22.5,
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 16,
+    gap: 30,
   },
   bodyCol: {
     flex: 1,
@@ -518,7 +518,7 @@ const boldStyles = StyleSheet.create({
     letterSpacing: 1.5,
     color: BOLD_INK,
     fontWeight: 700,
-    marginBottom: 6,
+    marginBottom: 8,
   },
   expCompany: {
     fontSize: 8.25,
@@ -538,7 +538,7 @@ const boldStyles = StyleSheet.create({
   expComment: {
     fontSize: 7.5,
     color: BOLD_MUTED,
-    marginTop: 1.5,
+    marginTop: 2,
   },
   languageRow: {
     flexDirection: "row",
@@ -850,8 +850,8 @@ function TerracottaPdfDocument({
                 <View
                   style={{
                     width: "100%",
-                    height: 90,
-                    marginBottom: 9,
+                    height: 120,
+                    marginBottom: 12,
                     backgroundColor: "#F5E6DF",
                     borderRadius: 3,
                   }}
@@ -1066,8 +1066,8 @@ function SagePdfDocument({
                   <View
                     style={{
                       width: "100%",
-                      height: 90,
-                      marginBottom: 15,
+                      height: 120,
+                      marginBottom: 20,
                       backgroundColor: "#EAF0EC",
                       borderRadius: 3,
                     }}
@@ -1138,10 +1138,10 @@ function ClassicPdfDocument({
   function renderSection(key: string) {
     if (key === "experience" && data.experience.length > 0) {
       return (
-        <View key="experience" style={{ marginBottom: 15 }}>
+        <View key="experience" style={{ marginBottom: 20 }}>
           <Text style={classicStyles.sectionLabel}>Experience</Text>
           {data.experience.map((item, i) => (
-            <View key={i} style={{ marginBottom: 12 }}>
+            <View key={i} style={{ marginBottom: 16 }}>
               <View
                 style={{
                   flexDirection: "row",
@@ -1171,10 +1171,10 @@ function ClassicPdfDocument({
     }
     if (key === "education" && data.education.length > 0) {
       return (
-        <View key="education" style={{ marginBottom: 15 }}>
+        <View key="education" style={{ marginBottom: 20 }}>
           <Text style={classicStyles.sectionLabel}>Education</Text>
           {data.education.map((item, i) => (
-            <View key={i} style={{ marginBottom: 12 }}>
+            <View key={i} style={{ marginBottom: 16 }}>
               <View
                 style={{
                   flexDirection: "row",
@@ -1249,7 +1249,7 @@ function ClassicPdfDocument({
                 </Text>
                 <View style={classicStyles.rule} />
                 {data.summary && (
-                  <View style={{ marginBottom: 15 }}>
+                  <View style={{ marginBottom: 20 }}>
                     <Text style={classicStyles.sectionLabel}>Profile</Text>
                     <Text style={classicStyles.summaryText}>
                       {data.summary}
@@ -1262,11 +1262,11 @@ function ClassicPdfDocument({
             {gi > 0 && (
               <View
                 style={{
-                  marginTop: 18,
+                  marginTop: 24,
                   borderTopWidth: 1,
                   borderTopColor: "#e5e7eb",
                   borderTopStyle: "dashed",
-                  paddingTop: 18,
+                  paddingTop: 24,
                 }}
               />
             )}
@@ -1304,7 +1304,7 @@ function BoldPdfDocument({
   function renderSection(key: string) {
     if (key === "experience" && data.experience.length > 0) {
       return (
-        <View key="experience" style={{ marginBottom: 22.5 }}>
+        <View key="experience" style={{ marginBottom: 30 }}>
           <Text style={boldStyles.sectionLabel}>Experience</Text>
           {data.experience.map((item, i) => (
             <View key={i} style={{ marginBottom: 10 }}>
@@ -1342,7 +1342,7 @@ function BoldPdfDocument({
                 {item.language}
                 {item.level ? ` — ${item.level}` : ""}
               </Text>
-              <View style={{ flexDirection: "row", gap: 2.25 }}>
+              <View style={{ flexDirection: "row", gap: 3 }}>
                 {Array.from({ length: 5 }).map((_, di) => {
                   const map: Record<string, number> = {
                     native: 5,
@@ -1356,9 +1356,9 @@ function BoldPdfDocument({
                     <View
                       key={di}
                       style={{
-                        width: 7.5,
-                        height: 7.5,
-                        borderRadius: 3.75,
+                        width: 10,
+                        height: 10,
+                        borderRadius: 5,
                         backgroundColor: di < filled ? BOLD_INK : "transparent",
                         borderWidth: 1,
                         borderColor: BOLD_INK,
@@ -1374,7 +1374,7 @@ function BoldPdfDocument({
     }
     if (key === "education" && data.education.length > 0) {
       return (
-        <View key="education" style={{ marginBottom: 22.5 }}>
+        <View key="education" style={{ marginBottom: 30 }}>
           <Text style={boldStyles.sectionLabel}>Education</Text>
           {data.education.map((item, i) => (
             <View key={i} style={{ marginBottom: 10 }}>
@@ -1401,7 +1401,7 @@ function BoldPdfDocument({
     }
     if (key === "skills" && data.skills.length > 0) {
       return (
-        <View key="skills" style={{ marginBottom: 22.5 }}>
+        <View key="skills" style={{ marginBottom: 30 }}>
           <Text style={boldStyles.sectionLabel}>Skills</Text>
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             {data.skills.map((item, i) => (
@@ -1511,11 +1511,11 @@ function BoldPdfDocument({
             {gi > 0 && (
               <View
                 style={{
-                  marginTop: 18,
+                  marginTop: 24,
                   borderTopWidth: 1,
                   borderTopColor: "#e5e7eb",
                   borderTopStyle: "dashed",
-                  paddingTop: 18,
+                  paddingTop: 24,
                 }}
               />
             )}
