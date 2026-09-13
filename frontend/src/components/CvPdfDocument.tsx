@@ -572,18 +572,18 @@ const minimalStyles = StyleSheet.create({
     flexDirection: "row",
   },
   photoCol: {
-    width: 165,
+    width: 220,
     backgroundColor: "#333333",
   },
   photo: {
     width: "100%",
-    height: 180,
+    height: 240,
     objectFit: "cover",
   },
   infoCol: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingVertical: 21,
+    paddingHorizontal: 32,
+    paddingVertical: 28,
   },
   name: {
     fontFamily: "Playfair Display",
@@ -599,7 +599,7 @@ const minimalStyles = StyleSheet.create({
   },
   shortRule: {
     width: 24,
-    height: 0.375,
+    height: 0.5,
     backgroundColor: MINIMAL_INK,
     marginVertical: 9,
   },
@@ -625,7 +625,7 @@ const minimalStyles = StyleSheet.create({
     color: MINIMAL_MUTED,
   },
   fullRule: {
-    height: 0.75,
+    height: 1,
     backgroundColor: "#e0e0e0",
   },
   bodyRow: {
@@ -633,22 +633,22 @@ const minimalStyles = StyleSheet.create({
     alignItems: "stretch",
   },
   sideCol: {
-    width: 165,
+    width: 220,
     backgroundColor: "#111111",
     borderRightWidth: 1,
     borderRightColor: "#e0e0e0",
     borderRightStyle: "solid",
-    paddingHorizontal: 18,
-    paddingVertical: 21,
+    paddingHorizontal: 24,
+    paddingVertical: 28,
     flexDirection: "column",
-    gap: 18,
+    gap: 24,
   },
   mainCol: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingVertical: 21,
+    paddingHorizontal: 32,
+    paddingVertical: 28,
     flexDirection: "column",
-    gap: 18,
+    gap: 24,
   },
   contactItem: {
     fontSize: 9,
