@@ -5,12 +5,16 @@
   position: relative;
 }
 
-.cv-page > .grid {
+.cv-page.terracotta > .grid,
+.cv-page.sage > .grid,
+.cv-page.minimal > .grid {
   align-items: stretch;
   min-height: 1123px;
 }
 
-.cv-page > .grid > div {
+.cv-page.terracotta > .grid > div,
+.cv-page.sage > .grid > div,
+.cv-page.minimal > .grid > div {
   align-self: stretch;
 }
 

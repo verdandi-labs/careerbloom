@@ -474,7 +474,7 @@ const boldStyles = StyleSheet.create({
     flex: 1,
   },
   sectionLabel: {
-    fontSize: 7,
+    fontSize: 9,
     textTransform: "uppercase",
     letterSpacing: 2,
     color: BOLD_INK,
@@ -1262,6 +1262,7 @@ function BoldPdfDocument({
     if (key === "experience" && data.experience.length > 0) {
       return (
         <View key="experience" style={{ marginBottom: 16 }}>
+          <Text style={boldStyles.sectionLabel}>Experience</Text>
           {data.experience.map((item, i) => (
             <View key={i} style={{ marginBottom: 10 }}>
               <View
@@ -1331,6 +1332,7 @@ function BoldPdfDocument({
     if (key === "education" && data.education.length > 0) {
       return (
         <View key="education" style={{ marginBottom: 16 }}>
+          <Text style={boldStyles.sectionLabel}>Education</Text>
           {data.education.map((item, i) => (
             <View key={i} style={{ marginBottom: 10 }}>
               <View
@@ -1474,18 +1476,21 @@ function BoldPdfDocument({
             />
           )}
           <View style={boldStyles.bodyRow}>
-            <View style={boldStyles.bodyCol}>
+            <View style={{ ...boldStyles.bodyCol, flex: 2 }}>
               {group
-                .filter((k) => k === "experience" || k === "languages")
+                .filter((k) => k === "experience")
                 .map((key) => (
                   <View key={key}>{renderSection(key)}</View>
                 ))}
             </View>
-            <View style={boldStyles.bodyCol}>
+            <View style={{ ...boldStyles.bodyCol, flex: 1 }}>
               {group
                 .filter(
                   (k) =>
-                    k === "education" || k === "skills" || k === "references",
+                    k === "education" ||
+                    k === "skills" ||
+                    k === "languages" ||
+                    k === "references",
                 )
                 .map((key) => (
                   <View key={key}>{renderSection(key)}</View>

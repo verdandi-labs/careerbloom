@@ -80,6 +80,12 @@ export function Bold({
     if (key === "experience" && data.experience.length > 0) {
       return (
         <div className="mb-5">
+          <p
+            className="text-[11px] uppercase tracking-widest font-semibold mb-3"
+            style={{ color: INK }}
+          >
+            Experience
+          </p>
           {data.experience.map((item, i) => (
             <div
               key={item.line_num}
@@ -123,7 +129,7 @@ export function Bold({
       return (
         <div>
           <p
-            className="text-[9px] uppercase tracking-widest font-semibold mb-3"
+            className="text-[11px] uppercase tracking-widest font-semibold mb-3"
             style={{ color: INK }}
           >
             Languages
@@ -147,6 +153,12 @@ export function Bold({
     if (key === "education" && data.education.length > 0) {
       return (
         <div className="mb-5">
+          <p
+            className="text-[11px] uppercase tracking-widest font-semibold mb-3"
+            style={{ color: INK }}
+          >
+            Education
+          </p>
           {data.education.map((item, i) => (
             <div
               key={item.line_num}
@@ -185,7 +197,7 @@ export function Bold({
       return (
         <div className="mb-5">
           <p
-            className="text-[9px] uppercase tracking-widest font-semibold mb-3"
+            className="text-[11px] uppercase tracking-widest font-semibold mb-3"
             style={{ color: INK }}
           >
             Skills
@@ -217,7 +229,7 @@ export function Bold({
       return (
         <div>
           <p
-            className="text-[9px] uppercase tracking-widest font-semibold mb-3"
+            className="text-[11px] uppercase tracking-widest font-semibold mb-3"
             style={{ color: INK }}
           >
             References
@@ -375,12 +387,10 @@ export function Bold({
             </>
           )}
 
-          <div className="grid grid-cols-2 gap-6 px-6 pb-4 mt-4">
+          <div className="grid grid-cols-[2fr_1fr] gap-6 px-6 pb-4 mt-4">
             <div>
               {group
-                .filter((k) =>
-                  ["experience", "languages"].includes(k as string),
-                )
+                .filter((k) => ["experience"].includes(k as string))
                 .map((key) => {
                   const idx = sectionOrder.findIndex(
                     (s) => s.type === "section" && s.key === key,
@@ -400,7 +410,9 @@ export function Bold({
             <div>
               {group
                 .filter((k) =>
-                  ["education", "skills", "references"].includes(k as string),
+                  ["education", "skills", "languages", "references"].includes(
+                    k as string,
+                  ),
                 )
                 .map((key) => {
                   const idx = sectionOrder.findIndex(
@@ -419,7 +431,6 @@ export function Bold({
                 })}
             </div>
           </div>
-
         </div>
       ))}
     </>
