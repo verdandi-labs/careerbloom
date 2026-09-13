@@ -326,8 +326,8 @@ export function Bold({
                   )}
                 </div>
                 <div
-                  className="aspect-[3/4] rounded-sm overflow-hidden"
-                  style={{ backgroundColor: "#C8C5BC" }}
+                  className="rounded-sm overflow-hidden"
+                  style={{ backgroundColor: "#C8C5BC", width: 144, height: 192, flexShrink: 0 }}
                 >
                   {photoUploading ? (
                     <div className="w-full h-full flex items-center justify-center animate-pulse">
