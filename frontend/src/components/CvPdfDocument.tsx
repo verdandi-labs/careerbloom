@@ -639,8 +639,8 @@ const minimalStyles = StyleSheet.create({
     borderRightWidth: 1,
     borderRightColor: "#e0e0e0",
     borderRightStyle: "solid",
-    paddingHorizontal: 24,
-    paddingVertical: 28,
+    paddingHorizontal: 18,
+    paddingVertical: 21,
     flexDirection: "column",
     gap: 24,
   },
@@ -1560,10 +1560,13 @@ function MinimalPdfDocument({
   const sidebarKeys = orderedSections(sectionOrder, [
     "contact",
     "skills",
-    "education",
     "languages",
   ]);
-  const mainKeys = orderedSections(sectionOrder, ["experience", "references"]);
+  const mainKeys = orderedSections(sectionOrder, [
+    "experience",
+    "education",
+    "references",
+  ]);
   const pageGroups = splitAtPageBreaks(sectionOrder, [
     ...sidebarKeys,
     ...mainKeys,
