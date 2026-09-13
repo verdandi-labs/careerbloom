@@ -48,7 +48,7 @@ export function Sage({
           {label}
         </p>
         <div
-          className="flex-1 h-px mb-3"
+          className="flex-1 h-px mb-[10px]"
           style={{ backgroundColor: SAGE_MID }}
         />
         {children}
@@ -264,7 +264,7 @@ export function Sage({
             }
           >
             <div
-              className="relative group px-8 pt-8 pb-5"
+              className="relative group px-8 pt-8 pb-[15px]"
               style={{ borderBottom: `1px solid ${SAGE_LIGHT}` }}
             >
               <p
