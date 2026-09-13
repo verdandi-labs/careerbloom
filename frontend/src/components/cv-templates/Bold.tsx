@@ -140,11 +140,18 @@ export function Bold({
               onClick={() => onEditItem?.("languages", i, item)}
               className="flex items-center justify-between mb-2 cursor-pointer hover:bg-black/5 rounded transition"
             >
-              <span className="text-[10px]" style={{ color: INK }}>
+              <span className="text-[12px]" style={{ color: INK }}>
                 {item.language}
-                {item.level ? ` — ${item.level}` : ""}
               </span>
-              <DotRating level={item.level} />
+              <span
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEditItem?.("languages", i, item);
+                }}
+                className="cursor-pointer"
+              >
+                <DotRating level={item.level} />
+              </span>
             </div>
           ))}
         </div>
