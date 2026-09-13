@@ -37,7 +37,7 @@ const terracottaStyles = StyleSheet.create({
     flexDirection: "row",
   },
   sidebar: {
-    width: 180,
+    width: 200,
     padding: 20,
     borderRightWidth: 1,
     borderRightColor: TERRACOTTA,
@@ -47,12 +47,12 @@ const terracottaStyles = StyleSheet.create({
   },
   main: {
     flex: 1,
-    padding: 28,
+    padding: 24,
     flexDirection: "column",
     gap: 16,
   },
   sidebarLabel: {
-    fontSize: 8,
+    fontSize: 10,
     textTransform: "uppercase",
     letterSpacing: 1.5,
     color: TERRACOTTA,
@@ -105,7 +105,7 @@ const terracottaStyles = StyleSheet.create({
   },
   name: {
     fontFamily: "Playfair Display",
-    fontSize: 28,
+    fontSize: 36,
     fontWeight: 700,
     color: INK,
     marginBottom: 4,
@@ -116,7 +116,7 @@ const terracottaStyles = StyleSheet.create({
     marginBottom: 6,
   },
   summary: {
-    fontSize: 9,
+    fontSize: 12,
     color: MUTED,
     lineHeight: 1.6,
     maxWidth: 320,
@@ -141,7 +141,7 @@ const terracottaStyles = StyleSheet.create({
   },
   expCompany: {
     fontFamily: "Playfair Display",
-    fontSize: 10,
+    fontSize: 14,
     fontWeight: 700,
     color: INK,
   },
@@ -151,7 +151,7 @@ const terracottaStyles = StyleSheet.create({
     marginTop: 1,
   },
   dateBadge: {
-    fontSize: 8,
+    fontSize: 10,
     color: MUTED,
     backgroundColor: TERRACOTTA_LIGHT,
     paddingHorizontal: 5,
@@ -159,7 +159,7 @@ const terracottaStyles = StyleSheet.create({
     borderRadius: 3,
   },
   expComments: {
-    fontSize: 9,
+    fontSize: 12,
     color: MUTED,
     lineHeight: 1.5,
   },
@@ -177,7 +177,7 @@ const sageStyles = StyleSheet.create({
   header: {
     paddingHorizontal: 32,
     paddingTop: 32,
-    paddingBottom: 20,
+    paddingBottom: 15,
     borderBottomWidth: 1,
     borderBottomColor: SAGE_LIGHT,
     borderBottomStyle: "solid",
@@ -191,13 +191,13 @@ const sageStyles = StyleSheet.create({
   },
   name: {
     fontFamily: "Playfair Display",
-    fontSize: 28,
+    fontSize: 48,
     fontWeight: 700,
     color: INK,
     marginBottom: 4,
   },
   contactLine: {
-    fontSize: 9,
+    fontSize: 10,
     color: MUTED,
     marginBottom: 10,
   },
@@ -207,7 +207,7 @@ const sageStyles = StyleSheet.create({
     borderRadius: 4,
   },
   summaryText: {
-    fontSize: 9,
+    fontSize: 12,
     lineHeight: 1.6,
     color: "#4a4a4a",
   },
@@ -217,21 +217,21 @@ const sageStyles = StyleSheet.create({
   },
   mainCol: {
     flex: 1,
-    padding: 28,
-    paddingRight: 20,
+    padding: 20,
+    paddingRight: 24,
   },
   sideCol: {
-    width: 160,
-    padding: 28,
-    paddingLeft: 20,
+    width: 200,
+    padding: 32,
+    paddingLeft: 24,
     borderLeftWidth: 1,
     borderLeftColor: SAGE_LIGHT,
     borderLeftStyle: "solid",
   },
   sectionLabel: {
-    fontSize: 8,
+    fontSize: 9,
     textTransform: "uppercase",
-    letterSpacing: 1.5,
+    letterSpacing: 3,
     color: SAGE,
     fontWeight: 700,
     marginBottom: 4,
@@ -243,7 +243,7 @@ const sageStyles = StyleSheet.create({
   },
   expCompany: {
     fontFamily: "Playfair Display",
-    fontSize: 10,
+    fontSize: 14,
     fontWeight: 700,
     color: INK,
   },
@@ -253,12 +253,12 @@ const sageStyles = StyleSheet.create({
     marginTop: 1,
   },
   dateBadge: {
-    fontSize: 8,
+    fontSize: 9,
     color: SAGE,
     backgroundColor: SAGE_LIGHT,
     paddingHorizontal: 5,
     paddingVertical: 2,
-    borderRadius: 3,
+    borderRadius: 9999,
   },
   expComments: {
     fontSize: 9,
@@ -305,7 +305,7 @@ const sageStyles = StyleSheet.create({
     color: MUTED,
   },
   sectionBlock: {
-    marginBottom: 12,
+    marginBottom: 20,
   },
 });
 
@@ -313,19 +313,21 @@ const classicStyles = StyleSheet.create({
   page: {
     fontFamily: "DM Sans",
     backgroundColor: "#ffffff",
-    padding: 48,
+    paddingHorizontal: 48,
+    paddingTop: 30,
+    paddingBottom: 40,
     flexDirection: "column",
   },
   name: {
     fontFamily: "Playfair Display",
-    fontSize: 32,
+    fontSize: 48,
     fontWeight: 700,
     color: CLASSIC_INK,
     textAlign: "center",
     marginBottom: 6,
   },
   contactLine: {
-    fontSize: 8,
+    fontSize: 12,
     color: CLASSIC_MUTED,
     textAlign: "center",
     letterSpacing: 2,
@@ -339,7 +341,7 @@ const classicStyles = StyleSheet.create({
   },
   sectionLabel: {
     fontFamily: "Playfair Display",
-    fontSize: 8,
+    fontSize: 12,
     textTransform: "uppercase",
     letterSpacing: 2.5,
     color: CLASSIC_INK,
@@ -347,28 +349,28 @@ const classicStyles = StyleSheet.create({
     marginBottom: 12,
   },
   summaryText: {
-    fontSize: 9,
+    fontSize: 12,
     lineHeight: 1.6,
     color: CLASSIC_MUTED,
   },
   expRole: {
     fontFamily: "Playfair Display",
-    fontSize: 10,
+    fontSize: 14,
     fontWeight: 700,
     color: CLASSIC_INK,
   },
   expDate: {
-    fontSize: 8,
+    fontSize: 10,
     color: CLASSIC_MUTED,
   },
   expCompany: {
-    fontSize: 8,
+    fontSize: 11,
     fontStyle: "normal",
     color: CLASSIC_MUTED,
     marginBottom: 2,
   },
   expComment: {
-    fontSize: 8,
+    fontSize: 11,
     color: CLASSIC_MUTED,
     lineHeight: 1.5,
   },
@@ -380,7 +382,7 @@ const classicStyles = StyleSheet.create({
     flex: 1,
   },
   skillText: {
-    fontSize: 9,
+    fontSize: 11,
     color: CLASSIC_MUTED,
     lineHeight: 1.6,
   },
@@ -390,11 +392,11 @@ const classicStyles = StyleSheet.create({
     marginBottom: 3,
   },
   languageName: {
-    fontSize: 9,
+    fontSize: 12,
     color: CLASSIC_INK,
   },
   languageLevel: {
-    fontSize: 9,
+    fontSize: 12,
     color: CLASSIC_MUTED,
   },
 });
@@ -410,7 +412,7 @@ const boldStyles = StyleSheet.create({
     borderBottomStyle: "solid",
   },
   topBarText: {
-    fontSize: 7,
+    fontSize: 9,
     textTransform: "uppercase",
     letterSpacing: 2,
     color: BOLD_INK,
@@ -474,7 +476,7 @@ const boldStyles = StyleSheet.create({
     flex: 1,
   },
   sectionLabel: {
-    fontSize: 9,
+    fontSize: 11,
     textTransform: "uppercase",
     letterSpacing: 2,
     color: BOLD_INK,
@@ -482,22 +484,22 @@ const boldStyles = StyleSheet.create({
     marginBottom: 8,
   },
   expCompany: {
-    fontSize: 9,
+    fontSize: 11,
     fontWeight: 700,
     textTransform: "uppercase",
     color: BOLD_INK,
   },
   expDate: {
-    fontSize: 8,
+    fontSize: 10,
     color: BOLD_MUTED,
   },
   expCity: {
-    fontSize: 8,
+    fontSize: 10,
     fontStyle: "normal",
     color: BOLD_MUTED,
   },
   expComment: {
-    fontSize: 8,
+    fontSize: 10,
     color: BOLD_MUTED,
     marginTop: 2,
   },
@@ -508,11 +510,11 @@ const boldStyles = StyleSheet.create({
     marginBottom: 4,
   },
   languageName: {
-    fontSize: 8,
+    fontSize: 10,
     color: BOLD_INK,
   },
   skillPill: {
-    fontSize: 8,
+    fontSize: 10,
     fontWeight: 700,
     textTransform: "uppercase",
     paddingHorizontal: 8,
@@ -546,12 +548,12 @@ const minimalStyles = StyleSheet.create({
     flexDirection: "row",
   },
   photoCol: {
-    width: 180,
-    backgroundColor: "#C8C8C6",
+    width: 220,
+    backgroundColor: "#333333",
   },
   photo: {
     width: "100%",
-    height: 180,
+    height: 240,
     objectFit: "cover",
   },
   infoCol: {
@@ -560,7 +562,7 @@ const minimalStyles = StyleSheet.create({
   },
   name: {
     fontFamily: "Playfair Display",
-    fontSize: 24,
+    fontSize: 33,
     fontWeight: 700,
     color: MINIMAL_INK,
     marginBottom: 4,
@@ -572,12 +574,12 @@ const minimalStyles = StyleSheet.create({
   },
   shortRule: {
     width: 24,
-    height: 2,
+    height: 0.5,
     backgroundColor: MINIMAL_INK,
     marginBottom: 12,
   },
   sectionLabel: {
-    fontSize: 7,
+    fontSize: 12,
     textTransform: "uppercase",
     letterSpacing: 2,
     color: MINIMAL_INK,
@@ -585,7 +587,7 @@ const minimalStyles = StyleSheet.create({
     marginBottom: 6,
   },
   summaryText: {
-    fontSize: 9,
+    fontSize: 14,
     lineHeight: 1.6,
     color: MINIMAL_MUTED,
   },
@@ -598,8 +600,8 @@ const minimalStyles = StyleSheet.create({
     alignItems: "stretch",
   },
   sideCol: {
-    width: 180,
-    backgroundColor: MINIMAL_LIGHT,
+    width: 220,
+    backgroundColor: "#333333",
     borderRightWidth: 1,
     borderRightColor: "#e0e0e0",
     borderRightStyle: "solid",
@@ -617,24 +619,24 @@ const minimalStyles = StyleSheet.create({
   },
   contactItem: {
     fontSize: 8,
-    color: MINIMAL_MUTED,
+    color: "rgba(255,255,255,0.65)",
     lineHeight: 1.5,
     marginBottom: 2,
   },
   skillItem: {
-    fontSize: 8,
-    color: MINIMAL_MUTED,
+    fontSize: 13,
+    color: "rgba(255,255,255,0.65)",
     lineHeight: 1.5,
     marginBottom: 2,
   },
   languageItem: {
-    fontSize: 8,
-    color: MINIMAL_MUTED,
+    fontSize: 14,
+    color: "rgba(255,255,255,0.65)",
     lineHeight: 1.5,
     marginBottom: 2,
   },
   eduTitle: {
-    fontSize: 9,
+    fontSize: 12,
     fontWeight: 700,
     textTransform: "uppercase",
     color: MINIMAL_INK,
@@ -813,7 +815,7 @@ function TerracottaPdfDocument({
                 <View
                   style={{
                     width: "100%",
-                    height: 100,
+                    height: 120,
                     marginBottom: 12,
                     backgroundColor: "#F5E6DF",
                     borderRadius: 3,
@@ -1028,7 +1030,7 @@ function SagePdfDocument({
                   <View
                     style={{
                       width: "100%",
-                      height: 100,
+                      height: 120,
                       marginBottom: 12,
                       backgroundColor: "#EAF0EC",
                       borderRadius: 3,
@@ -1313,9 +1315,9 @@ function BoldPdfDocument({
                     <View
                       key={di}
                       style={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: 4,
+                        width: 10,
+                        height: 10,
+                        borderRadius: 5,
                         backgroundColor: di < filled ? BOLD_INK : "transparent",
                         borderWidth: 1,
                         borderColor: BOLD_INK,
@@ -1421,7 +1423,7 @@ function BoldPdfDocument({
               </View>
               <View style={boldStyles.heroRow}>
                 <View style={boldStyles.heroLeft}>
-                  <Text style={boldStyles.heroTitle}>RESUME</Text>
+                  <Text style={boldStyles.heroTitle}>{data.title}</Text>
                   <Text style={boldStyles.heroSubtitle}>{data.title}</Text>
                   <Text style={boldStyles.heroName}>{data.name}</Text>
                   {data.summary && (
@@ -1497,7 +1499,6 @@ function BoldPdfDocument({
                 ))}
             </View>
           </View>
-          <Text style={boldStyles.footerName}>{data.name}</Text>
         </Page>
       ))}
     </Document>
@@ -1651,7 +1652,7 @@ function MinimalPdfDocument({
                       <View
                         style={{
                           width: "100%",
-                          height: 180,
+                          height: 240,
                           alignItems: "center",
                           justifyContent: "center",
                         }}
@@ -1674,7 +1675,6 @@ function MinimalPdfDocument({
                       <Text style={minimalStyles.title}>{data.title}</Text>
                     )}
                     <View style={minimalStyles.shortRule} />
-                    <Text style={minimalStyles.sectionLabel}>Summary</Text>
                     {data.summary && (
                       <Text style={minimalStyles.summaryText}>
                         {data.summary}
