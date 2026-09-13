@@ -361,11 +361,10 @@ export function Minimal({
               style={{ minHeight: "100%" }}
             >
               <div
-                className="px-6 py-7 flex flex-col gap-6 self-stretch"
+                className="px-6 py-7 flex flex-col gap-6 self-stretch min-h-[885px]"
                 style={{
                   backgroundColor: INK,
                   borderRight: "1px solid #e0e0e0",
-                  minHeight: "100%",
                 }}
               >
                 {pageSidebarKeys.map((key) => {
