@@ -13,6 +13,49 @@ import type {
 } from "@/lib/cv-templates";
 import { orderedSections, splitAtPageBreaks } from "@/lib/cv-templates";
 
+function groupHasContent(keys: string[], data: StructuredCVData): boolean {
+  return keys.some((key) => {
+    switch (key) {
+      case "experience":
+        return Array.isArray(data.experience) && data.experience.length > 0;
+      case "education":
+        return Array.isArray(data.education) && data.education.length > 0;
+      case "skills":
+        return Array.isArray(data.skills) && data.skills.length > 0;
+      case "languages":
+        return Array.isArray(data.languages) && data.languages.length > 0;
+      case "contact":
+        return Array.isArray(data.contact) && data.contact.length > 0;
+      case "awards":
+        return Array.isArray(data.awards) && data.awards.length > 0;
+      case "publications":
+        return Array.isArray(data.publications) && data.publications.length > 0;
+      case "volunteer":
+        return Array.isArray(data.volunteer) && data.volunteer.length > 0;
+      case "projects":
+        return Array.isArray(data.projects) && data.projects.length > 0;
+      case "references":
+        return (
+          typeof data.references === "string" &&
+          data.references.trim().length > 0
+        );
+      case "certifications":
+        return (
+          typeof data.certifications === "string" &&
+          data.certifications.trim().length > 0
+        );
+      case "other":
+        return typeof data.other === "string" && data.other.trim().length > 0;
+      case "summary":
+        return (
+          typeof data.summary === "string" && data.summary.trim().length > 0
+        );
+      default:
+        return false;
+    }
+  });
+}
+
 const TERRACOTTA = "#CB6843";
 const TERRACOTTA_LIGHT = "#FDE8E8";
 const SAGE = "#7B9E87";
@@ -37,41 +80,41 @@ const terracottaStyles = StyleSheet.create({
     flexDirection: "row",
   },
   sidebar: {
-    width: 200,
-    padding: 20,
+    width: 150,
+    padding: 15,
     borderRightWidth: 1,
     borderRightColor: TERRACOTTA,
     borderRightStyle: "solid",
     flexDirection: "column",
-    gap: 16,
+    gap: 15,
   },
   main: {
     flex: 1,
-    padding: 24,
+    padding: 18,
     flexDirection: "column",
-    gap: 16,
+    gap: 15,
   },
   sidebarLabel: {
-    fontSize: 10,
+    fontSize: 7.5,
     textTransform: "uppercase",
     letterSpacing: 1.5,
     color: TERRACOTTA,
-    marginBottom: 6,
+    marginBottom: 4,
     fontWeight: 700,
   },
   contactItem: {
     fontSize: 9,
     color: MUTED,
     lineHeight: 1.5,
-    marginBottom: 2,
+    marginBottom: 1.5,
   },
   skillPill: {
-    fontSize: 8,
+    fontSize: 7.5,
     color: TERRACOTTA,
     backgroundColor: TERRACOTTA_LIGHT,
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-    borderRadius: 4,
+    paddingHorizontal: 4.5,
+    paddingVertical: 2.25,
+    borderRadius: 3,
     marginRight: 4,
     marginBottom: 4,
   },
@@ -96,30 +139,30 @@ const terracottaStyles = StyleSheet.create({
     fontSize: 9,
     fontWeight: 500,
     color: INK,
-    marginBottom: 1,
+    marginBottom: 0.75,
   },
   eduSub: {
-    fontSize: 8,
+    fontSize: 7.5,
     color: MUTED,
-    marginBottom: 1,
+    marginBottom: 0.75,
   },
   name: {
     fontFamily: "Playfair Display",
-    fontSize: 36,
+    fontSize: 27,
     fontWeight: 700,
     color: INK,
-    marginBottom: 4,
+    marginBottom: 3,
   },
   jobTitle: {
-    fontSize: 11,
+    fontSize: 10.5,
     color: TERRACOTTA,
-    marginBottom: 6,
+    marginBottom: 4.5,
   },
   summary: {
-    fontSize: 12,
+    fontSize: 9,
     color: MUTED,
     lineHeight: 1.6,
-    maxWidth: 320,
+    maxWidth: 240,
   },
   divider: {
     height: 1,
@@ -128,7 +171,7 @@ const terracottaStyles = StyleSheet.create({
   },
   experienceSection: {
     flexDirection: "column",
-    gap: 12,
+    gap: 10.5,
   },
   experienceItem: {
     marginBottom: 4,
@@ -141,30 +184,30 @@ const terracottaStyles = StyleSheet.create({
   },
   expCompany: {
     fontFamily: "Playfair Display",
-    fontSize: 14,
+    fontSize: 10.5,
     fontWeight: 700,
     color: INK,
   },
   expCity: {
-    fontSize: 8,
+    fontSize: 7.5,
     color: TERRACOTTA,
-    marginTop: 1,
+    marginTop: 0.75,
   },
   dateBadge: {
-    fontSize: 10,
+    fontSize: 7.5,
     color: MUTED,
     backgroundColor: TERRACOTTA_LIGHT,
-    paddingHorizontal: 5,
-    paddingVertical: 2,
+    paddingHorizontal: 3.75,
+    paddingVertical: 1.5,
     borderRadius: 3,
   },
   expComments: {
-    fontSize: 12,
+    fontSize: 9,
     color: MUTED,
     lineHeight: 1.5,
   },
   sectionBlock: {
-    marginBottom: 4,
+    marginBottom: 3,
   },
 });
 
@@ -175,31 +218,31 @@ const sageStyles = StyleSheet.create({
     flexDirection: "column",
   },
   header: {
-    paddingHorizontal: 32,
-    paddingTop: 32,
-    paddingBottom: 15,
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 11.25,
     borderBottomWidth: 1,
     borderBottomColor: SAGE_LIGHT,
     borderBottomStyle: "solid",
   },
   cvLabel: {
-    fontSize: 8,
+    fontSize: 6.75,
     textTransform: "uppercase",
-    letterSpacing: 2,
+    letterSpacing: 1.5,
     color: SAGE,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   name: {
     fontFamily: "Playfair Display",
-    fontSize: 48,
+    fontSize: 36,
     fontWeight: 700,
     color: INK,
-    marginBottom: 4,
+    marginBottom: 3,
   },
   contactLine: {
-    fontSize: 10,
+    fontSize: 7.5,
     color: MUTED,
-    marginBottom: 10,
+    marginBottom: 7.5,
   },
   summaryBox: {
     backgroundColor: SAGE_LIGHT,
@@ -207,7 +250,7 @@ const sageStyles = StyleSheet.create({
     borderRadius: 4,
   },
   summaryText: {
-    fontSize: 12,
+    fontSize: 9,
     lineHeight: 1.6,
     color: "#4a4a4a",
   },
@@ -217,57 +260,57 @@ const sageStyles = StyleSheet.create({
   },
   mainCol: {
     flex: 1,
-    padding: 20,
-    paddingRight: 24,
+    padding: 15,
+    paddingRight: 18,
   },
   sideCol: {
-    width: 200,
-    padding: 32,
-    paddingLeft: 24,
+    width: 150,
+    padding: 24,
+    paddingLeft: 18,
     borderLeftWidth: 1,
     borderLeftColor: SAGE_LIGHT,
     borderLeftStyle: "solid",
   },
   sectionLabel: {
-    fontSize: 9,
+    fontSize: 6.75,
     textTransform: "uppercase",
-    letterSpacing: 3,
+    letterSpacing: 1.35,
     color: SAGE,
     fontWeight: 700,
-    marginBottom: 4,
+    marginBottom: 3,
   },
   sectionRule: {
     height: 1,
     backgroundColor: SAGE_MID,
-    marginBottom: 10,
+    marginBottom: 7.5,
   },
   expCompany: {
     fontFamily: "Playfair Display",
-    fontSize: 14,
+    fontSize: 10.5,
     fontWeight: 700,
     color: INK,
   },
   expCity: {
-    fontSize: 8,
+    fontSize: 7.5,
     color: SAGE,
-    marginTop: 1,
+    marginTop: 0.75,
   },
   dateBadge: {
-    fontSize: 9,
+    fontSize: 6.75,
     color: SAGE,
     backgroundColor: SAGE_LIGHT,
-    paddingHorizontal: 5,
-    paddingVertical: 2,
+    paddingHorizontal: 3.75,
+    paddingVertical: 1.5,
     borderRadius: 9999,
   },
   expComments: {
-    fontSize: 9,
+    fontSize: 8.25,
     color: MUTED,
     lineHeight: 1.5,
-    marginTop: 2,
+    marginTop: 1.5,
   },
   experienceItem: {
-    marginBottom: 8,
+    marginBottom: 6,
   },
   expHeader: {
     flexDirection: "row",
@@ -277,19 +320,19 @@ const sageStyles = StyleSheet.create({
   },
   eduCenter: {
     fontFamily: "Playfair Display",
-    fontSize: 10,
+    fontSize: 10.5,
     fontWeight: 700,
     color: INK,
   },
   eduSub: {
-    fontSize: 8,
+    fontSize: 7.5,
     color: MUTED,
-    marginBottom: 1,
+    marginBottom: 0.75,
   },
   skillItem: {
     fontSize: 9,
     color: INK,
-    marginBottom: 2,
+    marginBottom: 1.5,
   },
   languageRow: {
     flexDirection: "row",
@@ -305,7 +348,7 @@ const sageStyles = StyleSheet.create({
     color: MUTED,
   },
   sectionBlock: {
-    marginBottom: 20,
+    marginBottom: 15,
   },
 });
 
@@ -313,76 +356,76 @@ const classicStyles = StyleSheet.create({
   page: {
     fontFamily: "DM Sans",
     backgroundColor: "#ffffff",
-    paddingHorizontal: 48,
-    paddingTop: 30,
-    paddingBottom: 40,
+    paddingHorizontal: 36,
+    paddingTop: 22.5,
+    paddingBottom: 30,
     flexDirection: "column",
   },
   name: {
     fontFamily: "Playfair Display",
-    fontSize: 48,
+    fontSize: 36,
     fontWeight: 700,
     color: CLASSIC_INK,
     textAlign: "center",
-    marginBottom: 6,
+    marginBottom: 4.5,
   },
   contactLine: {
-    fontSize: 12,
+    fontSize: 9,
     color: CLASSIC_MUTED,
     textAlign: "center",
-    letterSpacing: 2,
+    letterSpacing: 1.5,
     textTransform: "uppercase",
-    marginBottom: 16,
+    marginBottom: 12,
   },
   rule: {
     height: 1,
     backgroundColor: CLASSIC_RULE,
-    marginVertical: 16,
+    marginVertical: 12,
   },
   sectionLabel: {
     fontFamily: "Playfair Display",
-    fontSize: 12,
+    fontSize: 9,
     textTransform: "uppercase",
-    letterSpacing: 2.5,
+    letterSpacing: 2,
     color: CLASSIC_INK,
     fontWeight: 600,
-    marginBottom: 12,
+    marginBottom: 9,
   },
   summaryText: {
-    fontSize: 12,
+    fontSize: 9,
     lineHeight: 1.6,
     color: CLASSIC_MUTED,
   },
   expRole: {
     fontFamily: "Playfair Display",
-    fontSize: 14,
+    fontSize: 10.5,
     fontWeight: 700,
     color: CLASSIC_INK,
   },
   expDate: {
-    fontSize: 10,
+    fontSize: 7.5,
     color: CLASSIC_MUTED,
   },
   expCompany: {
-    fontSize: 11,
+    fontSize: 7.5,
     fontStyle: "normal",
     color: CLASSIC_MUTED,
-    marginBottom: 2,
+    marginBottom: 1.5,
   },
   expComment: {
-    fontSize: 11,
+    fontSize: 8.25,
     color: CLASSIC_MUTED,
     lineHeight: 1.5,
   },
   bottomRow: {
     flexDirection: "row",
-    gap: 32,
+    gap: 24,
   },
   bottomCol: {
     flex: 1,
   },
   skillText: {
-    fontSize: 11,
+    fontSize: 8.25,
     color: CLASSIC_MUTED,
     lineHeight: 1.6,
   },
@@ -392,11 +435,11 @@ const classicStyles = StyleSheet.create({
     marginBottom: 3,
   },
   languageName: {
-    fontSize: 12,
+    fontSize: 9,
     color: CLASSIC_INK,
   },
   languageLevel: {
-    fontSize: 12,
+    fontSize: 9,
     color: CLASSIC_MUTED,
   },
 });
@@ -405,103 +448,96 @@ const boldStyles = StyleSheet.create({
   topBar: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 9,
     borderBottomWidth: 1,
     borderBottomColor: BOLD_INK,
     borderBottomStyle: "solid",
   },
   topBarText: {
-    fontSize: 9,
+    fontSize: 6.75,
     textTransform: "uppercase",
-    letterSpacing: 2,
+    letterSpacing: 1.5,
     color: BOLD_INK,
   },
   heroRow: {
     flexDirection: "row",
-    paddingHorizontal: 24,
-    paddingVertical: 20,
-    gap: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 18,
+    gap: 12,
   },
   heroLeft: {
     flex: 1,
   },
   heroTitle: {
-    fontSize: 48,
+    fontSize: 37.5,
     fontWeight: 900,
     textTransform: "uppercase",
     color: BOLD_INK,
-    letterSpacing: -1,
-    marginBottom: 8,
+    letterSpacing: -0.75,
+    marginBottom: 6,
   },
   heroSubtitle: {
-    fontSize: 9,
+    fontSize: 8.25,
     textTransform: "uppercase",
-    letterSpacing: 2,
+    letterSpacing: 1.5,
     color: BOLD_INK,
-    marginBottom: 4,
-  },
-  heroName: {
-    fontSize: 9,
-    textTransform: "uppercase",
-    letterSpacing: 2,
-    color: BOLD_INK,
-    marginBottom: 12,
+    marginBottom: 3,
   },
   heroSummary: {
-    fontSize: 9,
+    fontSize: 9.75,
     lineHeight: 1.6,
     color: BOLD_MUTED,
-    width: 280,
+    width: 210,
   },
   heroPhoto: {
-    width: 140,
-    height: 180,
+    width: 108,
+    height: 144,
     borderRadius: 3,
     backgroundColor: "#C8C5BC",
   },
   fullRule: {
     height: 1,
     backgroundColor: BOLD_INK,
-    marginHorizontal: 24,
+    marginHorizontal: 18,
   },
   bodyRow: {
     flexDirection: "row",
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 16,
-    gap: 30,
+    paddingHorizontal: 18,
+    paddingTop: 12,
+    paddingBottom: 12,
+    gap: 22.5,
   },
   bodyCol: {
     flex: 1,
   },
   sectionLabel: {
-    fontSize: 11,
+    fontSize: 8.25,
     textTransform: "uppercase",
-    letterSpacing: 2,
+    letterSpacing: 1.5,
     color: BOLD_INK,
     fontWeight: 700,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   expCompany: {
-    fontSize: 11,
+    fontSize: 8.25,
     fontWeight: 700,
     textTransform: "uppercase",
     color: BOLD_INK,
   },
   expDate: {
-    fontSize: 10,
+    fontSize: 7.5,
     color: BOLD_MUTED,
   },
   expCity: {
-    fontSize: 10,
+    fontSize: 7.5,
     fontStyle: "normal",
     color: BOLD_MUTED,
   },
   expComment: {
-    fontSize: 10,
+    fontSize: 7.5,
     color: BOLD_MUTED,
-    marginTop: 2,
+    marginTop: 1.5,
   },
   languageRow: {
     flexDirection: "row",
@@ -510,31 +546,18 @@ const boldStyles = StyleSheet.create({
     marginBottom: 4,
   },
   languageName: {
-    fontSize: 10,
+    fontSize: 9,
     color: BOLD_INK,
   },
   skillPill: {
-    fontSize: 10,
+    fontSize: 7.5,
     fontWeight: 700,
     textTransform: "uppercase",
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 10,
+    paddingHorizontal: 9,
+    paddingVertical: 3.375,
+    borderRadius: 9999,
     marginRight: 4,
     marginBottom: 4,
-  },
-  footerName: {
-    fontSize: 40,
-    fontWeight: 900,
-    textTransform: "uppercase",
-    textAlign: "center",
-    color: BOLD_INK,
-    borderTopWidth: 1,
-    borderTopColor: BOLD_INK,
-    borderTopStyle: "solid",
-    paddingVertical: 12,
-    marginHorizontal: 24,
-    letterSpacing: -1,
   },
 });
 
@@ -548,51 +571,60 @@ const minimalStyles = StyleSheet.create({
     flexDirection: "row",
   },
   photoCol: {
-    width: 220,
+    width: 165,
     backgroundColor: "#333333",
   },
   photo: {
     width: "100%",
-    height: 240,
+    height: 180,
     objectFit: "cover",
   },
   infoCol: {
     flex: 1,
-    padding: 28,
+    paddingHorizontal: 24,
+    paddingVertical: 21,
   },
   name: {
     fontFamily: "Playfair Display",
-    fontSize: 33,
+    fontSize: 24.75,
     fontWeight: 700,
     color: MINIMAL_INK,
-    marginBottom: 4,
+    marginBottom: 3,
   },
   title: {
     fontSize: 9,
     color: MINIMAL_MUTED,
-    marginBottom: 10,
+    marginBottom: 7.5,
   },
   shortRule: {
     width: 24,
-    height: 0.5,
+    height: 0.375,
     backgroundColor: MINIMAL_INK,
-    marginBottom: 12,
+    marginVertical: 9,
   },
-  sectionLabel: {
-    fontSize: 12,
+  sidebarSectionLabel: {
+    fontSize: 9,
     textTransform: "uppercase",
-    letterSpacing: 2,
+    letterSpacing: 1.5,
+    color: "#ffffff",
+    fontWeight: 700,
+    marginBottom: 6,
+  },
+  mainSectionLabel: {
+    fontSize: 9,
+    textTransform: "uppercase",
+    letterSpacing: 1.5,
     color: MINIMAL_INK,
     fontWeight: 700,
     marginBottom: 6,
   },
   summaryText: {
-    fontSize: 14,
+    fontSize: 10.5,
     lineHeight: 1.6,
     color: MINIMAL_MUTED,
   },
   fullRule: {
-    height: 1,
+    height: 0.75,
     backgroundColor: "#e0e0e0",
   },
   bodyRow: {
@@ -600,54 +632,54 @@ const minimalStyles = StyleSheet.create({
     alignItems: "stretch",
   },
   sideCol: {
-    width: 220,
-    backgroundColor: "#333333",
+    width: 165,
+    backgroundColor: "#111111",
     borderRightWidth: 1,
     borderRightColor: "#e0e0e0",
     borderRightStyle: "solid",
-    padding: 28,
-    paddingTop: 20,
+    paddingHorizontal: 18,
+    paddingVertical: 21,
     flexDirection: "column",
-    gap: 16,
+    gap: 18,
   },
   mainCol: {
     flex: 1,
-    padding: 28,
-    paddingTop: 20,
+    paddingHorizontal: 24,
+    paddingVertical: 21,
     flexDirection: "column",
-    gap: 16,
+    gap: 18,
   },
   contactItem: {
-    fontSize: 8,
+    fontSize: 9,
     color: "rgba(255,255,255,0.65)",
     lineHeight: 1.5,
     marginBottom: 2,
   },
   skillItem: {
-    fontSize: 13,
+    fontSize: 9.75,
     color: "rgba(255,255,255,0.65)",
     lineHeight: 1.5,
     marginBottom: 2,
   },
   languageItem: {
-    fontSize: 14,
+    fontSize: 10.5,
     color: "rgba(255,255,255,0.65)",
     lineHeight: 1.5,
     marginBottom: 2,
   },
   eduTitle: {
-    fontSize: 12,
+    fontSize: 9,
     fontWeight: 700,
     textTransform: "uppercase",
-    color: MINIMAL_INK,
+    color: "#ffffff",
     marginBottom: 1,
   },
   eduSub: {
-    fontSize: 8,
-    color: MINIMAL_MUTED,
+    fontSize: 7.5,
+    color: "rgba(255,255,255,0.65)",
   },
   expCompany: {
-    fontSize: 9,
+    fontSize: 10.5,
     fontWeight: 700,
     textTransform: "uppercase",
     color: MINIMAL_INK,
@@ -661,7 +693,7 @@ const minimalStyles = StyleSheet.create({
     color: MINIMAL_MUTED,
   },
   expComment: {
-    fontSize: 8,
+    fontSize: 8.25,
     color: MINIMAL_MUTED,
     lineHeight: 1.5,
     marginTop: 2,
@@ -802,6 +834,7 @@ function TerracottaPdfDocument({
   return (
     <Document>
       {pageGroups.map((pageKeys, gi) => {
+        if (!groupHasContent(pageKeys, data)) return null;
         const pageSidebarKeys = pageKeys.filter((k) => sidebarKeys.includes(k));
         const pageMainKeys = pageKeys.filter((k) => mainKeys.includes(k));
         return (
@@ -815,8 +848,8 @@ function TerracottaPdfDocument({
                 <View
                   style={{
                     width: "100%",
-                    height: 120,
-                    marginBottom: 12,
+                    height: 90,
+                    marginBottom: 9,
                     backgroundColor: "#F5E6DF",
                     borderRadius: 3,
                   }}
@@ -998,6 +1031,7 @@ function SagePdfDocument({
   return (
     <Document>
       {pageGroups.map((pageKeys, gi) => {
+        if (!groupHasContent(pageKeys, data)) return null;
         const pageSidebarKeys = pageKeys.filter((k) => sidebarKeys.includes(k));
         const pageMainKeys = pageKeys.filter((k) => mainKeys.includes(k));
         return (
@@ -1030,8 +1064,8 @@ function SagePdfDocument({
                   <View
                     style={{
                       width: "100%",
-                      height: 120,
-                      marginBottom: 12,
+                      height: 90,
+                      marginBottom: 15,
                       backgroundColor: "#EAF0EC",
                       borderRadius: 3,
                     }}
@@ -1102,10 +1136,10 @@ function ClassicPdfDocument({
   function renderSection(key: string) {
     if (key === "experience" && data.experience.length > 0) {
       return (
-        <View key="experience" style={{ marginBottom: 8 }}>
+        <View key="experience" style={{ marginBottom: 15 }}>
           <Text style={classicStyles.sectionLabel}>Experience</Text>
           {data.experience.map((item, i) => (
-            <View key={i} style={{ marginBottom: 8 }}>
+            <View key={i} style={{ marginBottom: 12 }}>
               <View
                 style={{
                   flexDirection: "row",
@@ -1135,10 +1169,10 @@ function ClassicPdfDocument({
     }
     if (key === "education" && data.education.length > 0) {
       return (
-        <View key="education" style={{ marginBottom: 8 }}>
+        <View key="education" style={{ marginBottom: 15 }}>
           <Text style={classicStyles.sectionLabel}>Education</Text>
           {data.education.map((item, i) => (
-            <View key={i} style={{ marginBottom: 6 }}>
+            <View key={i} style={{ marginBottom: 12 }}>
               <View
                 style={{
                   flexDirection: "row",
@@ -1196,48 +1230,53 @@ function ClassicPdfDocument({
 
   return (
     <Document>
-      {groups.map((group, gi) => (
-        <Page
-          key={gi}
-          size="A4"
-          style={{ ...classicStyles.page, fontSize: 10 * pdfScale }}
-        >
-          {gi === 0 && (
-            <>
-              <Text style={classicStyles.name}>{data.name}</Text>
-              <Text style={classicStyles.contactLine}>
-                {data.title ? `${data.title}${contactText ? " · " : ""}` : ""}
-                {contactText}
-              </Text>
-              <View style={classicStyles.rule} />
-              {data.summary && (
-                <View style={{ marginBottom: 8 }}>
-                  <Text style={classicStyles.sectionLabel}>Profile</Text>
-                  <Text style={classicStyles.summaryText}>{data.summary}</Text>
-                </View>
-              )}
-              <View style={classicStyles.rule} />
-            </>
-          )}
-          {gi > 0 && (
-            <View
-              style={{
-                marginTop: 24,
-                borderTopWidth: 1,
-                borderTopColor: "#e5e7eb",
-                borderTopStyle: "dashed",
-                paddingTop: 24,
-              }}
-            />
-          )}
-          {group.map((key) => (
-            <View key={key}>
-              {renderSection(key)}
-              <View style={classicStyles.rule} />
-            </View>
-          ))}
-        </Page>
-      ))}
+      {groups.map((group, gi) => {
+        if (!groupHasContent(group, data)) return null;
+        return (
+          <Page
+            key={gi}
+            size="A4"
+            style={{ ...classicStyles.page, fontSize: 10 * pdfScale }}
+          >
+            {gi === 0 && (
+              <>
+                <Text style={classicStyles.name}>{data.name}</Text>
+                <Text style={classicStyles.contactLine}>
+                  {data.title ? `${data.title}${contactText ? " · " : ""}` : ""}
+                  {contactText}
+                </Text>
+                <View style={classicStyles.rule} />
+                {data.summary && (
+                  <View style={{ marginBottom: 15 }}>
+                    <Text style={classicStyles.sectionLabel}>Profile</Text>
+                    <Text style={classicStyles.summaryText}>
+                      {data.summary}
+                    </Text>
+                  </View>
+                )}
+                <View style={classicStyles.rule} />
+              </>
+            )}
+            {gi > 0 && (
+              <View
+                style={{
+                  marginTop: 18,
+                  borderTopWidth: 1,
+                  borderTopColor: "#e5e7eb",
+                  borderTopStyle: "dashed",
+                  paddingTop: 18,
+                }}
+              />
+            )}
+            {group.map((key) => (
+              <View key={key}>
+                {renderSection(key)}
+                <View style={classicStyles.rule} />
+              </View>
+            ))}
+          </Page>
+        );
+      })}
     </Document>
   );
 }
@@ -1263,7 +1302,7 @@ function BoldPdfDocument({
   function renderSection(key: string) {
     if (key === "experience" && data.experience.length > 0) {
       return (
-        <View key="experience" style={{ marginBottom: 30 }}>
+        <View key="experience" style={{ marginBottom: 22.5 }}>
           <Text style={boldStyles.sectionLabel}>Experience</Text>
           {data.experience.map((item, i) => (
             <View key={i} style={{ marginBottom: 10 }}>
@@ -1301,7 +1340,7 @@ function BoldPdfDocument({
                 {item.language}
                 {item.level ? ` — ${item.level}` : ""}
               </Text>
-              <View style={{ flexDirection: "row", gap: 3 }}>
+              <View style={{ flexDirection: "row", gap: 2.25 }}>
                 {Array.from({ length: 5 }).map((_, di) => {
                   const map: Record<string, number> = {
                     native: 5,
@@ -1315,9 +1354,9 @@ function BoldPdfDocument({
                     <View
                       key={di}
                       style={{
-                        width: 10,
-                        height: 10,
-                        borderRadius: 5,
+                        width: 7.5,
+                        height: 7.5,
+                        borderRadius: 3.75,
                         backgroundColor: di < filled ? BOLD_INK : "transparent",
                         borderWidth: 1,
                         borderColor: BOLD_INK,
@@ -1333,7 +1372,7 @@ function BoldPdfDocument({
     }
     if (key === "education" && data.education.length > 0) {
       return (
-        <View key="education" style={{ marginBottom: 30 }}>
+        <View key="education" style={{ marginBottom: 22.5 }}>
           <Text style={boldStyles.sectionLabel}>Education</Text>
           {data.education.map((item, i) => (
             <View key={i} style={{ marginBottom: 10 }}>
@@ -1360,7 +1399,7 @@ function BoldPdfDocument({
     }
     if (key === "skills" && data.skills.length > 0) {
       return (
-        <View key="skills" style={{ marginBottom: 30 }}>
+        <View key="skills" style={{ marginBottom: 22.5 }}>
           <Text style={boldStyles.sectionLabel}>Skills</Text>
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             {data.skills.map((item, i) => (
@@ -1400,107 +1439,109 @@ function BoldPdfDocument({
 
   return (
     <Document>
-      {groups.map((group, gi) => (
-        <Page
-          key={gi}
-          size="A4"
-          style={{
-            backgroundColor: BOLD_BG,
-            fontFamily: "DM Sans",
-            fontSize: 10 * pdfScale,
-          }}
-        >
-          {gi === 0 && (
-            <>
-              <View style={boldStyles.topBar}>
-                <Text style={boldStyles.topBarText}>{data.name}</Text>
-                <Text style={boldStyles.topBarText}>
-                  {data.contact[0]?.detail}
-                </Text>
-                <Text style={boldStyles.topBarText}>
-                  {data.contact[1]?.detail}
-                </Text>
-              </View>
-              <View style={boldStyles.heroRow}>
-                <View style={boldStyles.heroLeft}>
-                  <Text style={boldStyles.heroTitle}>{data.title}</Text>
-                  <Text style={boldStyles.heroSubtitle}>{data.title}</Text>
-                  <Text style={boldStyles.heroName}>{data.name}</Text>
-                  {data.summary && (
-                    <Text style={boldStyles.heroSummary}>{data.summary}</Text>
-                  )}
+      {groups.map((group, gi) => {
+        if (!groupHasContent(group, data)) return null;
+        return (
+          <Page
+            key={gi}
+            size="A4"
+            style={{
+              backgroundColor: BOLD_BG,
+              fontFamily: "DM Sans",
+              fontSize: 10 * pdfScale,
+            }}
+          >
+            {gi === 0 && (
+              <>
+                <View style={boldStyles.topBar}>
+                  <Text style={boldStyles.topBarText}>{data.name}</Text>
+                  <Text style={boldStyles.topBarText}>
+                    {data.contact[0]?.detail}
+                  </Text>
+                  <Text style={boldStyles.topBarText}>
+                    {data.contact[1]?.detail}
+                  </Text>
                 </View>
-                <View style={boldStyles.heroPhoto}>
-                  {data.photo ? (
-                    <Image
-                      src={data.photo}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        borderRadius: 4,
-                      }}
-                    />
-                  ) : (
-                    <View
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <View
+                <View style={boldStyles.heroRow}>
+                  <View style={boldStyles.heroLeft}>
+                    <Text style={boldStyles.heroTitle}>{data.title}</Text>
+                    <Text style={boldStyles.heroSubtitle}>{data.title}</Text>
+                    {data.summary && (
+                      <Text style={boldStyles.heroSummary}>{data.summary}</Text>
+                    )}
+                  </View>
+                  <View style={boldStyles.heroPhoto}>
+                    {data.photo ? (
+                      <Image
+                        src={data.photo}
                         style={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: 16,
-                          backgroundColor: BOLD_INK,
-                          opacity: 0.15,
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          borderRadius: 4,
                         }}
                       />
-                    </View>
-                  )}
+                    ) : (
+                      <View
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <View
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: 16,
+                            backgroundColor: BOLD_INK,
+                            opacity: 0.15,
+                          }}
+                        />
+                      </View>
+                    )}
+                  </View>
                 </View>
+                <View style={boldStyles.fullRule} />
+              </>
+            )}
+            {gi > 0 && (
+              <View
+                style={{
+                  marginTop: 18,
+                  borderTopWidth: 1,
+                  borderTopColor: "#e5e7eb",
+                  borderTopStyle: "dashed",
+                  paddingTop: 18,
+                }}
+              />
+            )}
+            <View style={boldStyles.bodyRow}>
+              <View style={{ ...boldStyles.bodyCol, flex: 2 }}>
+                {group
+                  .filter((k) => k === "experience")
+                  .map((key) => (
+                    <View key={key}>{renderSection(key)}</View>
+                  ))}
               </View>
-              <View style={boldStyles.fullRule} />
-            </>
-          )}
-          {gi > 0 && (
-            <View
-              style={{
-                marginTop: 24,
-                borderTopWidth: 1,
-                borderTopColor: "#e5e7eb",
-                borderTopStyle: "dashed",
-                paddingTop: 24,
-              }}
-            />
-          )}
-          <View style={boldStyles.bodyRow}>
-            <View style={{ ...boldStyles.bodyCol, flex: 2 }}>
-              {group
-                .filter((k) => k === "experience")
-                .map((key) => (
-                  <View key={key}>{renderSection(key)}</View>
-                ))}
+              <View style={{ ...boldStyles.bodyCol, flex: 1 }}>
+                {group
+                  .filter(
+                    (k) =>
+                      k === "education" ||
+                      k === "skills" ||
+                      k === "languages" ||
+                      k === "references",
+                  )
+                  .map((key) => (
+                    <View key={key}>{renderSection(key)}</View>
+                  ))}
+              </View>
             </View>
-            <View style={{ ...boldStyles.bodyCol, flex: 1 }}>
-              {group
-                .filter(
-                  (k) =>
-                    k === "education" ||
-                    k === "skills" ||
-                    k === "languages" ||
-                    k === "references",
-                )
-                .map((key) => (
-                  <View key={key}>{renderSection(key)}</View>
-                ))}
-            </View>
-          </View>
-        </Page>
-      ))}
+          </Page>
+        );
+      })}
     </Document>
   );
 }
@@ -1530,7 +1571,7 @@ function MinimalPdfDocument({
     if (key === "skills" && data.skills.length > 0) {
       return (
         <View key="skills">
-          <Text style={minimalStyles.sectionLabel}>Skills</Text>
+          <Text style={minimalStyles.sidebarSectionLabel}>Skills</Text>
           {data.skills.map((item, i) => (
             <Text key={i} style={minimalStyles.skillItem}>
               • {item.skill}
@@ -1542,7 +1583,7 @@ function MinimalPdfDocument({
     if (key === "languages" && data.languages.length > 0) {
       return (
         <View key="languages">
-          <Text style={minimalStyles.sectionLabel}>Languages</Text>
+          <Text style={minimalStyles.sidebarSectionLabel}>Languages</Text>
           {data.languages.map((item, i) => (
             <Text key={i} style={minimalStyles.languageItem}>
               • {item.language}
@@ -1555,7 +1596,7 @@ function MinimalPdfDocument({
     if (key === "contact" && data.contact.length > 0) {
       return (
         <View key="contact">
-          <Text style={minimalStyles.sectionLabel}>Contact</Text>
+          <Text style={minimalStyles.sidebarSectionLabel}>Contact</Text>
           {data.contact.map((item, i) => (
             <Text key={i} style={minimalStyles.contactItem}>
               • {item.detail}
@@ -1571,7 +1612,7 @@ function MinimalPdfDocument({
     if (key === "experience" && data.experience.length > 0) {
       return (
         <View key="experience">
-          <Text style={minimalStyles.sectionLabel}>Experience</Text>
+          <Text style={minimalStyles.mainSectionLabel}>Experience</Text>
           {data.experience.map((item, i) => (
             <View key={i} style={{ marginBottom: 10 }}>
               <View
@@ -1603,7 +1644,7 @@ function MinimalPdfDocument({
     if (key === "education" && data.education.length > 0) {
       return (
         <View key="education">
-          <Text style={minimalStyles.sectionLabel}>Education</Text>
+          <Text style={minimalStyles.mainSectionLabel}>Education</Text>
           {data.education.map((item, i) => (
             <View key={i} style={{ marginBottom: 6 }}>
               <Text style={minimalStyles.eduTitle}>{item.edu_center}</Text>
@@ -1621,7 +1662,7 @@ function MinimalPdfDocument({
     if (key === "references" && data.references) {
       return (
         <View key="references">
-          <Text style={minimalStyles.sectionLabel}>References</Text>
+          <Text style={minimalStyles.mainSectionLabel}>References</Text>
           <Text style={{ fontSize: 8, color: MINIMAL_MUTED, lineHeight: 1.5 }}>
             {data.references}
           </Text>
@@ -1634,6 +1675,7 @@ function MinimalPdfDocument({
   return (
     <Document>
       {pageGroups.map((pageKeys, gi) => {
+        if (!groupHasContent(pageKeys, data)) return null;
         const pageSidebarKeys = pageKeys.filter((k) => sidebarKeys.includes(k));
         const pageMainKeys = pageKeys.filter((k) => mainKeys.includes(k));
         return (
@@ -1652,7 +1694,7 @@ function MinimalPdfDocument({
                       <View
                         style={{
                           width: "100%",
-                          height: 240,
+                          height: 180,
                           alignItems: "center",
                           justifyContent: "center",
                         }}
