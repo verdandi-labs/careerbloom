@@ -241,7 +241,10 @@ export function Terracotta({
             <div className="grid grid-cols-[180px_1fr] items-stretch">
               <div
                 className="p-5 flex flex-col gap-5 self-stretch"
-                style={{ borderRight: `1px solid ${TERRACOTTA}`, minHeight: "100%" }}
+                style={{
+                  borderRight: `1px solid ${TERRACOTTA}`,
+                  minHeight: "100%",
+                }}
               >
                 {gi === 0 && (
                   <div

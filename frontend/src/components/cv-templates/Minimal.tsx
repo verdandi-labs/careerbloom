@@ -104,11 +104,17 @@ export function Minimal({
               >
                 {item.edu_center}
               </p>
-              <p className="text-[9px]" style={{ color: "rgba(255,255,255,0.65)" }}>
+              <p
+                className="text-[9px]"
+                style={{ color: "rgba(255,255,255,0.65)" }}
+              >
                 {[item.start_date ?? item.end_date].filter(Boolean).join(" – ")}
               </p>
               {item.comments && (
-                <p className="text-[9px]" style={{ color: "rgba(255,255,255,0.65)" }}>
+                <p
+                  className="text-[9px]"
+                  style={{ color: "rgba(255,255,255,0.65)" }}
+                >
                   {item.comments}
                 </p>
               )}
@@ -350,7 +356,10 @@ export function Minimal({
               </>
             )}
 
-            <div className="grid grid-cols-[220px_1fr] items-stretch" style={{ minHeight: "100%" }}>
+            <div
+              className="grid grid-cols-[220px_1fr] items-stretch"
+              style={{ minHeight: "100%" }}
+            >
               <div
                 className="px-6 py-7 flex flex-col gap-6 self-stretch"
                 style={{

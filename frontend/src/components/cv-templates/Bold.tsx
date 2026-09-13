@@ -327,7 +327,12 @@ export function Bold({
                 </div>
                 <div
                   className="rounded-sm overflow-hidden"
-                  style={{ backgroundColor: "#C8C5BC", width: 144, height: 192, flexShrink: 0 }}
+                  style={{
+                    backgroundColor: "#C8C5BC",
+                    width: 144,
+                    height: 192,
+                    flexShrink: 0,
+                  }}
                 >
                   {photoUploading ? (
                     <div className="w-full h-full flex items-center justify-center animate-pulse">
@@ -370,22 +375,49 @@ export function Bold({
             </>
           )}
 
-          <div className="px-6 pb-4 mt-4">
-            {group.map((key) => {
-              const idx = sectionOrder.findIndex(
-                (s) => s.type === "section" && s.key === key,
-              );
-              return (
-                <DragSection
-                  key={key as string}
-                  index={idx}
-                  onDrop={onDragSection ?? (() => {})}
-                  isActive={activeDragIndex === idx}
-                >
-                  {renderSection(key)}
-                </DragSection>
-              );
-            })}
+          <div className="grid grid-cols-2 gap-6 px-6 pb-4 mt-4">
+            <div>
+              {group
+                .filter((k) =>
+                  ["experience", "languages"].includes(k as string),
+                )
+                .map((key) => {
+                  const idx = sectionOrder.findIndex(
+                    (s) => s.type === "section" && s.key === key,
+                  );
+                  return (
+                    <DragSection
+                      key={key as string}
+                      index={idx}
+                      onDrop={onDragSection ?? (() => {})}
+                      isActive={activeDragIndex === idx}
+                    >
+                      {renderSection(key)}
+                    </DragSection>
+                  );
+                })}
+            </div>
+            <div>
+              {group
+                .filter((k) =>
+                  ["education", "skills", "references"].includes(k as string),
+                )
+                .map((key) => {
+                  const idx = sectionOrder.findIndex(
+                    (s) => s.type === "section" && s.key === key,
+                  );
+                  return (
+                    <DragSection
+                      key={key as string}
+                      index={idx}
+                      onDrop={onDragSection ?? (() => {})}
+                      isActive={activeDragIndex === idx}
+                    >
+                      {renderSection(key)}
+                    </DragSection>
+                  );
+                })}
+            </div>
           </div>
           <div
             className="px-6 py-4 text-center"

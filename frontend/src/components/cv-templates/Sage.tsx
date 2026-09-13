@@ -349,7 +349,10 @@ export function Sage({
               </div>
               <div
                 className="p-8 pl-6 self-stretch"
-                style={{ borderLeft: `1px solid ${SAGE_LIGHT}`, minHeight: "100%" }}
+                style={{
+                  borderLeft: `1px solid ${SAGE_LIGHT}`,
+                  minHeight: "100%",
+                }}
               >
                 {gi === 0 && (
                   <div
