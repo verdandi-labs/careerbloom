@@ -1560,13 +1560,10 @@ function MinimalPdfDocument({
   const sidebarKeys = orderedSections(sectionOrder, [
     "contact",
     "skills",
+    "education",
     "languages",
   ]);
-  const mainKeys = orderedSections(sectionOrder, [
-    "experience",
-    "education",
-    "references",
-  ]);
+  const mainKeys = orderedSections(sectionOrder, ["experience", "references"]);
   const pageGroups = splitAtPageBreaks(sectionOrder, [
     ...sidebarKeys,
     ...mainKeys,
@@ -1610,6 +1607,24 @@ function MinimalPdfDocument({
         </View>
       );
     }
+    if (key === "education" && data.education.length > 0) {
+      return (
+        <View key="education">
+          <Text style={minimalStyles.sidebarSectionLabel}>Education</Text>
+          {data.education.map((item, i) => (
+            <View key={i} style={{ marginBottom: 6 }}>
+              <Text style={minimalStyles.eduTitle}>{item.edu_center}</Text>
+              <Text style={minimalStyles.eduSub}>
+                {[item.start_date ?? item.end_date].filter(Boolean).join(" – ")}
+              </Text>
+              {item.comments && (
+                <Text style={minimalStyles.eduSub}>{item.comments}</Text>
+              )}
+            </View>
+          ))}
+        </View>
+      );
+    }
     return null;
   }
 
@@ -1640,24 +1655,6 @@ function MinimalPdfDocument({
               )}
               {item.comments && (
                 <Text style={minimalStyles.expComment}>{item.comments}</Text>
-              )}
-            </View>
-          ))}
-        </View>
-      );
-    }
-    if (key === "education" && data.education.length > 0) {
-      return (
-        <View key="education">
-          <Text style={minimalStyles.mainSectionLabel}>Education</Text>
-          {data.education.map((item, i) => (
-            <View key={i} style={{ marginBottom: 6 }}>
-              <Text style={minimalStyles.eduTitle}>{item.edu_center}</Text>
-              <Text style={minimalStyles.eduSub}>
-                {[item.start_date ?? item.end_date].filter(Boolean).join(" – ")}
-              </Text>
-              {item.comments && (
-                <Text style={minimalStyles.eduSub}>{item.comments}</Text>
               )}
             </View>
           ))}
