@@ -297,8 +297,13 @@ export function Bold({
                   </div>
                   {(/\S/.test(data.name ?? "") || e) && (
                     <div
-                      className="text-[13px] font-bold uppercase tracking-widest mt-1"
-                      style={{ color: INK }}
+                      className="font-black uppercase mt-1"
+                      style={{
+                        fontSize: 50 * (pdfScale ?? 1),
+                        letterSpacing: -1,
+                        color: INK,
+                        lineHeight: 1,
+                      }}
                     >
                       <Editable
                         value={data.name}
@@ -326,13 +331,8 @@ export function Bold({
                   )}
                 </div>
                 <div
-                  className="rounded-sm overflow-hidden"
-                  style={{
-                    backgroundColor: "#C8C5BC",
-                    width: 144,
-                    height: 192,
-                    flexShrink: 0,
-                  }}
+                  className="aspect-[3/4] rounded-sm overflow-hidden"
+                  style={{ backgroundColor: "#C8C5BC" }}
                 >
                   {photoUploading ? (
                     <div className="w-full h-full flex items-center justify-center animate-pulse">
@@ -419,29 +419,7 @@ export function Bold({
                 })}
             </div>
           </div>
-          <div
-            className="px-6 py-4 text-center"
-            style={{ borderTop: `1px solid ${INK}` }}
-          >
-            <div
-              className="font-black uppercase"
-              style={{
-                fontSize: 64 * (pdfScale ?? 1),
-                letterSpacing: -1,
-                color: INK,
-                lineHeight: 1,
-              }}
-            >
-              <Editable
-                value={data.name}
-                field="name"
-                editable={e}
-                onChange={onChange}
-                as="span"
-                multiline={false}
-              />
-            </div>
-          </div>
+
         </div>
       ))}
     </>
