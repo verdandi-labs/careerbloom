@@ -246,7 +246,8 @@ const sageStyles = StyleSheet.create({
   },
   summaryBox: {
     backgroundColor: SAGE_LIGHT,
-    padding: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
     borderRadius: 4,
   },
   summaryText: {
