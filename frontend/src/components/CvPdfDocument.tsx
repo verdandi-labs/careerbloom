@@ -572,7 +572,7 @@ const minimalStyles = StyleSheet.create({
     flexDirection: "row",
   },
   photoCol: {
-    width: 220,
+    width: 165,
     backgroundColor: "#333333",
   },
   photo: {
@@ -631,9 +631,10 @@ const minimalStyles = StyleSheet.create({
   bodyRow: {
     flexDirection: "row",
     alignItems: "stretch",
+    flex: 1,
   },
   sideCol: {
-    width: 220,
+    width: 165,
     backgroundColor: "#111111",
     borderRightWidth: 1,
     borderRightColor: "#e0e0e0",
