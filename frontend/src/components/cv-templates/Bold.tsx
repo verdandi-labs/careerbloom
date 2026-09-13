@@ -127,7 +127,7 @@ export function Bold({
     }
     if (key === "languages" && data.languages.length > 0) {
       return (
-        <div>
+        <div className="mb-[30px]">
           <p
             className="text-[11px] uppercase tracking-widest font-semibold mb-3"
             style={{ color: INK }}
@@ -227,7 +227,7 @@ export function Bold({
     }
     if (key === "references" && data.references.length > 0) {
       return (
-        <div>
+        <div className="mb-[30px]">
           <p
             className="text-[11px] uppercase tracking-widest font-semibold mb-3"
             style={{ color: INK }}
