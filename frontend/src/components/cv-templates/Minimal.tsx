@@ -41,7 +41,7 @@ export function Minimal({
       return (
         <div key="contact">
           <p
-            className="text-[9px] uppercase tracking-widest font-semibold mb-2"
+            className="text-xs uppercase tracking-widest font-semibold mb-2"
             style={{ color: "#ffffff" }}
           >
             Contact
@@ -50,7 +50,7 @@ export function Minimal({
             <p
               key={item.line_num}
               onClick={() => onEditItem?.("contact", i, item)}
-              className="text-[10px] leading-relaxed flex items-start gap-2 cursor-pointer hover:bg-white/10 rounded transition"
+              className="text-xs leading-relaxed flex items-start gap-2 cursor-pointer hover:bg-white/10 rounded transition"
               style={{ color: "rgba(255,255,255,0.65)" }}
             >
               <span className="shrink-0">•</span>
@@ -64,7 +64,7 @@ export function Minimal({
       return (
         <div key="skills">
           <p
-            className="text-[9px] uppercase tracking-widest font-semibold mb-2"
+            className="text-xs uppercase tracking-widest font-semibold mb-2"
             style={{ color: "#ffffff" }}
           >
             Skills
@@ -73,7 +73,7 @@ export function Minimal({
             <p
               key={item.line_num}
               onClick={() => onEditItem?.("skills", i, item)}
-              className="text-[10px] leading-relaxed flex items-start gap-2 cursor-pointer hover:bg-white/10 rounded transition"
+              className="text-[13px] leading-relaxed flex items-start gap-2 cursor-pointer hover:bg-white/10 rounded transition"
               style={{ color: "rgba(255,255,255,0.65)" }}
             >
               <span className="shrink-0">•</span>
@@ -87,7 +87,7 @@ export function Minimal({
       return (
         <div key="education">
           <p
-            className="text-[9px] uppercase tracking-widest font-semibold mb-2"
+            className="text-xs uppercase tracking-widest font-semibold mb-2"
             style={{ color: "#ffffff" }}
           >
             Education
@@ -99,20 +99,20 @@ export function Minimal({
               className="mb-2 cursor-pointer hover:bg-white/10 rounded transition"
             >
               <p
-                className="text-[10px] font-bold uppercase"
+                className="text-xs font-semibold uppercase"
                 style={{ color: "#ffffff" }}
               >
                 {item.edu_center}
               </p>
               <p
-                className="text-[9px]"
+                className="text-[10px]"
                 style={{ color: "rgba(255,255,255,0.65)" }}
               >
                 {[item.start_date ?? item.end_date].filter(Boolean).join(" – ")}
               </p>
               {item.comments && (
                 <p
-                  className="text-[9px]"
+                  className="text-[11px]"
                   style={{ color: "rgba(255,255,255,0.65)" }}
                 >
                   {item.comments}
@@ -127,7 +127,7 @@ export function Minimal({
       return (
         <div key="languages">
           <p
-            className="text-[9px] uppercase tracking-widest font-semibold mb-2"
+            className="text-xs uppercase tracking-widest font-semibold mb-2"
             style={{ color: "#ffffff" }}
           >
             Languages
@@ -136,7 +136,7 @@ export function Minimal({
             <p
               key={item.line_num}
               onClick={() => onEditItem?.("languages", i, item)}
-              className="text-[10px] leading-relaxed flex items-start gap-2 cursor-pointer hover:bg-white/10 rounded transition"
+              className="text-sm leading-relaxed flex items-start gap-2 cursor-pointer hover:bg-white/10 rounded transition"
               style={{ color: "rgba(255,255,255,0.65)" }}
             >
               <span className="shrink-0">•</span>
@@ -155,7 +155,7 @@ export function Minimal({
       return (
         <div key="experience">
           <p
-            className="text-[9px] uppercase tracking-widest font-semibold mb-3"
+            className="text-xs uppercase tracking-widest font-semibold mb-3"
             style={{ color: INK }}
           >
             Experience
@@ -168,14 +168,14 @@ export function Minimal({
             >
               <div className="flex justify-between items-start">
                 <p
-                  className="text-[11px] font-bold uppercase"
+                  className="text-sm font-bold uppercase"
                   style={{ color: INK }}
                 >
                   {item.company}
                 </p>
                 {(item.start_date || item.end_date) && (
                   <span
-                    className="text-[9px] shrink-0"
+                    className="text-[10px] shrink-0"
                     style={{ color: MUTED }}
                   >
                     {item.start_date && item.end_date
@@ -185,7 +185,7 @@ export function Minimal({
                 )}
               </div>
               {item.city && (
-                <p className="text-[9px]" style={{ color: MUTED }}>
+                <p className="text-[10px]" style={{ color: MUTED }}>
                   {item.city}
                 </p>
               )}
@@ -197,7 +197,7 @@ export function Minimal({
                     .map((line, li) => (
                       <li
                         key={li}
-                        className="text-[10px] leading-relaxed flex items-start gap-2"
+                        className="text-[11px] leading-relaxed flex items-start gap-2"
                         style={{ color: MUTED }}
                       >
                         <span className="shrink-0">•</span>
@@ -215,12 +215,12 @@ export function Minimal({
       return (
         <div key="references">
           <p
-            className="text-[9px] uppercase tracking-widest font-semibold mb-3"
+            className="text-xs uppercase tracking-widest font-semibold mb-3"
             style={{ color: INK }}
           >
             References
           </p>
-          <p className="text-[10px] leading-relaxed" style={{ color: MUTED }}>
+          <p className="text-[11px] leading-relaxed" style={{ color: MUTED }}>
             {data.references}
           </p>
         </div>
@@ -306,7 +306,7 @@ export function Minimal({
                           fontFamily: "Playfair Display, serif",
                           color: INK,
                         }}
-                        className="text-[30px] font-bold leading-tight"
+                        className="text-[33px] leading-tight"
                       >
                         <Editable
                           value={data.name}
@@ -331,22 +331,16 @@ export function Minimal({
                       </p>
                     )}
                     <div
-                      className="w-full h-0.5 my-3"
-                      style={{ backgroundColor: INK }}
+                      className="w-full my-3"
+                      style={{ backgroundColor: "#2B2B2B", height: "0.5px" }}
                     />
-                    <p
-                      className="text-[9px] uppercase tracking-widest font-semibold mb-1"
-                      style={{ color: INK }}
-                    >
-                      Summary
-                    </p>
                     {(/\S/.test(data.summary ?? "") || e) && (
                       <Editable
                         value={data.summary}
                         field="summary"
                         editable={e}
                         onChange={onChange}
-                        className="text-[11px] leading-relaxed"
+                        className="text-sm leading-relaxed"
                         style={{ color: MUTED }}
                       />
                     )}
