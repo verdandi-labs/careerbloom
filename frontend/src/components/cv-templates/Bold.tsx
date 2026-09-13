@@ -10,6 +10,7 @@ export function Bold({
   editable,
   onChange,
   onEditItem,
+  onUpdateItem,
   sectionOrder,
   template: _template,
   onDragSection,
@@ -51,7 +52,14 @@ export function Bold({
     );
   }
 
-  function DotRating({ level }: { level?: string }) {
+  function DotRating({
+    level,
+    onSetLevel,
+  }: {
+    level?: string;
+    onSetLevel?: (level: string) => void;
+  }) {
+    const levels = ["basic", "intermediate", "advanced", "fluent", "native"];
     const map: Record<string, number> = {
       native: 5,
       fluent: 4,
@@ -65,10 +73,14 @@ export function Bold({
         {Array.from({ length: 5 }).map((_, i) => (
           <span
             key={i}
-            className="w-2.5 h-2.5 rounded-full"
+            className="w-2.5 h-2.5 rounded-full cursor-pointer hover:scale-125 transition-transform"
             style={{
               backgroundColor: i < filled ? INK : "transparent",
               border: `1.5px solid ${INK}`,
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onSetLevel?.(levels[i]);
             }}
           />
         ))}
@@ -143,15 +155,12 @@ export function Bold({
               <span className="text-[12px]" style={{ color: INK }}>
                 {item.language}
               </span>
-              <span
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEditItem?.("languages", i, item);
-                }}
-                className="cursor-pointer"
-              >
-                <DotRating level={item.level} />
-              </span>
+              <DotRating
+                level={item.level}
+                onSetLevel={(newLevel) =>
+                  onUpdateItem?.("languages", i, { level: newLevel })
+                }
+              />
             </div>
           ))}
         </div>

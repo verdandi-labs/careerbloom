@@ -543,6 +543,25 @@ function PreviewPage() {
     setEditingItem(null);
   }
 
+  function handleUpdateItem(
+    field: keyof StructuredCVData,
+    index: number,
+    updates: Record<string, unknown>,
+  ) {
+    if (!structuredData) return;
+    const arr = structuredData[field];
+    if (!Array.isArray(arr)) return;
+    const updated = arr.map((item, i) =>
+      i === index ? { ...item, ...updates } : item,
+    );
+    const newData = { ...structuredData, [field]: updated };
+    setStructuredData(newData);
+    localStorage.setItem(
+      "cv-preview-structured-edits",
+      JSON.stringify(newData),
+    );
+  }
+
   async function fetchVersions() {
     setVersionsLoading(true);
     try {
@@ -960,6 +979,7 @@ function PreviewPage() {
                   template={selectedTemplate}
                   editable={true}
                   onChange={handleChange}
+                  onUpdateItem={handleUpdateItem}
                   onEditItem={(field, index, item) =>
                     setEditingItem({ field, index, item })
                   }

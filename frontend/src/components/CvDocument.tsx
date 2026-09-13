@@ -26,6 +26,11 @@ export type Props = {
     index: number,
     updatedItem: unknown,
   ) => void;
+  onUpdateItem?: (
+    field: keyof StructuredCVData,
+    index: number,
+    updates: Record<string, unknown>,
+  ) => void;
   sectionOrder: SectionOrderItem[];
   onDragSection?: (fromIndex: number, toIndex: number) => void;
   activeDragIndex?: number | null;
