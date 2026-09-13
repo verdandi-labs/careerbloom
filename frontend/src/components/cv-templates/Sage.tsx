@@ -328,7 +328,7 @@ export function Sage({
               )}
             </div>
             <div className="grid grid-cols-[1fr_200px] items-stretch">
-              <div className="p-8 pr-6">
+              <div className="p-5 pr-6">
                 {pageMainKeys.map((key) => (
                   <DragSection
                     key={key}
