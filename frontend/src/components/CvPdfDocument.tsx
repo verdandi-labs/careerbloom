@@ -1340,7 +1340,6 @@ function BoldPdfDocument({
             <View key={i} style={boldStyles.languageRow}>
               <Text style={boldStyles.languageName}>
                 {item.language}
-                {item.level ? ` — ${item.level}` : ""}
               </Text>
               <View style={{ flexDirection: "row", gap: 3 }}>
                 {Array.from({ length: 5 }).map((_, di) => {
@@ -1356,9 +1355,9 @@ function BoldPdfDocument({
                     <View
                       key={di}
                       style={{
-                        width: 10,
-                        height: 10,
-                        borderRadius: 5,
+                        width: 6,
+                        height: 6,
+                        borderRadius: 3,
                         backgroundColor: di < filled ? BOLD_INK : "transparent",
                         borderWidth: 1,
                         borderColor: BOLD_INK,
