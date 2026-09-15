@@ -73,635 +73,6 @@ const MINIMAL_INK = "#111";
 const MINIMAL_MUTED = "#666";
 const MINIMAL_LIGHT = "#f5f5f5";
 
-const terracottaStyles = StyleSheet.create({
-  page: {
-    fontFamily: "DM Sans",
-    backgroundColor: "#ffffff",
-    flexDirection: "row",
-  },
-  sidebar: {
-    width: 150,
-    padding: 20,
-    borderRightWidth: 1,
-    borderRightColor: TERRACOTTA,
-    borderRightStyle: "solid",
-    flexDirection: "column",
-    gap: 20,
-  },
-  main: {
-    flex: 1,
-    padding: 24,
-    flexDirection: "column",
-    gap: 20,
-  },
-  sidebarLabel: {
-    fontSize: 7.5,
-    textTransform: "uppercase",
-    letterSpacing: 1.5,
-    color: TERRACOTTA,
-    marginBottom: 6,
-    fontWeight: 700,
-  },
-  contactItem: {
-    fontSize: 9,
-    color: MUTED,
-    lineHeight: 1.5,
-    marginBottom: 2,
-  },
-  skillPill: {
-    fontSize: 7.5,
-    color: TERRACOTTA,
-    backgroundColor: TERRACOTTA_LIGHT,
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-    borderRadius: 4,
-    marginRight: 4,
-    marginBottom: 4,
-  },
-  skillsWrap: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  languageRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 3,
-  },
-  languageName: {
-    fontSize: 9,
-    color: INK,
-  },
-  languageLevel: {
-    fontSize: 9,
-    color: MUTED,
-  },
-  eduCenter: {
-    fontSize: 9,
-    fontWeight: 500,
-    color: INK,
-    marginBottom: 1,
-  },
-  eduSub: {
-    fontSize: 7.5,
-    color: MUTED,
-    marginBottom: 1,
-  },
-  name: {
-    fontFamily: "Playfair Display",
-    fontSize: 27,
-    fontWeight: 700,
-    color: INK,
-    marginBottom: 4,
-  },
-  jobTitle: {
-    fontSize: 10.5,
-    color: TERRACOTTA,
-    marginBottom: 6,
-  },
-  summary: {
-    fontSize: 9,
-    color: MUTED,
-    lineHeight: 1.6,
-    maxWidth: 240,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: TERRACOTTA,
-    marginVertical: 4,
-  },
-  experienceSection: {
-    flexDirection: "column",
-    gap: 14,
-  },
-  experienceItem: {
-    marginBottom: 4,
-  },
-  expHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 2,
-  },
-  expCompany: {
-    fontFamily: "Playfair Display",
-    fontSize: 10.5,
-    fontWeight: 700,
-    color: INK,
-  },
-  expCity: {
-    fontSize: 7.5,
-    color: TERRACOTTA,
-    marginTop: 1,
-  },
-  dateBadge: {
-    fontSize: 7.5,
-    color: MUTED,
-    backgroundColor: TERRACOTTA_LIGHT,
-    paddingHorizontal: 5,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  expComments: {
-    fontSize: 9,
-    color: MUTED,
-    lineHeight: 1.5,
-  },
-  sectionBlock: {
-    marginBottom: 4,
-  },
-});
-
-const sageStyles = StyleSheet.create({
-  page: {
-    fontFamily: "DM Sans",
-    backgroundColor: "#ffffff",
-    flexDirection: "column",
-  },
-  header: {
-    paddingHorizontal: 32,
-    paddingTop: 32,
-    paddingBottom: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: SAGE_LIGHT,
-    borderBottomStyle: "solid",
-  },
-  cvLabel: {
-    fontSize: 6.75,
-    textTransform: "uppercase",
-    letterSpacing: 1.5,
-    color: SAGE,
-    marginBottom: 8,
-  },
-  name: {
-    fontFamily: "Playfair Display",
-    fontSize: 36,
-    fontWeight: 700,
-    color: INK,
-    marginBottom: 4,
-  },
-  contactLine: {
-    fontSize: 7.5,
-    color: MUTED,
-    marginBottom: 10,
-  },
-  summaryBox: {
-    backgroundColor: SAGE_LIGHT,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 4,
-  },
-  summaryText: {
-    fontSize: 9,
-    lineHeight: 1.6,
-    color: "#4a4a4a",
-  },
-  body: {
-    flex: 1,
-    flexDirection: "row",
-  },
-  mainCol: {
-    flex: 1,
-    padding: 20,
-    paddingRight: 24,
-  },
-  sideCol: {
-    width: 150,
-    padding: 32,
-    paddingLeft: 24,
-    borderLeftWidth: 1,
-    borderLeftColor: SAGE_LIGHT,
-    borderLeftStyle: "solid",
-  },
-  sectionLabel: {
-    fontSize: 6.75,
-    textTransform: "uppercase",
-    letterSpacing: 1.35,
-    color: SAGE,
-    fontWeight: 700,
-    marginBottom: 4,
-  },
-  sectionRule: {
-    height: 1,
-    backgroundColor: SAGE_MID,
-    marginBottom: 10,
-  },
-  expCompany: {
-    fontFamily: "Playfair Display",
-    fontSize: 10.5,
-    fontWeight: 700,
-    color: INK,
-  },
-  expCity: {
-    fontSize: 7.5,
-    color: SAGE,
-    marginTop: 1,
-  },
-  dateBadge: {
-    fontSize: 6.75,
-    color: SAGE,
-    backgroundColor: SAGE_LIGHT,
-    paddingHorizontal: 5,
-    paddingVertical: 2,
-    borderRadius: 9999,
-  },
-  expComments: {
-    fontSize: 8.25,
-    color: MUTED,
-    lineHeight: 1.5,
-    marginTop: 2,
-  },
-  experienceItem: {
-    marginBottom: 8,
-  },
-  expHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 2,
-  },
-  eduCenter: {
-    fontFamily: "Playfair Display",
-    fontSize: 10.5,
-    fontWeight: 700,
-    color: INK,
-  },
-  eduSub: {
-    fontSize: 7.5,
-    color: MUTED,
-    marginBottom: 1,
-  },
-  skillItem: {
-    fontSize: 9,
-    color: INK,
-    marginBottom: 2,
-  },
-  languageRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 3,
-  },
-  languageName: {
-    fontSize: 9,
-    color: INK,
-  },
-  languageLevel: {
-    fontSize: 9,
-    color: MUTED,
-  },
-  sectionBlock: {
-    marginBottom: 20,
-  },
-});
-
-const classicStyles = StyleSheet.create({
-  page: {
-    fontFamily: "DM Sans",
-    backgroundColor: "#ffffff",
-    paddingHorizontal: 48,
-    paddingTop: 30,
-    paddingBottom: 40,
-    flexDirection: "column",
-  },
-  name: {
-    fontFamily: "Playfair Display",
-    fontSize: 36,
-    fontWeight: 700,
-    color: CLASSIC_INK,
-    textAlign: "center",
-    marginBottom: 6,
-  },
-  contactLine: {
-    fontSize: 9,
-    color: CLASSIC_MUTED,
-    textAlign: "center",
-    letterSpacing: 1.5,
-    textTransform: "uppercase",
-    marginBottom: 16,
-  },
-  rule: {
-    height: 1,
-    backgroundColor: CLASSIC_RULE,
-    marginVertical: 16,
-  },
-  sectionLabel: {
-    fontFamily: "Playfair Display",
-    fontSize: 9,
-    textTransform: "uppercase",
-    letterSpacing: 2,
-    color: CLASSIC_INK,
-    fontWeight: 600,
-    marginBottom: 12,
-  },
-  summaryText: {
-    fontSize: 9,
-    lineHeight: 1.6,
-    color: CLASSIC_MUTED,
-  },
-  expRole: {
-    fontFamily: "Playfair Display",
-    fontSize: 10.5,
-    fontWeight: 700,
-    color: CLASSIC_INK,
-  },
-  expDate: {
-    fontSize: 7.5,
-    color: CLASSIC_MUTED,
-  },
-  expCompany: {
-    fontSize: 7.5,
-    fontStyle: "normal",
-    color: CLASSIC_MUTED,
-    marginBottom: 2,
-  },
-  expComment: {
-    fontSize: 8.25,
-    color: CLASSIC_MUTED,
-    lineHeight: 1.5,
-  },
-  bottomRow: {
-    flexDirection: "row",
-    gap: 32,
-  },
-  bottomCol: {
-    flex: 1,
-  },
-  skillText: {
-    fontSize: 8.25,
-    color: CLASSIC_MUTED,
-    lineHeight: 1.6,
-  },
-  languageRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 3,
-  },
-  languageName: {
-    fontSize: 9,
-    color: CLASSIC_INK,
-  },
-  languageLevel: {
-    fontSize: 9,
-    color: CLASSIC_MUTED,
-  },
-});
-
-const boldStyles = StyleSheet.create({
-  topBar: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: BOLD_INK,
-    borderBottomStyle: "solid",
-  },
-  topBarText: {
-    fontSize: 6.75,
-    textTransform: "uppercase",
-    letterSpacing: 1.5,
-    color: BOLD_INK,
-  },
-  heroRow: {
-    flexDirection: "row",
-    paddingHorizontal: 24,
-    paddingVertical: 24,
-    gap: 16,
-  },
-  heroLeft: {
-    flex: 1,
-  },
-  heroTitle: {
-    fontSize: 37.5,
-    fontWeight: 900,
-    textTransform: "uppercase",
-    color: BOLD_INK,
-    letterSpacing: -0.75,
-    marginBottom: 8,
-  },
-  heroSubtitle: {
-    fontSize: 8.25,
-    textTransform: "uppercase",
-    letterSpacing: 1.5,
-    color: BOLD_INK,
-    marginBottom: 4,
-  },
-  heroSummary: {
-    fontSize: 9.75,
-    lineHeight: 1.6,
-    color: BOLD_MUTED,
-    width: 280,
-  },
-  heroPhoto: {
-    width: 108,
-    height: 144,
-    borderRadius: 3,
-    backgroundColor: "#C8C5BC",
-  },
-  fullRule: {
-    height: 1,
-    backgroundColor: BOLD_INK,
-    marginHorizontal: 24,
-  },
-  bodyRow: {
-    flexDirection: "row",
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 16,
-    gap: 30,
-  },
-  bodyCol: {
-    flex: 1,
-  },
-  sectionLabel: {
-    fontSize: 8.25,
-    textTransform: "uppercase",
-    letterSpacing: 1.5,
-    color: BOLD_INK,
-    fontWeight: 700,
-    marginBottom: 8,
-  },
-  expCompany: {
-    fontSize: 8.25,
-    fontWeight: 700,
-    textTransform: "uppercase",
-    color: BOLD_INK,
-  },
-  expDate: {
-    fontSize: 7.5,
-    color: BOLD_MUTED,
-  },
-  expCity: {
-    fontSize: 7.5,
-    fontStyle: "normal",
-    color: BOLD_MUTED,
-  },
-  expComment: {
-    fontSize: 7.5,
-    color: BOLD_MUTED,
-    marginTop: 2,
-  },
-  languageRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 4,
-  },
-  languageName: {
-    fontSize: 9,
-    color: BOLD_INK,
-  },
-  skillPill: {
-    fontSize: 7.5,
-    fontWeight: 700,
-    textTransform: "uppercase",
-    paddingHorizontal: 9,
-    paddingVertical: 3.375,
-    borderRadius: 9999,
-    marginRight: 4,
-    marginBottom: 4,
-  },
-});
-
-const minimalStyles = StyleSheet.create({
-  page: {
-    fontFamily: "DM Sans",
-    backgroundColor: "#ffffff",
-    flexDirection: "column",
-  },
-  topRow: {
-    flexDirection: "row",
-  },
-  photoCol: {
-    width: 165,
-    backgroundColor: "#333333",
-  },
-  photo: {
-    width: "100%",
-    height: 240,
-    objectFit: "cover",
-  },
-  infoCol: {
-    flex: 1,
-    paddingHorizontal: 32,
-    paddingVertical: 28,
-  },
-  name: {
-    fontFamily: "Playfair Display",
-    fontSize: 24.75,
-    fontWeight: 700,
-    color: MINIMAL_INK,
-    marginBottom: 3,
-  },
-  title: {
-    fontSize: 9,
-    color: MINIMAL_MUTED,
-    marginBottom: 7.5,
-  },
-  shortRule: {
-    width: 24,
-    height: 0.5,
-    backgroundColor: MINIMAL_INK,
-    marginVertical: 9,
-  },
-  sidebarSectionLabel: {
-    fontSize: 9,
-    textTransform: "uppercase",
-    letterSpacing: 1.5,
-    color: "#ffffff",
-    fontWeight: 700,
-    marginBottom: 6,
-  },
-  mainSectionLabel: {
-    fontSize: 9,
-    textTransform: "uppercase",
-    letterSpacing: 1.5,
-    color: MINIMAL_INK,
-    fontWeight: 700,
-    marginBottom: 6,
-  },
-  summaryText: {
-    fontSize: 10.5,
-    lineHeight: 1.6,
-    color: MINIMAL_MUTED,
-  },
-  fullRule: {
-    height: 1,
-    backgroundColor: "#e0e0e0",
-  },
-  bodyRow: {
-    flexDirection: "row",
-    alignItems: "stretch",
-    flex: 1,
-  },
-  sideCol: {
-    width: 165,
-    backgroundColor: "#111111",
-    borderRightWidth: 1,
-    borderRightColor: "#e0e0e0",
-    borderRightStyle: "solid",
-    paddingHorizontal: 18,
-    paddingVertical: 21,
-    flexDirection: "column",
-    gap: 24,
-  },
-  mainCol: {
-    flex: 1,
-    paddingHorizontal: 32,
-    paddingVertical: 28,
-    flexDirection: "column",
-    gap: 24,
-  },
-  contactItem: {
-    fontSize: 9,
-    color: "rgba(255,255,255,0.65)",
-    lineHeight: 1.5,
-    marginBottom: 2,
-  },
-  skillItem: {
-    fontSize: 9.75,
-    color: "rgba(255,255,255,0.65)",
-    lineHeight: 1.5,
-    marginBottom: 2,
-  },
-  languageItem: {
-    fontSize: 10.5,
-    color: "rgba(255,255,255,0.65)",
-    lineHeight: 1.5,
-    marginBottom: 2,
-  },
-  eduTitle: {
-    fontSize: 9,
-    fontWeight: 700,
-    textTransform: "uppercase",
-    color: "#ffffff",
-    marginBottom: 1,
-  },
-  eduSub: {
-    fontSize: 7.5,
-    color: "rgba(255,255,255,0.65)",
-  },
-  expCompany: {
-    fontSize: 10.5,
-    fontWeight: 700,
-    textTransform: "uppercase",
-    color: MINIMAL_INK,
-  },
-  expDate: {
-    fontSize: 8,
-    color: MINIMAL_MUTED,
-  },
-  expCity: {
-    fontSize: 8,
-    color: MINIMAL_MUTED,
-  },
-  expComment: {
-    fontSize: 8.25,
-    color: MINIMAL_MUTED,
-    lineHeight: 1.5,
-    marginTop: 2,
-  },
-});
-
 function TerracottaPdfDocument({
   data,
   sectionOrder,
@@ -729,13 +100,153 @@ function TerracottaPdfDocument({
     ...mainKeys,
   ]);
 
+  const sc = 0.75 * pdfScale;
+
+  const styles = StyleSheet.create({
+    page: {
+      fontFamily: "DM Sans",
+      backgroundColor: "#ffffff",
+      flexDirection: "row",
+    },
+    sidebar: {
+      width: 150,
+      padding: 20,
+      borderRightWidth: 1,
+      borderRightColor: TERRACOTTA,
+      borderRightStyle: "solid",
+      flexDirection: "column",
+      gap: 20,
+    },
+    main: {
+      flex: 1,
+      padding: 24,
+      flexDirection: "column",
+      gap: 20,
+    },
+    sidebarLabel: {
+      fontSize: 7.5 * sc,
+      textTransform: "uppercase",
+      letterSpacing: 1.5,
+      color: TERRACOTTA,
+      marginBottom: 6,
+      fontWeight: 700,
+    },
+    contactItem: {
+      fontSize: 9 * sc,
+      color: MUTED,
+      lineHeight: 1.5,
+      marginBottom: 2,
+    },
+    skillPill: {
+      fontSize: 7.5 * sc,
+      color: TERRACOTTA,
+      backgroundColor: TERRACOTTA_LIGHT,
+      paddingHorizontal: 6,
+      paddingVertical: 3,
+      borderRadius: 4,
+      marginRight: 4,
+      marginBottom: 4,
+    },
+    skillsWrap: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+    },
+    languageRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 3,
+    },
+    languageName: {
+      fontSize: 9 * sc,
+      color: INK,
+    },
+    languageLevel: {
+      fontSize: 9 * sc,
+      color: MUTED,
+    },
+    eduCenter: {
+      fontSize: 9 * sc,
+      fontWeight: 500,
+      color: INK,
+      marginBottom: 1,
+    },
+    eduSub: {
+      fontSize: 7.5 * sc,
+      color: MUTED,
+      marginBottom: 1,
+    },
+    name: {
+      fontFamily: "Playfair Display",
+      fontSize: 27 * sc,
+      fontWeight: 700,
+      color: INK,
+      marginBottom: 4,
+    },
+    jobTitle: {
+      fontSize: 10.5 * sc,
+      color: TERRACOTTA,
+      marginBottom: 6,
+    },
+    summary: {
+      fontSize: 9 * sc,
+      color: MUTED,
+      lineHeight: 1.6,
+      maxWidth: 240,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: TERRACOTTA,
+      marginVertical: 4,
+    },
+    experienceSection: {
+      flexDirection: "column",
+      gap: 14,
+    },
+    experienceItem: {
+      marginBottom: 4,
+    },
+    expHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+      marginBottom: 2,
+    },
+    expCompany: {
+      fontFamily: "Playfair Display",
+      fontSize: 10.5 * sc,
+      fontWeight: 700,
+      color: INK,
+    },
+    expCity: {
+      fontSize: 7.5 * sc,
+      color: TERRACOTTA,
+      marginTop: 1,
+    },
+    dateBadge: {
+      fontSize: 7.5 * sc,
+      color: MUTED,
+      backgroundColor: TERRACOTTA_LIGHT,
+      paddingHorizontal: 5,
+      paddingVertical: 2,
+      borderRadius: 4,
+    },
+    expComments: {
+      fontSize: 9 * sc,
+      color: MUTED,
+      lineHeight: 1.5,
+    },
+    sectionBlock: {
+      marginBottom: 4,
+    },
+  });
+
   function renderSidebarSection(key: string) {
     if (key === "contact" && data.contact.length > 0) {
       return (
-        <View key="contact" style={terracottaStyles.sectionBlock}>
-          <Text style={terracottaStyles.sidebarLabel}>Contact</Text>
+        <View key="contact" style={styles.sectionBlock}>
+          <Text style={styles.sidebarLabel}>Contact</Text>
           {data.contact.map((item, i) => (
-            <Text key={i} style={terracottaStyles.contactItem}>
+            <Text key={i} style={styles.contactItem}>
               {item.detail}
             </Text>
           ))}
@@ -744,11 +255,11 @@ function TerracottaPdfDocument({
     }
     if (key === "skills" && data.skills.length > 0) {
       return (
-        <View key="skills" style={terracottaStyles.sectionBlock}>
-          <Text style={terracottaStyles.sidebarLabel}>Skills</Text>
-          <View style={terracottaStyles.skillsWrap}>
+        <View key="skills" style={styles.sectionBlock}>
+          <Text style={styles.sidebarLabel}>Skills</Text>
+          <View style={styles.skillsWrap}>
             {data.skills.map((item, i) => (
-              <Text key={i} style={terracottaStyles.skillPill}>
+              <Text key={i} style={styles.skillPill}>
                 {item.skill}
               </Text>
             ))}
@@ -758,13 +269,13 @@ function TerracottaPdfDocument({
     }
     if (key === "languages" && data.languages.length > 0) {
       return (
-        <View key="languages" style={terracottaStyles.sectionBlock}>
-          <Text style={terracottaStyles.sidebarLabel}>Languages</Text>
+        <View key="languages" style={styles.sectionBlock}>
+          <Text style={styles.sidebarLabel}>Languages</Text>
           {data.languages.map((item, i) => (
-            <View key={i} style={terracottaStyles.languageRow}>
-              <Text style={terracottaStyles.languageName}>{item.language}</Text>
+            <View key={i} style={styles.languageRow}>
+              <Text style={styles.languageName}>{item.language}</Text>
               {item.level && (
-                <Text style={terracottaStyles.languageLevel}>{item.level}</Text>
+                <Text style={styles.languageLevel}>{item.level}</Text>
               )}
             </View>
           ))}
@@ -773,18 +284,18 @@ function TerracottaPdfDocument({
     }
     if (key === "education" && data.education.length > 0) {
       return (
-        <View key="education" style={terracottaStyles.sectionBlock}>
-          <Text style={terracottaStyles.sidebarLabel}>Education</Text>
+        <View key="education" style={styles.sectionBlock}>
+          <Text style={styles.sidebarLabel}>Education</Text>
           {data.education.map((item, i) => (
             <View key={i} style={{ marginBottom: 6 }}>
-              <Text style={terracottaStyles.eduCenter}>{item.edu_center}</Text>
-              <Text style={terracottaStyles.eduSub}>
+              <Text style={styles.eduCenter}>{item.edu_center}</Text>
+              <Text style={styles.eduSub}>
                 {[item.city, item.end_date ?? item.start_date]
                   .filter(Boolean)
                   .join(" · ")}
               </Text>
               {item.comments && (
-                <Text style={terracottaStyles.eduSub}>{item.comments}</Text>
+                <Text style={styles.eduSub}>{item.comments}</Text>
               )}
             </View>
           ))}
@@ -798,21 +309,21 @@ function TerracottaPdfDocument({
     if (key === "experience" && data.experience.length > 0) {
       return (
         <View key="experience">
-          <Text style={terracottaStyles.sidebarLabel}>Experience</Text>
-          <View style={terracottaStyles.experienceSection}>
+          <Text style={styles.sidebarLabel}>Experience</Text>
+          <View style={styles.experienceSection}>
             {data.experience.map((item, i) => (
-              <View key={i} style={terracottaStyles.experienceItem}>
-                <View style={terracottaStyles.expHeader}>
+              <View key={i} style={styles.experienceItem}>
+                <View style={styles.expHeader}>
                   <View>
-                    <Text style={terracottaStyles.expCompany}>
+                    <Text style={styles.expCompany}>
                       {item.company}
                     </Text>
                     {item.city && (
-                      <Text style={terracottaStyles.expCity}>{item.city}</Text>
+                      <Text style={styles.expCity}>{item.city}</Text>
                     )}
                   </View>
                   {(item.start_date || item.end_date) && (
-                    <Text style={terracottaStyles.dateBadge}>
+                    <Text style={styles.dateBadge}>
                       {item.start_date && item.end_date
                         ? `${item.start_date} – ${item.end_date}`
                         : (item.start_date ?? item.end_date)}
@@ -820,7 +331,7 @@ function TerracottaPdfDocument({
                   )}
                 </View>
                 {item.comments && (
-                  <Text style={terracottaStyles.expComments}>
+                  <Text style={styles.expComments}>
                     {item.comments}
                   </Text>
                 )}
@@ -843,9 +354,9 @@ function TerracottaPdfDocument({
           <Page
             key={gi}
             size="A4"
-            style={{ ...terracottaStyles.page, fontSize: 10 * pdfScale }}
+            style={styles.page}
           >
-            <View style={terracottaStyles.sidebar}>
+            <View style={styles.sidebar}>
               {gi === 0 && (
                 <View
                   style={{
@@ -890,19 +401,19 @@ function TerracottaPdfDocument({
               )}
               {pageSidebarKeys.map((key) => renderSidebarSection(key))}
             </View>
-            <View style={terracottaStyles.main}>
+            <View style={styles.main}>
               {gi === 0 && data.name && (
                 <View>
-                  <Text style={terracottaStyles.name}>{data.name}</Text>
+                  <Text style={styles.name}>{data.name}</Text>
                   {data.title && (
-                    <Text style={terracottaStyles.jobTitle}>{data.title}</Text>
+                    <Text style={styles.jobTitle}>{data.title}</Text>
                   )}
                   {data.summary && (
-                    <Text style={terracottaStyles.summary}>{data.summary}</Text>
+                    <Text style={styles.summary}>{data.summary}</Text>
                   )}
                 </View>
               )}
-              {gi === 0 && <View style={terracottaStyles.divider} />}
+              {gi === 0 && <View style={styles.divider} />}
               {pageMainKeys.map((key) => renderMainSection(key))}
             </View>
           </Page>
@@ -933,14 +444,158 @@ function SagePdfDocument({
     ...mainKeys,
   ]);
 
+  const sc = 0.75 * pdfScale;
+
+  const styles = StyleSheet.create({
+    page: {
+      fontFamily: "DM Sans",
+      backgroundColor: "#ffffff",
+      flexDirection: "column",
+    },
+    header: {
+      paddingHorizontal: 32,
+      paddingTop: 32,
+      paddingBottom: 15,
+      borderBottomWidth: 1,
+      borderBottomColor: SAGE_LIGHT,
+      borderBottomStyle: "solid",
+    },
+    cvLabel: {
+      fontSize: 6.75 * sc,
+      textTransform: "uppercase",
+      letterSpacing: 1.5,
+      color: SAGE,
+      marginBottom: 8,
+    },
+    name: {
+      fontFamily: "Playfair Display",
+      fontSize: 36 * sc,
+      fontWeight: 700,
+      color: INK,
+      marginBottom: 4,
+    },
+    contactLine: {
+      fontSize: 7.5 * sc,
+      color: MUTED,
+      marginBottom: 10,
+    },
+    summaryBox: {
+      backgroundColor: SAGE_LIGHT,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderRadius: 4,
+    },
+    summaryText: {
+      fontSize: 9 * sc,
+      lineHeight: 1.6,
+      color: "#4a4a4a",
+    },
+    body: {
+      flex: 1,
+      flexDirection: "row",
+    },
+    mainCol: {
+      flex: 1,
+      padding: 20,
+      paddingRight: 24,
+    },
+    sideCol: {
+      width: 150,
+      padding: 32,
+      paddingLeft: 24,
+      borderLeftWidth: 1,
+      borderLeftColor: SAGE_LIGHT,
+      borderLeftStyle: "solid",
+    },
+    sectionLabel: {
+      fontSize: 6.75 * sc,
+      textTransform: "uppercase",
+      letterSpacing: 1.35,
+      color: SAGE,
+      fontWeight: 700,
+      marginBottom: 4,
+    },
+    sectionRule: {
+      height: 1,
+      backgroundColor: SAGE_MID,
+      marginBottom: 10,
+    },
+    expCompany: {
+      fontFamily: "Playfair Display",
+      fontSize: 10.5 * sc,
+      fontWeight: 700,
+      color: INK,
+    },
+    expCity: {
+      fontSize: 7.5 * sc,
+      color: SAGE,
+      marginTop: 1,
+    },
+    dateBadge: {
+      fontSize: 6.75 * sc,
+      color: SAGE,
+      backgroundColor: SAGE_LIGHT,
+      paddingHorizontal: 5,
+      paddingVertical: 2,
+      borderRadius: 9999,
+    },
+    expComments: {
+      fontSize: 8.25 * sc,
+      color: MUTED,
+      lineHeight: 1.5,
+      marginTop: 2,
+    },
+    experienceItem: {
+      marginBottom: 8,
+    },
+    expHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+      marginBottom: 2,
+    },
+    eduCenter: {
+      fontFamily: "Playfair Display",
+      fontSize: 10.5 * sc,
+      fontWeight: 700,
+      color: INK,
+    },
+    eduSub: {
+      fontSize: 7.5 * sc,
+      color: MUTED,
+      marginBottom: 1,
+    },
+    skillItem: {
+      fontSize: 9 * sc,
+      color: INK,
+      marginBottom: 2,
+    },
+    languageRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 3,
+    },
+    languageName: {
+      fontSize: 9 * sc,
+      color: INK,
+    },
+    languageLevel: {
+      fontSize: 9 * sc,
+      color: MUTED,
+    },
+    sectionBlock: {
+      marginBottom: 20,
+    },
+  });
+
   function renderSidebarSection(key: string) {
     if (key === "skills" && data.skills.length > 0) {
       return (
-        <View key="skills" style={sageStyles.sectionBlock}>
-          <Text style={sageStyles.sectionLabel}>Skills</Text>
-          <View style={sageStyles.sectionRule} />
+        <View key="skills" style={styles.sectionBlock}>
+          <Text style={styles.sectionLabel}>Skills</Text>
+          <View style={styles.sectionRule} />
           {data.skills.map((item, i) => (
-            <Text key={i} style={sageStyles.skillItem}>
+            <Text key={i} style={styles.skillItem}>
               {item.skill}
             </Text>
           ))}
@@ -949,14 +604,14 @@ function SagePdfDocument({
     }
     if (key === "languages" && data.languages.length > 0) {
       return (
-        <View key="languages" style={sageStyles.sectionBlock}>
-          <Text style={sageStyles.sectionLabel}>Languages</Text>
-          <View style={sageStyles.sectionRule} />
+        <View key="languages" style={styles.sectionBlock}>
+          <Text style={styles.sectionLabel}>Languages</Text>
+          <View style={styles.sectionRule} />
           {data.languages.map((item, i) => (
-            <View key={i} style={sageStyles.languageRow}>
-              <Text style={sageStyles.languageName}>{item.language}</Text>
+            <View key={i} style={styles.languageRow}>
+              <Text style={styles.languageName}>{item.language}</Text>
               {item.level && (
-                <Text style={sageStyles.languageLevel}>{item.level}</Text>
+                <Text style={styles.languageLevel}>{item.level}</Text>
               )}
             </View>
           ))}
@@ -969,20 +624,20 @@ function SagePdfDocument({
   function renderMainSection(key: string) {
     if (key === "experience" && data.experience.length > 0) {
       return (
-        <View key="experience" style={sageStyles.sectionBlock}>
-          <Text style={sageStyles.sectionLabel}>Experience</Text>
-          <View style={sageStyles.sectionRule} />
+        <View key="experience" style={styles.sectionBlock}>
+          <Text style={styles.sectionLabel}>Experience</Text>
+          <View style={styles.sectionRule} />
           {data.experience.map((item, i) => (
-            <View key={i} style={sageStyles.experienceItem}>
-              <View style={sageStyles.expHeader}>
+            <View key={i} style={styles.experienceItem}>
+              <View style={styles.expHeader}>
                 <View>
-                  <Text style={sageStyles.expCompany}>{item.company}</Text>
+                  <Text style={styles.expCompany}>{item.company}</Text>
                   {item.city && (
-                    <Text style={sageStyles.expCity}>{item.city}</Text>
+                    <Text style={styles.expCity}>{item.city}</Text>
                   )}
                 </View>
                 {(item.start_date || item.end_date) && (
-                  <Text style={sageStyles.dateBadge}>
+                  <Text style={styles.dateBadge}>
                     {item.start_date && item.end_date
                       ? `${item.start_date} – ${item.end_date}`
                       : (item.start_date ?? item.end_date)}
@@ -990,7 +645,7 @@ function SagePdfDocument({
                 )}
               </View>
               {item.comments && (
-                <Text style={sageStyles.expComments}>{item.comments}</Text>
+                <Text style={styles.expComments}>{item.comments}</Text>
               )}
             </View>
           ))}
@@ -999,20 +654,20 @@ function SagePdfDocument({
     }
     if (key === "education" && data.education.length > 0) {
       return (
-        <View key="education" style={sageStyles.sectionBlock}>
-          <Text style={sageStyles.sectionLabel}>Education</Text>
-          <View style={sageStyles.sectionRule} />
+        <View key="education" style={styles.sectionBlock}>
+          <Text style={styles.sectionLabel}>Education</Text>
+          <View style={styles.sectionRule} />
           {data.education.map((item, i) => (
-            <View key={i} style={sageStyles.experienceItem}>
-              <View style={sageStyles.expHeader}>
+            <View key={i} style={styles.experienceItem}>
+              <View style={styles.expHeader}>
                 <View>
-                  <Text style={sageStyles.eduCenter}>{item.edu_center}</Text>
+                  <Text style={styles.eduCenter}>{item.edu_center}</Text>
                   {item.city && (
-                    <Text style={sageStyles.eduSub}>{item.city}</Text>
+                    <Text style={styles.eduSub}>{item.city}</Text>
                   )}
                 </View>
                 {(item.start_date || item.end_date) && (
-                  <Text style={sageStyles.dateBadge}>
+                  <Text style={styles.dateBadge}>
                     {item.start_date && item.end_date
                       ? `${item.start_date} – ${item.end_date}`
                       : (item.start_date ?? item.end_date)}
@@ -1020,7 +675,7 @@ function SagePdfDocument({
                 )}
               </View>
               {item.comments && (
-                <Text style={sageStyles.expComments}>{item.comments}</Text>
+                <Text style={styles.expComments}>{item.comments}</Text>
               )}
             </View>
           ))}
@@ -1040,28 +695,28 @@ function SagePdfDocument({
           <Page
             key={gi}
             size="A4"
-            style={{ ...sageStyles.page, fontSize: 10 * pdfScale }}
+            style={styles.page}
           >
             {gi === 0 && (
-              <View style={sageStyles.header}>
-                <Text style={sageStyles.cvLabel}>Curriculum Vitae</Text>
-                {data.name && <Text style={sageStyles.name}>{data.name}</Text>}
-                <Text style={sageStyles.contactLine}>
+              <View style={styles.header}>
+                <Text style={styles.cvLabel}>Curriculum Vitae</Text>
+                {data.name && <Text style={styles.name}>{data.name}</Text>}
+                <Text style={styles.contactLine}>
                   {data.title ? `${data.title}${contactText ? " · " : ""}` : ""}
                   {contactText}
                 </Text>
                 {data.summary && (
-                  <View style={sageStyles.summaryBox}>
-                    <Text style={sageStyles.summaryText}>{data.summary}</Text>
+                  <View style={styles.summaryBox}>
+                    <Text style={styles.summaryText}>{data.summary}</Text>
                   </View>
                 )}
               </View>
             )}
-            <View style={sageStyles.body}>
-              <View style={sageStyles.mainCol}>
+            <View style={styles.body}>
+              <View style={styles.mainCol}>
                 {pageMainKeys.map((key) => renderMainSection(key))}
               </View>
-              <View style={sageStyles.sideCol}>
+              <View style={styles.sideCol}>
                 {gi === 0 && (
                   <View
                     style={{
@@ -1135,11 +790,105 @@ function ClassicPdfDocument({
   ]);
   const groups = splitAtPageBreaks(sectionOrder, allKeys);
 
+  const sc = 0.75 * pdfScale;
+
+  const styles = StyleSheet.create({
+    page: {
+      fontFamily: "DM Sans",
+      backgroundColor: "#ffffff",
+      paddingHorizontal: 48,
+      paddingTop: 30,
+      paddingBottom: 40,
+      flexDirection: "column",
+    },
+    name: {
+      fontFamily: "Playfair Display",
+      fontSize: 36 * sc,
+      fontWeight: 700,
+      color: CLASSIC_INK,
+      textAlign: "center",
+      marginBottom: 6,
+    },
+    contactLine: {
+      fontSize: 9 * sc,
+      color: CLASSIC_MUTED,
+      textAlign: "center",
+      letterSpacing: 1.5,
+      textTransform: "uppercase",
+      marginBottom: 16,
+    },
+    rule: {
+      height: 1,
+      backgroundColor: CLASSIC_RULE,
+      marginVertical: 16,
+    },
+    sectionLabel: {
+      fontFamily: "Playfair Display",
+      fontSize: 9 * sc,
+      textTransform: "uppercase",
+      letterSpacing: 2,
+      color: CLASSIC_INK,
+      fontWeight: 600,
+      marginBottom: 12,
+    },
+    summaryText: {
+      fontSize: 9 * sc,
+      lineHeight: 1.6,
+      color: CLASSIC_MUTED,
+    },
+    expRole: {
+      fontFamily: "Playfair Display",
+      fontSize: 10.5 * sc,
+      fontWeight: 700,
+      color: CLASSIC_INK,
+    },
+    expDate: {
+      fontSize: 7.5 * sc,
+      color: CLASSIC_MUTED,
+    },
+    expCompany: {
+      fontSize: 7.5 * sc,
+      fontStyle: "normal",
+      color: CLASSIC_MUTED,
+      marginBottom: 2,
+    },
+    expComment: {
+      fontSize: 8.25 * sc,
+      color: CLASSIC_MUTED,
+      lineHeight: 1.5,
+    },
+    bottomRow: {
+      flexDirection: "row",
+      gap: 32,
+    },
+    bottomCol: {
+      flex: 1,
+    },
+    skillText: {
+      fontSize: 8.25 * sc,
+      color: CLASSIC_MUTED,
+      lineHeight: 1.6,
+    },
+    languageRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 3,
+    },
+    languageName: {
+      fontSize: 9 * sc,
+      color: CLASSIC_INK,
+    },
+    languageLevel: {
+      fontSize: 9 * sc,
+      color: CLASSIC_MUTED,
+    },
+  });
+
   function renderSection(key: string) {
     if (key === "experience" && data.experience.length > 0) {
       return (
         <View key="experience" style={{ marginBottom: 20 }}>
-          <Text style={classicStyles.sectionLabel}>Experience</Text>
+          <Text style={styles.sectionLabel}>Experience</Text>
           {data.experience.map((item, i) => (
             <View key={i} style={{ marginBottom: 16 }}>
               <View
@@ -1149,9 +898,9 @@ function ClassicPdfDocument({
                   marginBottom: 2,
                 }}
               >
-                <Text style={classicStyles.expRole}>{item.company}</Text>
+                <Text style={styles.expRole}>{item.company}</Text>
                 {(item.start_date || item.end_date) && (
-                  <Text style={classicStyles.expDate}>
+                  <Text style={styles.expDate}>
                     {item.start_date && item.end_date
                       ? `${item.start_date} – ${item.end_date}`
                       : (item.start_date ?? item.end_date)}
@@ -1159,10 +908,10 @@ function ClassicPdfDocument({
                 )}
               </View>
               {item.city && (
-                <Text style={classicStyles.expCompany}>{item.city}</Text>
+                <Text style={styles.expCompany}>{item.city}</Text>
               )}
               {item.comments && (
-                <Text style={classicStyles.expComment}>{item.comments}</Text>
+                <Text style={styles.expComment}>{item.comments}</Text>
               )}
             </View>
           ))}
@@ -1172,7 +921,7 @@ function ClassicPdfDocument({
     if (key === "education" && data.education.length > 0) {
       return (
         <View key="education" style={{ marginBottom: 20 }}>
-          <Text style={classicStyles.sectionLabel}>Education</Text>
+          <Text style={styles.sectionLabel}>Education</Text>
           {data.education.map((item, i) => (
             <View key={i} style={{ marginBottom: 16 }}>
               <View
@@ -1182,9 +931,9 @@ function ClassicPdfDocument({
                   marginBottom: 2,
                 }}
               >
-                <Text style={classicStyles.expRole}>{item.edu_center}</Text>
+                <Text style={styles.expRole}>{item.edu_center}</Text>
                 {(item.start_date || item.end_date) && (
-                  <Text style={classicStyles.expDate}>
+                  <Text style={styles.expDate}>
                     {item.start_date && item.end_date
                       ? `${item.start_date} – ${item.end_date}`
                       : (item.start_date ?? item.end_date)}
@@ -1192,7 +941,7 @@ function ClassicPdfDocument({
                 )}
               </View>
               {item.city && (
-                <Text style={classicStyles.expCompany}>{item.city}</Text>
+                <Text style={styles.expCompany}>{item.city}</Text>
               )}
             </View>
           ))}
@@ -1202,8 +951,8 @@ function ClassicPdfDocument({
     if (key === "skills" && data.skills.length > 0) {
       return (
         <View key="skills">
-          <Text style={classicStyles.sectionLabel}>Skills</Text>
-          <Text style={classicStyles.skillText}>
+          <Text style={styles.sectionLabel}>Skills</Text>
+          <Text style={styles.skillText}>
             {data.skills
               .map((item) => item.skill)
               .filter(Boolean)
@@ -1215,12 +964,12 @@ function ClassicPdfDocument({
     if (key === "languages" && data.languages.length > 0) {
       return (
         <View key="languages">
-          <Text style={classicStyles.sectionLabel}>Languages</Text>
+          <Text style={styles.sectionLabel}>Languages</Text>
           {data.languages.map((item, i) => (
-            <View key={i} style={classicStyles.languageRow}>
-              <Text style={classicStyles.languageName}>{item.language}</Text>
+            <View key={i} style={styles.languageRow}>
+              <Text style={styles.languageName}>{item.language}</Text>
               {item.level && (
-                <Text style={classicStyles.languageLevel}>{item.level}</Text>
+                <Text style={styles.languageLevel}>{item.level}</Text>
               )}
             </View>
           ))}
@@ -1238,25 +987,25 @@ function ClassicPdfDocument({
           <Page
             key={gi}
             size="A4"
-            style={{ ...classicStyles.page, fontSize: 10 * pdfScale }}
+            style={styles.page}
           >
             {gi === 0 && (
               <>
-                <Text style={classicStyles.name}>{data.name}</Text>
-                <Text style={classicStyles.contactLine}>
+                <Text style={styles.name}>{data.name}</Text>
+                <Text style={styles.contactLine}>
                   {data.title ? `${data.title}${contactText ? " · " : ""}` : ""}
                   {contactText}
                 </Text>
-                <View style={classicStyles.rule} />
+                <View style={styles.rule} />
                 {data.summary && (
                   <View style={{ marginBottom: 20 }}>
-                    <Text style={classicStyles.sectionLabel}>Profile</Text>
-                    <Text style={classicStyles.summaryText}>
+                    <Text style={styles.sectionLabel}>Profile</Text>
+                    <Text style={styles.summaryText}>
                       {data.summary}
                     </Text>
                   </View>
                 )}
-                <View style={classicStyles.rule} />
+                <View style={styles.rule} />
               </>
             )}
             {gi > 0 && (
@@ -1273,7 +1022,7 @@ function ClassicPdfDocument({
             {group.map((key) => (
               <View key={key}>
                 {renderSection(key)}
-                <View style={classicStyles.rule} />
+                <View style={styles.rule} />
               </View>
             ))}
           </Page>
@@ -1301,11 +1050,130 @@ function BoldPdfDocument({
   ]);
   const groups = splitAtPageBreaks(sectionOrder, allKeys);
 
+  const sc = 0.75 * pdfScale;
+
+  const styles = StyleSheet.create({
+    topBar: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      paddingHorizontal: 24,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: BOLD_INK,
+      borderBottomStyle: "solid",
+    },
+    topBarText: {
+      fontSize: 6.75 * sc,
+      textTransform: "uppercase",
+      letterSpacing: 1.5,
+      color: BOLD_INK,
+    },
+    heroRow: {
+      flexDirection: "row",
+      paddingHorizontal: 24,
+      paddingVertical: 24,
+      gap: 16,
+    },
+    heroLeft: {
+      flex: 1,
+    },
+    heroTitle: {
+      fontSize: 37.5 * sc,
+      fontWeight: 900,
+      textTransform: "uppercase",
+      color: BOLD_INK,
+      letterSpacing: -0.75,
+      marginBottom: 8,
+    },
+    heroSubtitle: {
+      fontSize: 8.25 * sc,
+      textTransform: "uppercase",
+      letterSpacing: 1.5,
+      color: BOLD_INK,
+      marginBottom: 4,
+    },
+    heroSummary: {
+      fontSize: 9.75 * sc,
+      lineHeight: 1.6,
+      color: BOLD_MUTED,
+      width: 280,
+    },
+    heroPhoto: {
+      width: 108,
+      height: 144,
+      borderRadius: 3,
+      backgroundColor: "#C8C5BC",
+    },
+    fullRule: {
+      height: 1,
+      backgroundColor: BOLD_INK,
+      marginHorizontal: 24,
+    },
+    bodyRow: {
+      flexDirection: "row",
+      paddingHorizontal: 24,
+      paddingTop: 16,
+      paddingBottom: 16,
+      gap: 30,
+    },
+    bodyCol: {
+      flex: 1,
+    },
+    sectionLabel: {
+      fontSize: 8.25 * sc,
+      textTransform: "uppercase",
+      letterSpacing: 1.5,
+      color: BOLD_INK,
+      fontWeight: 700,
+      marginBottom: 8,
+    },
+    expCompany: {
+      fontSize: 8.25 * sc,
+      fontWeight: 700,
+      textTransform: "uppercase",
+      color: BOLD_INK,
+    },
+    expDate: {
+      fontSize: 7.5 * sc,
+      color: BOLD_MUTED,
+    },
+    expCity: {
+      fontSize: 7.5 * sc,
+      fontStyle: "normal",
+      color: BOLD_MUTED,
+    },
+    expComment: {
+      fontSize: 7.5 * sc,
+      color: BOLD_MUTED,
+      marginTop: 2,
+    },
+    languageRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 4,
+    },
+    languageName: {
+      fontSize: 9 * sc,
+      color: BOLD_INK,
+    },
+    skillPill: {
+      fontSize: 7.5 * sc,
+      fontWeight: 700,
+      textTransform: "uppercase",
+      paddingHorizontal: 9,
+      paddingVertical: 3.375,
+      borderRadius: 9999,
+      marginRight: 4,
+      marginBottom: 4,
+    },
+  });
+
   function renderSection(key: string) {
     if (key === "experience" && data.experience.length > 0) {
       return (
         <View key="experience" style={{ marginBottom: 30 }}>
-          <Text style={boldStyles.sectionLabel}>Experience</Text>
+          <Text style={styles.sectionLabel}>Experience</Text>
           {data.experience.map((item, i) => (
             <View key={i} style={{ marginBottom: 10 }}>
               <View
@@ -1314,18 +1182,18 @@ function BoldPdfDocument({
                   justifyContent: "space-between",
                 }}
               >
-                <Text style={boldStyles.expCompany}>{item.company}</Text>
+                <Text style={styles.expCompany}>{item.company}</Text>
                 {(item.start_date || item.end_date) && (
-                  <Text style={boldStyles.expDate}>
+                  <Text style={styles.expDate}>
                     {item.start_date && item.end_date
                       ? `${item.start_date} – ${item.end_date}`
                       : (item.start_date ?? item.end_date)}
                   </Text>
                 )}
               </View>
-              {item.city && <Text style={boldStyles.expCity}>{item.city}</Text>}
+              {item.city && <Text style={styles.expCity}>{item.city}</Text>}
               {item.comments && (
-                <Text style={boldStyles.expComment}>{item.comments}</Text>
+                <Text style={styles.expComment}>{item.comments}</Text>
               )}
             </View>
           ))}
@@ -1335,10 +1203,10 @@ function BoldPdfDocument({
     if (key === "languages" && data.languages.length > 0) {
       return (
         <View key="languages">
-          <Text style={boldStyles.sectionLabel}>Languages</Text>
+          <Text style={styles.sectionLabel}>Languages</Text>
           {data.languages.map((item, i) => (
-            <View key={i} style={boldStyles.languageRow}>
-              <Text style={boldStyles.languageName}>
+            <View key={i} style={styles.languageRow}>
+              <Text style={styles.languageName}>
                 {item.language}
               </Text>
               <View style={{ flexDirection: "row", gap: 3 }}>
@@ -1374,7 +1242,7 @@ function BoldPdfDocument({
     if (key === "education" && data.education.length > 0) {
       return (
         <View key="education" style={{ marginBottom: 30 }}>
-          <Text style={boldStyles.sectionLabel}>Education</Text>
+          <Text style={styles.sectionLabel}>Education</Text>
           {data.education.map((item, i) => (
             <View key={i} style={{ marginBottom: 10 }}>
               <View
@@ -1383,16 +1251,16 @@ function BoldPdfDocument({
                   justifyContent: "space-between",
                 }}
               >
-                <Text style={boldStyles.expCompany}>{item.edu_center}</Text>
+                <Text style={styles.expCompany}>{item.edu_center}</Text>
                 {(item.start_date || item.end_date) && (
-                  <Text style={boldStyles.expDate}>
+                  <Text style={styles.expDate}>
                     {item.start_date && item.end_date
                       ? `${item.start_date} – ${item.end_date}`
                       : (item.start_date ?? item.end_date)}
                   </Text>
                 )}
               </View>
-              {item.city && <Text style={boldStyles.expCity}>{item.city}</Text>}
+              {item.city && <Text style={styles.expCity}>{item.city}</Text>}
             </View>
           ))}
         </View>
@@ -1401,13 +1269,13 @@ function BoldPdfDocument({
     if (key === "skills" && data.skills.length > 0) {
       return (
         <View key="skills" style={{ marginBottom: 30 }}>
-          <Text style={boldStyles.sectionLabel}>Skills</Text>
+          <Text style={styles.sectionLabel}>Skills</Text>
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             {data.skills.map((item, i) => (
               <Text
                 key={i}
                 style={{
-                  ...boldStyles.skillPill,
+                  ...styles.skillPill,
                   ...(i < Math.ceil(data.skills.length / 2)
                     ? { backgroundColor: BOLD_INK, color: BOLD_BG }
                     : {
@@ -1428,8 +1296,8 @@ function BoldPdfDocument({
     if (key === "references" && data.references.length > 0) {
       return (
         <View key="references">
-          <Text style={boldStyles.sectionLabel}>References</Text>
-          <Text style={{ fontSize: 8, color: BOLD_MUTED, lineHeight: 1.5 }}>
+          <Text style={styles.sectionLabel}>References</Text>
+          <Text style={{ fontSize: 8 * sc, color: BOLD_MUTED, lineHeight: 1.5 }}>
             {data.references}
           </Text>
         </View>
@@ -1449,29 +1317,28 @@ function BoldPdfDocument({
             style={{
               backgroundColor: BOLD_BG,
               fontFamily: "DM Sans",
-              fontSize: 10 * pdfScale,
             }}
           >
             {gi === 0 && (
               <>
-                <View style={boldStyles.topBar}>
-                  <Text style={boldStyles.topBarText}>{data.name}</Text>
-                  <Text style={boldStyles.topBarText}>
+                <View style={styles.topBar}>
+                  <Text style={styles.topBarText}>{data.name}</Text>
+                  <Text style={styles.topBarText}>
                     {data.contact[0]?.detail}
                   </Text>
-                  <Text style={boldStyles.topBarText}>
+                  <Text style={styles.topBarText}>
                     {data.contact[1]?.detail}
                   </Text>
                 </View>
-                <View style={boldStyles.heroRow}>
-                  <View style={boldStyles.heroLeft}>
-                    <Text style={boldStyles.heroTitle}>{data.title}</Text>
-                    <Text style={boldStyles.heroSubtitle}>{data.title}</Text>
+                <View style={styles.heroRow}>
+                  <View style={styles.heroLeft}>
+                    <Text style={styles.heroTitle}>{data.title}</Text>
+                    <Text style={styles.heroSubtitle}>{data.title}</Text>
                     {data.summary && (
-                      <Text style={boldStyles.heroSummary}>{data.summary}</Text>
+                      <Text style={styles.heroSummary}>{data.summary}</Text>
                     )}
                   </View>
-                  <View style={boldStyles.heroPhoto}>
+                  <View style={styles.heroPhoto}>
                     {data.photo ? (
                       <Image
                         src={data.photo}
@@ -1504,7 +1371,7 @@ function BoldPdfDocument({
                     )}
                   </View>
                 </View>
-                <View style={boldStyles.fullRule} />
+                <View style={styles.fullRule} />
               </>
             )}
             {gi > 0 && (
@@ -1518,15 +1385,15 @@ function BoldPdfDocument({
                 }}
               />
             )}
-            <View style={boldStyles.bodyRow}>
-              <View style={{ ...boldStyles.bodyCol, flex: 2 }}>
+            <View style={styles.bodyRow}>
+              <View style={{ ...styles.bodyCol, flex: 2 }}>
                 {group
                   .filter((k) => k === "experience")
                   .map((key) => (
                     <View key={key}>{renderSection(key)}</View>
                   ))}
               </View>
-              <View style={{ ...boldStyles.bodyCol, flex: 1 }}>
+              <View style={{ ...styles.bodyCol, flex: 1 }}>
                 {group
                   .filter(
                     (k) =>
@@ -1568,13 +1435,155 @@ function MinimalPdfDocument({
     ...mainKeys,
   ]);
 
+  const sc = 0.75 * pdfScale;
+
+  const styles = StyleSheet.create({
+    page: {
+      fontFamily: "DM Sans",
+      backgroundColor: "#ffffff",
+      flexDirection: "column",
+    },
+    topRow: {
+      flexDirection: "row",
+    },
+    photoCol: {
+      width: 165,
+      backgroundColor: "#333333",
+    },
+    photo: {
+      width: "100%",
+      height: 240,
+      objectFit: "cover",
+    },
+    infoCol: {
+      flex: 1,
+      paddingHorizontal: 32,
+      paddingVertical: 28,
+    },
+    name: {
+      fontFamily: "Playfair Display",
+      fontSize: 24.75 * sc,
+      fontWeight: 700,
+      color: MINIMAL_INK,
+      marginBottom: 3,
+    },
+    title: {
+      fontSize: 9 * sc,
+      color: MINIMAL_MUTED,
+      marginBottom: 7.5,
+    },
+    shortRule: {
+      width: 24,
+      height: 0.5,
+      backgroundColor: MINIMAL_INK,
+      marginVertical: 9,
+    },
+    sidebarSectionLabel: {
+      fontSize: 9 * sc,
+      textTransform: "uppercase",
+      letterSpacing: 1.5,
+      color: "#ffffff",
+      fontWeight: 700,
+      marginBottom: 6,
+    },
+    mainSectionLabel: {
+      fontSize: 9 * sc,
+      textTransform: "uppercase",
+      letterSpacing: 1.5,
+      color: MINIMAL_INK,
+      fontWeight: 700,
+      marginBottom: 6,
+    },
+    summaryText: {
+      fontSize: 10.5 * sc,
+      lineHeight: 1.6,
+      color: MINIMAL_MUTED,
+    },
+    fullRule: {
+      height: 1,
+      backgroundColor: "#e0e0e0",
+    },
+    bodyRow: {
+      flexDirection: "row",
+      alignItems: "stretch",
+      flex: 1,
+    },
+    sideCol: {
+      width: 165,
+      backgroundColor: "#111111",
+      borderRightWidth: 1,
+      borderRightColor: "#e0e0e0",
+      borderRightStyle: "solid",
+      paddingHorizontal: 18,
+      paddingVertical: 21,
+      flexDirection: "column",
+      gap: 24,
+    },
+    mainCol: {
+      flex: 1,
+      paddingHorizontal: 32,
+      paddingVertical: 28,
+      flexDirection: "column",
+      gap: 24,
+    },
+    contactItem: {
+      fontSize: 9 * sc,
+      color: "rgba(255,255,255,0.65)",
+      lineHeight: 1.5,
+      marginBottom: 2,
+    },
+    skillItem: {
+      fontSize: 9.75 * sc,
+      color: "rgba(255,255,255,0.65)",
+      lineHeight: 1.5,
+      marginBottom: 2,
+    },
+    languageItem: {
+      fontSize: 10.5 * sc,
+      color: "rgba(255,255,255,0.65)",
+      lineHeight: 1.5,
+      marginBottom: 2,
+    },
+    eduTitle: {
+      fontSize: 9 * sc,
+      fontWeight: 700,
+      textTransform: "uppercase",
+      color: "#ffffff",
+      marginBottom: 1,
+    },
+    eduSub: {
+      fontSize: 7.5 * sc,
+      color: "rgba(255,255,255,0.65)",
+    },
+    expCompany: {
+      fontSize: 10.5 * sc,
+      fontWeight: 700,
+      textTransform: "uppercase",
+      color: MINIMAL_INK,
+    },
+    expDate: {
+      fontSize: 8 * sc,
+      color: MINIMAL_MUTED,
+    },
+    expCity: {
+      fontSize: 8 * sc,
+      color: MINIMAL_MUTED,
+    },
+    expComment: {
+      fontSize: 8.25 * sc,
+      color: MINIMAL_MUTED,
+      lineHeight: 1.5,
+      marginTop: 2,
+    },
+  });
+
   function renderSidebarSection(key: string) {
     if (key === "skills" && data.skills.length > 0) {
       return (
         <View key="skills">
-          <Text style={minimalStyles.sidebarSectionLabel}>Skills</Text>
+          <Text style={styles.sidebarSectionLabel}>Skills</Text>
           {data.skills.map((item, i) => (
-            <Text key={i} style={minimalStyles.skillItem}>
+            <Text key={i} style={styles.skillItem}>
               • {item.skill}
             </Text>
           ))}
@@ -1584,9 +1593,9 @@ function MinimalPdfDocument({
     if (key === "languages" && data.languages.length > 0) {
       return (
         <View key="languages">
-          <Text style={minimalStyles.sidebarSectionLabel}>Languages</Text>
+          <Text style={styles.sidebarSectionLabel}>Languages</Text>
           {data.languages.map((item, i) => (
-            <Text key={i} style={minimalStyles.languageItem}>
+            <Text key={i} style={styles.languageItem}>
               • {item.language}
               {item.level ? ` — ${item.level}` : ""}
             </Text>
@@ -1597,9 +1606,9 @@ function MinimalPdfDocument({
     if (key === "contact" && data.contact.length > 0) {
       return (
         <View key="contact">
-          <Text style={minimalStyles.sidebarSectionLabel}>Contact</Text>
+          <Text style={styles.sidebarSectionLabel}>Contact</Text>
           {data.contact.map((item, i) => (
-            <Text key={i} style={minimalStyles.contactItem}>
+            <Text key={i} style={styles.contactItem}>
               • {item.detail}
             </Text>
           ))}
@@ -1609,15 +1618,15 @@ function MinimalPdfDocument({
     if (key === "education" && data.education.length > 0) {
       return (
         <View key="education">
-          <Text style={minimalStyles.sidebarSectionLabel}>Education</Text>
+          <Text style={styles.sidebarSectionLabel}>Education</Text>
           {data.education.map((item, i) => (
             <View key={i} style={{ marginBottom: 6 }}>
-              <Text style={minimalStyles.eduTitle}>{item.edu_center}</Text>
-              <Text style={minimalStyles.eduSub}>
+              <Text style={styles.eduTitle}>{item.edu_center}</Text>
+              <Text style={styles.eduSub}>
                 {[item.start_date ?? item.end_date].filter(Boolean).join(" – ")}
               </Text>
               {item.comments && (
-                <Text style={minimalStyles.eduSub}>{item.comments}</Text>
+                <Text style={styles.eduSub}>{item.comments}</Text>
               )}
             </View>
           ))}
@@ -1631,7 +1640,7 @@ function MinimalPdfDocument({
     if (key === "experience" && data.experience.length > 0) {
       return (
         <View key="experience">
-          <Text style={minimalStyles.mainSectionLabel}>Experience</Text>
+          <Text style={styles.mainSectionLabel}>Experience</Text>
           {data.experience.map((item, i) => (
             <View key={i} style={{ marginBottom: 10 }}>
               <View
@@ -1640,9 +1649,9 @@ function MinimalPdfDocument({
                   justifyContent: "space-between",
                 }}
               >
-                <Text style={minimalStyles.expCompany}>{item.company}</Text>
+                <Text style={styles.expCompany}>{item.company}</Text>
                 {(item.start_date || item.end_date) && (
-                  <Text style={minimalStyles.expDate}>
+                  <Text style={styles.expDate}>
                     {item.start_date && item.end_date
                       ? `${item.start_date} – ${item.end_date}`
                       : (item.start_date ?? item.end_date)}
@@ -1650,10 +1659,10 @@ function MinimalPdfDocument({
                 )}
               </View>
               {item.city && (
-                <Text style={minimalStyles.expCity}>{item.city}</Text>
+                <Text style={styles.expCity}>{item.city}</Text>
               )}
               {item.comments && (
-                <Text style={minimalStyles.expComment}>{item.comments}</Text>
+                <Text style={styles.expComment}>{item.comments}</Text>
               )}
             </View>
           ))}
@@ -1663,8 +1672,8 @@ function MinimalPdfDocument({
     if (key === "references" && data.references) {
       return (
         <View key="references">
-          <Text style={minimalStyles.mainSectionLabel}>References</Text>
-          <Text style={{ fontSize: 8, color: MINIMAL_MUTED, lineHeight: 1.5 }}>
+          <Text style={styles.mainSectionLabel}>References</Text>
+          <Text style={{ fontSize: 8 * sc, color: MINIMAL_MUTED, lineHeight: 1.5 }}>
             {data.references}
           </Text>
         </View>
@@ -1683,14 +1692,14 @@ function MinimalPdfDocument({
           <Page
             key={gi}
             size="A4"
-            style={{ ...minimalStyles.page, fontSize: 10 * pdfScale }}
+            style={styles.page}
           >
             {gi === 0 && (
               <>
-                <View style={minimalStyles.topRow}>
-                  <View style={minimalStyles.photoCol}>
+                <View style={styles.topRow}>
+                  <View style={styles.photoCol}>
                     {data.photo ? (
-                      <Image src={data.photo} style={minimalStyles.photo} />
+                      <Image src={data.photo} style={styles.photo} />
                     ) : (
                       <View
                         style={{
@@ -1712,27 +1721,27 @@ function MinimalPdfDocument({
                       </View>
                     )}
                   </View>
-                  <View style={minimalStyles.infoCol}>
-                    <Text style={minimalStyles.name}>{data.name}</Text>
+                  <View style={styles.infoCol}>
+                    <Text style={styles.name}>{data.name}</Text>
                     {data.title && (
-                      <Text style={minimalStyles.title}>{data.title}</Text>
+                      <Text style={styles.title}>{data.title}</Text>
                     )}
-                    <View style={minimalStyles.shortRule} />
+                    <View style={styles.shortRule} />
                     {data.summary && (
-                      <Text style={minimalStyles.summaryText}>
+                      <Text style={styles.summaryText}>
                         {data.summary}
                       </Text>
                     )}
                   </View>
                 </View>
-                <View style={minimalStyles.fullRule} />
+                <View style={styles.fullRule} />
               </>
             )}
-            <View style={minimalStyles.bodyRow}>
-              <View style={minimalStyles.sideCol}>
+            <View style={styles.bodyRow}>
+              <View style={styles.sideCol}>
                 {pageSidebarKeys.map((key) => renderSidebarSection(key))}
               </View>
-              <View style={minimalStyles.mainCol}>
+              <View style={styles.mainCol}>
                 {pageMainKeys.map((key) => renderMainSection(key))}
               </View>
             </View>
