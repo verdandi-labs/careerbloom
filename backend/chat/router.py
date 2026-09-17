@@ -19,6 +19,9 @@ from chat.schemas import (
 from chat.service import parse_suggestion, stream_chat
 from cv.repository import CvRepository
 from cv.service import limiter
+from career_direction.repository import CareerDirectionRepository
+from shared.crypto import decrypt, decrypt_user_key
+from shared.models.career_direction import CareerDirection
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 logger = logging.getLogger(__name__)
@@ -105,6 +108,16 @@ async def send_message(
     except Exception:
         logger.exception("Failed to load CV context for conversation")
 
+    career_direction = None
+    try:
+        cd_repo = CareerDirectionRepository(db)
+        latest_cd = await cd_repo.get_latest(user.user_id)
+        if latest_cd:
+            user_key = decrypt_user_key(user.encryption_key)
+            career_direction = decrypt(latest_cd.summary, user_key)
+    except Exception:
+        logger.exception("Failed to load career direction context")
+
     await repo.add_message(user.user_id, conversation_id, "user", body.content)
 
     history = await repo.get_messages(user.user_id, conversation_id)
@@ -114,7 +127,7 @@ async def send_message(
         full_response = ""
         try:
             async for chunk in stream_chat(
-                messages, cv_text, cover_letter=conv.is_cover_letter
+                messages, cv_text, cover_letter=conv.is_cover_letter, career_direction=career_direction
             ):
                 if chunk:
                     full_response += chunk

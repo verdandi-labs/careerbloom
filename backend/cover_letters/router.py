@@ -14,6 +14,8 @@ from cover_letters.schemas import (
     SaveCoverLetterRequest,
 )
 from cv.service import generate_cover_letter_ai, limiter
+from career_direction.repository import CareerDirectionRepository
+from shared.crypto import decrypt, decrypt_user_key
 
 router = APIRouter(prefix="/cover-letters", tags=["cover-letters"])
 logger = logging.getLogger(__name__)
@@ -28,11 +30,22 @@ async def generate_letter(
     db: AsyncSession = Depends(get_db_for_current_user),
 ):
     try:
+        career_direction = None
+        try:
+            cd_repo = CareerDirectionRepository(db)
+            latest_cd = await cd_repo.get_latest(user.user_id)
+            if latest_cd:
+                user_key = decrypt_user_key(user.encryption_key)
+                career_direction = decrypt(latest_cd.summary, user_key)
+        except Exception:
+            logger.exception("Failed to load career direction for cover letter")
+
         text = await generate_cover_letter_ai(
             body.job_title,
             body.company,
             (body.job_description or "")[:5_000],
             body.context or "",
+            career_direction=career_direction,
         )
     except Exception:
         logger.error("Cover letter generation failed", exc_info=True)

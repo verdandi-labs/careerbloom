@@ -116,7 +116,7 @@ async def translate_cv(data: CvData, language: str) -> CvData:
     return CvData.model_validate(extract_json(raw))
 
 
-async def generate_cover_letter_ai(job_title: str, company: str, job_description: str, cv_text: str) -> str:
+async def generate_cover_letter_ai(job_title: str, company: str, job_description: str, cv_text: str, career_direction: str | None = None) -> str:
     instructions = (
         "Write a warm, ATS-friendly cover letter for the position below.\n"
         "250-350 words. Open with a hook tied to the company. Avoid cliches.\n"
@@ -128,7 +128,8 @@ async def generate_cover_letter_ai(job_title: str, company: str, job_description
         job=job_description,
         cv=cv_text[:8000],
     )
-    prompt = f"{instructions}\n\n{data_block}\n\n{SAFETY_BOUNDARY}"
+    career_block = f"\n\n<career_direction>{career_direction}</career_direction>" if career_direction else ""
+    prompt = f"{instructions}\n\n{data_block}{career_block}\n\n{SAFETY_BOUNDARY}"
 
     try:
         raw = await chat_completion(
