@@ -254,3 +254,11 @@
 .fixed-bg--bare {
   background-image: url('/blossom.jpg');
 }
+
+.cv-page {
+  width: 794px;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}

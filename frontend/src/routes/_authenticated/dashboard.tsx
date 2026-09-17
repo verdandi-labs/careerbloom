@@ -99,41 +99,21 @@ function Dashboard() {
         <article className="bg-secondary/70 backdrop-blur-md flex flex-col p-6 rounded-[20px] shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)] lg:col-span-4">
           <div className="flex items-start justify-between">
             <div>
-              <h2 className="font-display text-2xl">Your CV</h2>
+              <h2 className="font-display text-2xl">
+                Improve your CV with Bloom
+              </h2>
               <p className="mt-0.5 text-xs text-foreground/70">
-                A living document
+                Chat with Bloom to tailor your CV. It will update automatically.
               </p>
             </div>
             <FileText className="h-5 w-5 text-foreground/70" />
           </div>
 
-          <div className="mt-5 flex items-end justify-between">
-            <span className="font-display text-5xl leading-none">
-              72<span className="text-xl text-foreground/50">%</span>
-            </span>
-            <div className="flex items-center gap-1 rounded-full bg-white/60 p-1 text-[10px]">
-              <button className="rounded-full bg-foreground px-2.5 py-1 text-background">
-                <Globe2 className="mr-1 inline h-3 w-3" />
-                EN
-              </button>
-              <button className="px-2.5 py-1 text-foreground/60">ES</button>
-            </div>
-          </div>
-          <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/60">
-            <div
-              className="h-full rounded-full bg-foreground"
-              style={{ width: "72%" }}
-            />
-          </div>
-          <p className="mt-2 text-[11px] text-foreground/60">
-            Last edited yesterday
-          </p>
-
           <Link
-            to="/cv"
+            to="/chat"
             className="mt-5 flex items-center justify-center gap-2 rounded-2xl bg-foreground py-3 text-sm font-medium text-background"
           >
-            Open CV Builder <ArrowUpRight className="h-4 w-4" />
+            Chat with Bloom → <ArrowUpRight className="h-4 w-4" />
           </Link>
         </article>
 

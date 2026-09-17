@@ -194,7 +194,7 @@ async def reject_suggestion(
     return await repo.mark_rejected(message)
 
 
-@router.delete("/conversations/{conversation_id}/messages/{message_id}", status_code=204)
+@router.delete("/conversations/{conversation_id}/messages/{message_id}")
 async def delete_message(
     conversation_id: UUID,
     message_id: UUID,
@@ -205,3 +205,4 @@ async def delete_message(
     deleted = await repo.delete_message(user.user_id, conversation_id, message_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Message not found")
+    return {"ok": True}

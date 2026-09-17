@@ -196,19 +196,25 @@ function ChatLayout() {
                   ) : isDeleting ? (
                     <>
                       <span className="flex-1 truncate px-1 text-xs text-foreground/70">
-                        Delete conversation?
+                        Delete?
                       </span>
                       <button
-                        onClick={() => setDeletingId(null)}
-                        className="grid h-6 w-6 place-items-center rounded-full hover:bg-white"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeletingId(null);
+                        }}
+                        className="grid h-6 w-6 place-items-center rounded-full text-xs text-foreground/40 hover:text-foreground hover:bg-white"
                       >
-                        <X className="h-3 w-3" />
+                        No
                       </button>
                       <button
-                        onClick={() => handleDelete(c.id)}
-                        className="grid h-6 w-6 place-items-center rounded-full bg-rose-50 text-rose-600 hover:bg-white"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(c.id);
+                        }}
+                        className="grid h-6 w-6 place-items-center rounded-full bg-rose-50 text-xs font-medium text-rose-500 hover:bg-rose-100"
                       >
-                        <Trash2 className="h-3 w-3" />
+                        Yes
                       </button>
                     </>
                   ) : (
@@ -244,7 +250,10 @@ function ChatLayout() {
                             <Pencil className="h-3 w-3" />
                           </button>
                           <button
-                            onClick={() => setDeletingId(c.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeletingId(c.id);
+                            }}
                             className="grid h-6 w-6 place-items-center rounded-full text-foreground/50 opacity-70 transition hover:bg-white hover:text-foreground md:opacity-0 md:group-hover:opacity-100"
                             title="Delete"
                           >
