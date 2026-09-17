@@ -891,29 +891,13 @@ function PreviewPage() {
               </button>
             )}
             <button
-              onClick={handleReset}
-              className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs text-foreground hover:bg-white"
-            >
-              Reset to saved
-            </button>
-            <button
               onClick={() => {
                 setVersionsOpen(true);
                 void fetchVersions();
               }}
               className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs text-foreground hover:bg-white"
             >
-              <BookMarked className="h-3 w-3" /> Load Saved CV
-            </button>
-            <button
-              onClick={() => {
-                setSaveModalOpen(true);
-                void fetchVersions();
-              }}
-              disabled={!cv}
-              className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs text-foreground hover:bg-white disabled:opacity-50"
-            >
-              <Save className="h-3 w-3" /> Save CV
+              <BookMarked className="h-3 w-3" /> Saved CVs
             </button>
           </div>
         </div>
@@ -1025,6 +1009,22 @@ function PreviewPage() {
             <p className="text-sm text-foreground/50">
               You can save up to 6 CV versions. {versions.length} / 6 saved.
             </p>
+            <button
+              onClick={() => {
+                setSaveModalOpen(true);
+                void fetchVersions();
+              }}
+              disabled={!cv}
+              className="w-full rounded-full bg-foreground px-4 py-2 text-xs text-background hover:opacity-80 transition disabled:opacity-50"
+            >
+              <Save className="h-3 w-3 inline" /> Save CV
+            </button>
+            <button
+              onClick={handleReset}
+              className="w-full rounded-full border border-foreground/10 px-4 py-2 text-xs text-foreground/60 hover:border-foreground/30 hover:text-foreground transition"
+            >
+              Reset to saved
+            </button>
             {versionsLoading ? (
               <div className="flex justify-center py-8">
                 <Loader2 className="h-5 w-5 animate-spin text-foreground/30" />
