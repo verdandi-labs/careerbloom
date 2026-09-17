@@ -10,7 +10,11 @@ export function PageBreakLabel({ top }: PageBreakLabelProps) {
       <div className="cv-page-break-label__inner">
         <div className="cv-page-break-label__rule" />
         <div className="cv-page-break-label__center">
-          <img src="/logo_bw.png" alt="" className="cv-page-break-label__logo" />
+          <img
+            src="/logo_bw.png"
+            alt=""
+            className="cv-page-break-label__logo"
+          />
           <span className="cv-page-break-label__text">Page Break</span>
         </div>
         <div className="cv-page-break-label__rule" />

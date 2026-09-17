@@ -315,9 +315,7 @@ function TerracottaPdfDocument({
               <View key={i} style={styles.experienceItem}>
                 <View style={styles.expHeader}>
                   <View>
-                    <Text style={styles.expCompany}>
-                      {item.company}
-                    </Text>
+                    <Text style={styles.expCompany}>{item.company}</Text>
                     {item.city && (
                       <Text style={styles.expCity}>{item.city}</Text>
                     )}
@@ -331,9 +329,7 @@ function TerracottaPdfDocument({
                   )}
                 </View>
                 {item.comments && (
-                  <Text style={styles.expComments}>
-                    {item.comments}
-                  </Text>
+                  <Text style={styles.expComments}>{item.comments}</Text>
                 )}
               </View>
             ))}
@@ -351,11 +347,7 @@ function TerracottaPdfDocument({
         const pageSidebarKeys = pageKeys.filter((k) => sidebarKeys.includes(k));
         const pageMainKeys = pageKeys.filter((k) => mainKeys.includes(k));
         return (
-          <Page
-            key={gi}
-            size="A4"
-            style={styles.page}
-          >
+          <Page key={gi} size="A4" style={styles.page}>
             <View style={styles.sidebar}>
               {gi === 0 && (
                 <View
@@ -632,9 +624,7 @@ function SagePdfDocument({
               <View style={styles.expHeader}>
                 <View>
                   <Text style={styles.expCompany}>{item.company}</Text>
-                  {item.city && (
-                    <Text style={styles.expCity}>{item.city}</Text>
-                  )}
+                  {item.city && <Text style={styles.expCity}>{item.city}</Text>}
                 </View>
                 {(item.start_date || item.end_date) && (
                   <Text style={styles.dateBadge}>
@@ -662,9 +652,7 @@ function SagePdfDocument({
               <View style={styles.expHeader}>
                 <View>
                   <Text style={styles.eduCenter}>{item.edu_center}</Text>
-                  {item.city && (
-                    <Text style={styles.eduSub}>{item.city}</Text>
-                  )}
+                  {item.city && <Text style={styles.eduSub}>{item.city}</Text>}
                 </View>
                 {(item.start_date || item.end_date) && (
                   <Text style={styles.dateBadge}>
@@ -692,11 +680,7 @@ function SagePdfDocument({
         const pageSidebarKeys = pageKeys.filter((k) => sidebarKeys.includes(k));
         const pageMainKeys = pageKeys.filter((k) => mainKeys.includes(k));
         return (
-          <Page
-            key={gi}
-            size="A4"
-            style={styles.page}
-          >
+          <Page key={gi} size="A4" style={styles.page}>
             {gi === 0 && (
               <View style={styles.header}>
                 <Text style={styles.cvLabel}>Curriculum Vitae</Text>
@@ -907,9 +891,7 @@ function ClassicPdfDocument({
                   </Text>
                 )}
               </View>
-              {item.city && (
-                <Text style={styles.expCompany}>{item.city}</Text>
-              )}
+              {item.city && <Text style={styles.expCompany}>{item.city}</Text>}
               {item.comments && (
                 <Text style={styles.expComment}>{item.comments}</Text>
               )}
@@ -940,9 +922,7 @@ function ClassicPdfDocument({
                   </Text>
                 )}
               </View>
-              {item.city && (
-                <Text style={styles.expCompany}>{item.city}</Text>
-              )}
+              {item.city && <Text style={styles.expCompany}>{item.city}</Text>}
             </View>
           ))}
         </View>
@@ -984,11 +964,7 @@ function ClassicPdfDocument({
       {groups.map((group, gi) => {
         if (!groupHasContent(group, data)) return null;
         return (
-          <Page
-            key={gi}
-            size="A4"
-            style={styles.page}
-          >
+          <Page key={gi} size="A4" style={styles.page}>
             {gi === 0 && (
               <>
                 <Text style={styles.name}>{data.name}</Text>
@@ -1000,9 +976,7 @@ function ClassicPdfDocument({
                 {data.summary && (
                   <View style={{ marginBottom: 20 }}>
                     <Text style={styles.sectionLabel}>Profile</Text>
-                    <Text style={styles.summaryText}>
-                      {data.summary}
-                    </Text>
+                    <Text style={styles.summaryText}>{data.summary}</Text>
                   </View>
                 )}
                 <View style={styles.rule} />
@@ -1206,9 +1180,7 @@ function BoldPdfDocument({
           <Text style={styles.sectionLabel}>Languages</Text>
           {data.languages.map((item, i) => (
             <View key={i} style={styles.languageRow}>
-              <Text style={styles.languageName}>
-                {item.language}
-              </Text>
+              <Text style={styles.languageName}>{item.language}</Text>
               <View style={{ flexDirection: "row", gap: 3 }}>
                 {Array.from({ length: 5 }).map((_, di) => {
                   const map: Record<string, number> = {
@@ -1297,7 +1269,9 @@ function BoldPdfDocument({
       return (
         <View key="references">
           <Text style={styles.sectionLabel}>References</Text>
-          <Text style={{ fontSize: 8 * sc, color: BOLD_MUTED, lineHeight: 1.5 }}>
+          <Text
+            style={{ fontSize: 8 * sc, color: BOLD_MUTED, lineHeight: 1.5 }}
+          >
             {data.references}
           </Text>
         </View>
@@ -1658,9 +1632,7 @@ function MinimalPdfDocument({
                   </Text>
                 )}
               </View>
-              {item.city && (
-                <Text style={styles.expCity}>{item.city}</Text>
-              )}
+              {item.city && <Text style={styles.expCity}>{item.city}</Text>}
               {item.comments && (
                 <Text style={styles.expComment}>{item.comments}</Text>
               )}
@@ -1673,7 +1645,9 @@ function MinimalPdfDocument({
       return (
         <View key="references">
           <Text style={styles.mainSectionLabel}>References</Text>
-          <Text style={{ fontSize: 8 * sc, color: MINIMAL_MUTED, lineHeight: 1.5 }}>
+          <Text
+            style={{ fontSize: 8 * sc, color: MINIMAL_MUTED, lineHeight: 1.5 }}
+          >
             {data.references}
           </Text>
         </View>
@@ -1689,11 +1663,7 @@ function MinimalPdfDocument({
         const pageSidebarKeys = pageKeys.filter((k) => sidebarKeys.includes(k));
         const pageMainKeys = pageKeys.filter((k) => mainKeys.includes(k));
         return (
-          <Page
-            key={gi}
-            size="A4"
-            style={styles.page}
-          >
+          <Page key={gi} size="A4" style={styles.page}>
             {gi === 0 && (
               <>
                 <View style={styles.topRow}>
@@ -1728,9 +1698,7 @@ function MinimalPdfDocument({
                     )}
                     <View style={styles.shortRule} />
                     {data.summary && (
-                      <Text style={styles.summaryText}>
-                        {data.summary}
-                      </Text>
+                      <Text style={styles.summaryText}>{data.summary}</Text>
                     )}
                   </View>
                 </View>
