@@ -161,8 +161,7 @@ function Dashboard() {
             const id = await getOrCreateCareerDirection();
             if (id)
               navigate({
-                to: "/chat/$conversationId",
-                params: { conversationId: id },
+                to: "/career-direction",
               });
           }}
           className="group relative flex flex-col justify-between overflow-hidden rounded-[20px] border border-white/40 bg-white/30 p-6 text-left backdrop-blur-xl shadow-[0_16px_40px_-18px_rgba(248,175,166,0.6)] transition hover:bg-white/40 lg:col-span-8 min-h-[200px]"

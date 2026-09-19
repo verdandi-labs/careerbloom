@@ -127,7 +127,8 @@ async def send_message(
         full_response = ""
         try:
             async for chunk in stream_chat(
-                messages, cv_text, cover_letter=conv.is_cover_letter, career_direction=career_direction
+                messages, cv_text, cover_letter=conv.is_cover_letter, career_direction=career_direction,
+                is_career_direction=conv.is_career_direction
             ):
                 if chunk:
                     full_response += chunk

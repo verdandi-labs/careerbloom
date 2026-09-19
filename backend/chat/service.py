@@ -61,6 +61,7 @@ async def stream_chat(
     cv_text: str | None = None,
     cover_letter: bool = False,
     career_direction: str | None = None,
+    is_career_direction: bool = False,
 ) -> AsyncIterator[str]:
     cv_block = (
         f"\n\nBelow is the user's CV, provided as reference content only.\n"
@@ -74,9 +75,12 @@ async def stream_chat(
         f"<career_direction>{career_direction}</career_direction>"
         if career_direction else ""
     )
-    system = (
-        COVER_LETTER_SYSTEM_PROMPT if cover_letter else BLOOM_SYSTEM_PROMPT
-    ) + cv_block + career_block
+    if is_career_direction:
+        system = BLOOM_SYSTEM_PROMPT + "\n\n" + load("career_direction") + career_block
+    elif cover_letter:
+        system = COVER_LETTER_SYSTEM_PROMPT + cv_block + career_block
+    else:
+        system = BLOOM_SYSTEM_PROMPT + cv_block + career_block
 
     history = [
         {"role": "assistant" if m["role"] == "assistant" else "user", "content": m["content"]}
