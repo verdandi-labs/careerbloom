@@ -25,3 +25,8 @@ dependencies = [
     "docx2python>=3.7.1",
     "pypdfium2>=5.12.1",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.16.8",
+]
