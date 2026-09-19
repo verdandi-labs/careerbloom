@@ -1,12 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import {
   CoverLetterSuggestionCard,
   type CoverLetterSuggestion,
 } from "@/components/CoverLetterSuggestionCard";
-import { API_BASE, ApiError, api, apiStream, errorMessage } from "@/lib/api";
+import { API_BASE, ApiError, api, errorMessage } from "@/lib/api";
+import { useChat, type MessagePayload } from "@/hooks/useChat";
 import {
   createCoverLetterConversation,
   listCoverLetterConversations,
@@ -38,15 +39,6 @@ type Suggestion = {
 
 type MsgSuggestion = Suggestion | CoverLetterSuggestion;
 
-type MessagePayload = {
-  id: string;
-  role: string;
-  content: string;
-  suggestion: MsgSuggestion | null;
-  applied_text: string | null;
-  rejected: boolean;
-};
-
 type Msg = {
   id?: string;
   role: "user" | "assistant";
@@ -65,6 +57,17 @@ type Letter = {
 
 const GREETING =
   "Hi! I'm Bloom 🌸 Let's work on your cover letter. What role are you applying for, and which company?";
+
+function mapMessage(p: MessagePayload): Msg {
+  return {
+    id: p.id,
+    role: p.role as "user" | "assistant",
+    content: p.content,
+    suggestion: (p.suggestion as MsgSuggestion) ?? null,
+    applied_text: p.applied_text,
+    rejected: p.rejected,
+  };
+}
 
 async function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -316,61 +319,25 @@ function ConversationView({
   savedCount: number;
 }) {
   const qc = useQueryClient();
-  const [messages, setMessages] = useState<Msg[]>([]);
-  const [loaded, setLoaded] = useState(false);
-  const [loadError, setLoadError] = useState("");
-  const [retryKey, setRetryKey] = useState(0);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [listErr, setListErr] = useState("");
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    setLoaded(false);
-    setMessages([]);
-    setLoadError("");
-    (async () => {
-      try {
-        const msgs = await api<MessagePayload[]>(
-          `/chat/conversations/${conversationId}/messages`,
-        );
-        const loadedMsgs: Msg[] = (msgs ?? []).map((r) => ({
-          id: r.id,
-          role: r.role as "user" | "assistant",
-          content: r.content,
-          suggestion: r.suggestion,
-          applied_text: r.applied_text,
-          rejected: r.rejected,
-        }));
-        if (loadedMsgs.length === 0) {
-          loadedMsgs.push({
-            role: "assistant",
-            content: GREETING,
-            suggestion: null,
-            applied_text: null,
-            rejected: false,
-          });
-        }
-        setMessages(loadedMsgs);
-      } catch (e) {
-        setLoadError(errorMessage(e, "Couldn't load messages, please refresh"));
-      }
-      setLoaded(true);
-    })();
-  }, [conversationId, retryKey]);
-
-  useEffect(() => {
-    scrollRef.current?.scrollTo({
-      top: scrollRef.current.scrollHeight,
-      behavior: "smooth",
-    });
-  }, [messages, loading]);
-
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, [loading, conversationId]);
+  const {
+    messages,
+    setMessages,
+    input,
+    setInput,
+    send,
+    isStreaming,
+    loaded,
+    loadError,
+    scrollRef,
+    inputRef,
+  } = useChat<Msg>({
+    conversationId,
+    greeting: GREETING,
+    mapMessage,
+  });
 
   async function removeMessage(id: string) {
     setDeleting(id);
@@ -402,142 +369,6 @@ function ConversationView({
     } catch {
       return false;
     }
-  }
-
-  async function sendText(text: string): Promise<void> {
-    const clean = text.trim();
-    if (!clean || loading) return;
-    setInput("");
-    const preSendCount = messages.filter((m) => m.id).length;
-    const userMsg: Msg = {
-      role: "user",
-      content: clean,
-      suggestion: null,
-      applied_text: null,
-      rejected: false,
-    };
-    setMessages((prev) => [...prev, userMsg]);
-    setLoading(true);
-
-    try {
-      const stream = await apiStream(
-        `/chat/conversations/${conversationId}/messages`,
-        { method: "POST", json: { content: clean } },
-      );
-
-      const reader = stream.getReader();
-      const decoder = new TextDecoder();
-      let buf = "";
-      let assistant = "";
-      let streamFailed = false;
-      setMessages((m) => [
-        ...m,
-        {
-          role: "assistant",
-          content: "",
-          suggestion: null,
-          applied_text: null,
-          rejected: false,
-        },
-      ]);
-
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        buf += decoder.decode(value, { stream: true });
-        const lines = buf.split("\n");
-        buf = lines.pop() ?? "";
-        for (const line of lines) {
-          const l = line.trim();
-          if (!l.startsWith("data:")) continue;
-          const data = l.slice(5).trim();
-          if (data === "[DONE]") continue;
-          try {
-            const json = JSON.parse(data);
-            if (json.error) {
-              streamFailed = true;
-              setMessages((m) => {
-                const copy = [...m];
-                copy[copy.length - 1] = {
-                  role: "assistant",
-                  content: errorMessage(
-                    json.error,
-                    "Response interrupted, please try sending that again",
-                  ),
-                  suggestion: null,
-                  applied_text: null,
-                  rejected: false,
-                };
-                return copy;
-              });
-              continue;
-            }
-            if (json.content) {
-              assistant += json.content;
-              setMessages((m) => {
-                const copy = [...m];
-                copy[copy.length - 1] = {
-                  role: "assistant",
-                  content: assistant,
-                  suggestion: null,
-                  applied_text: null,
-                  rejected: false,
-                };
-                return copy;
-              });
-            }
-          } catch {
-            /* skip */
-          }
-        }
-      }
-
-      if (streamFailed) {
-        throw new Error("Stream failed");
-      }
-
-      try {
-        const msgs = await api<MessagePayload[]>(
-          `/chat/conversations/${conversationId}/messages`,
-        );
-        if (!msgs || msgs.length < preSendCount + 2) return;
-        const last = msgs?.[msgs.length - 1];
-        if (last?.id) {
-          setMessages((m) => {
-            const copy = [...m];
-            copy[copy.length - 1] = {
-              id: last.id,
-              role: "assistant",
-              content: last.content,
-              suggestion: last.suggestion,
-              applied_text: last.applied_text,
-              rejected: last.rejected,
-            };
-            return copy;
-          });
-        }
-      } catch {
-        /* keep the streamed text as-is */
-      }
-    } catch (e) {
-      setMessages((m) => [
-        ...m,
-        {
-          role: "assistant",
-          content: errorMessage(e, "Couldn't send message, please try again"),
-          suggestion: null,
-          applied_text: null,
-          rejected: false,
-        },
-      ]);
-      throw e;
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function send() {
-    void sendText(input);
   }
 
   return (
@@ -572,12 +403,6 @@ function ConversationView({
         {loaded && loadError && (
           <div className="flex flex-col items-center gap-3 py-10 text-center">
             <p className="text-sm text-foreground/70">{loadError}</p>
-            <button
-              onClick={() => setRetryKey((k) => k + 1)}
-              className="rounded-full bg-white/75 px-4 py-2 text-xs hover:bg-white"
-            >
-              Try again
-            </button>
           </div>
         )}
         {listErr && (
@@ -609,9 +434,7 @@ function ConversationView({
                   <CoverLetterSuggestionCard
                     suggestion={m.suggestion}
                     onSave={saveLetter}
-                    onDislike={() =>
-                      sendText("I don't like any of these options.")
-                    }
+                    onDislike={() => send("I don't like any of these options.")}
                     savedCount={savedCount}
                   />
                 )}
@@ -641,7 +464,7 @@ function ConversationView({
             )}
           </div>
         ))}
-        {loading && messages[messages.length - 1]?.role === "user" && (
+        {isStreaming && messages[messages.length - 1]?.role === "user" && (
           <div className="flex items-center gap-2 text-xs text-foreground/50">
             <Loader2 className="h-3 w-3 animate-spin" /> Bloom is thinking…
           </div>
@@ -659,13 +482,13 @@ function ConversationView({
           ref={inputRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          disabled={loading}
+          disabled={isStreaming}
           className="flex-1 bg-transparent text-base outline-none placeholder:text-foreground/40 disabled:opacity-60"
           placeholder="Which role are you applying for?"
         />
         <button
           type="submit"
-          disabled={loading || !input.trim()}
+          disabled={isStreaming || !input.trim()}
           className="grid h-10 w-10 place-items-center rounded-full bg-secondary text-secondary-foreground disabled:opacity-50"
         >
           <Send className="h-4 w-4" />

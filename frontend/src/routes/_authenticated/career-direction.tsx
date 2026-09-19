@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
-import { api, apiStream, ApiError, errorMessage } from "@/lib/api";
+import { api, ApiError, errorMessage } from "@/lib/api";
+import { useChat, type MessagePayload } from "@/hooks/useChat";
 import { Compass, Loader2, Send, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/career-direction")({
@@ -16,30 +17,25 @@ type CareerDirection = {
   created_at: string;
 };
 
-type MessagePayload = {
-  id: string;
-  role: string;
-  content: string;
-};
-
 type Msg = {
   id?: string;
   role: "user" | "assistant";
   content: string;
 };
 
+function mapMessage(p: MessagePayload): Msg {
+  return {
+    id: p.id,
+    role: p.role as "user" | "assistant",
+    content: p.content,
+  };
+}
+
 function CareerDirectionPage() {
   const qc = useQueryClient();
   const [conversationId, setConversationId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<Msg[]>([]);
-  const [loaded, setLoaded] = useState(false);
-  const [loadError, setLoadError] = useState("");
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [saveErr, setSaveErr] = useState("");
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const {
     data: current,
@@ -60,44 +56,28 @@ function CareerDirectionPage() {
           "/chat/conversations/career-direction",
         );
         setConversationId(conv.id);
-        const msgs = await api<MessagePayload[]>(
-          `/chat/conversations/${conv.id}/messages`,
-        );
-        const loaded: Msg[] = (msgs ?? []).map((r) => ({
-          id: r.id,
-          role: r.role as "user" | "assistant",
-          content: r.content,
-        }));
-        if (loaded.length === 0) {
-          loaded.push({
-            role: "assistant",
-            content:
-              "Hi, I'm Bloom your career companion. Tell me a little about where you are and where you'd like to go.",
-          });
-        }
-        setMessages(loaded);
-      } catch (e) {
-        setLoadError(
-          errorMessage(
-            e,
-            "Couldn't load career direction chat, please refresh",
-          ),
-        );
+      } catch {
+        /* conversationId stays null, hook won't load */
       }
-      setLoaded(true);
     })();
   }, []);
 
-  useEffect(() => {
-    scrollRef.current?.scrollTo({
-      top: scrollRef.current.scrollHeight,
-      behavior: "smooth",
-    });
-  }, [messages, loading]);
-
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, [conversationId]);
+  const {
+    messages,
+    input,
+    setInput,
+    send,
+    isStreaming,
+    loaded,
+    loadError,
+    scrollRef,
+    inputRef,
+  } = useChat<Msg>({
+    conversationId,
+    greeting:
+      "Hi, I'm Bloom your career companion. Tell me a little about where you are and where you'd like to go.",
+    mapMessage,
+  });
 
   async function saveAsCareerDirection(content: string) {
     if (!conversationId) return;
@@ -120,109 +100,6 @@ function CareerDirectionPage() {
       );
     } finally {
       setSavingId(null);
-    }
-  }
-
-  async function send() {
-    const text = input.trim();
-    if (!text || loading || !conversationId) return;
-    setInput("");
-    const preSendCount = messages.filter((m) => m.id).length;
-    const userMsg: Msg = { role: "user", content: text };
-    const next: Msg[] = [...messages, userMsg];
-    setMessages(next);
-    setLoading(true);
-
-    try {
-      const stream = await apiStream(
-        `/chat/conversations/${conversationId}/messages`,
-        { method: "POST", json: { content: text } },
-      );
-
-      const reader = stream.getReader();
-      const decoder = new TextDecoder();
-      let buf = "";
-      let assistant = "";
-      let streamFailed = false;
-      setMessages((m) => [...m, { role: "assistant", content: "" }]);
-
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        buf += decoder.decode(value, { stream: true });
-        const lines = buf.split("\n");
-        buf = lines.pop() ?? "";
-        for (const line of lines) {
-          const l = line.trim();
-          if (!l.startsWith("data:")) continue;
-          const data = l.slice(5).trim();
-          if (data === "[DONE]") continue;
-          try {
-            const json = JSON.parse(data);
-            if (json.error) {
-              streamFailed = true;
-              setMessages((m) => {
-                const copy = [...m];
-                copy[copy.length - 1] = {
-                  role: "assistant",
-                  content: errorMessage(
-                    json.error,
-                    "Response interrupted, please try sending that again",
-                  ),
-                };
-                return copy;
-              });
-              continue;
-            }
-            if (json.content) {
-              assistant += json.content;
-              setMessages((m) => {
-                const copy = [...m];
-                copy[copy.length - 1] = {
-                  role: "assistant",
-                  content: assistant,
-                };
-                return copy;
-              });
-            }
-          } catch {
-            /* skip */
-          }
-        }
-      }
-
-      if (streamFailed) return;
-
-      try {
-        const msgs = await api<MessagePayload[]>(
-          `/chat/conversations/${conversationId}/messages`,
-        );
-        if (!msgs || msgs.length < preSendCount + 2) return;
-        const last = msgs[msgs.length - 1];
-        if (last?.id) {
-          setMessages((m) => {
-            const copy = [...m];
-            copy[copy.length - 1] = {
-              id: last.id,
-              role: "assistant",
-              content: last.content,
-            };
-            return copy;
-          });
-        }
-      } catch {
-        /* keep the streamed text as-is */
-      }
-    } catch (e) {
-      setMessages((m) => [
-        ...m,
-        {
-          role: "assistant",
-          content: errorMessage(e, "Couldn't send message, please try again"),
-        },
-      ]);
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -315,7 +192,7 @@ function CareerDirectionPage() {
                 </div>
               </div>
             ))}
-            {loading && messages[messages.length - 1]?.role === "user" && (
+            {isStreaming && messages[messages.length - 1]?.role === "user" && (
               <div className="flex items-center gap-1 text-sm text-pink-300 animate-pulse">
                 Thinking...
               </div>
@@ -333,13 +210,13 @@ function CareerDirectionPage() {
               ref={inputRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              disabled={loading || !conversationId}
+              disabled={isStreaming || !conversationId}
               className="flex-1 bg-transparent text-base outline-none placeholder:text-foreground/40 disabled:opacity-60"
               placeholder="Tell me about your career goals..."
             />
             <button
               type="submit"
-              disabled={loading || !input.trim() || !conversationId}
+              disabled={isStreaming || !input.trim() || !conversationId}
               className="grid h-10 w-10 place-items-center rounded-full bg-secondary text-secondary-foreground disabled:opacity-50"
             >
               <Send className="h-4 w-4" />
