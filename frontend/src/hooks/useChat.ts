@@ -21,13 +21,14 @@ interface UseChatOptions<T> {
 }
 
 export function useChat<
-  T extends { id?: string; role: string; content: string },
+  T extends { id?: string; role: string; content: string; isError?: boolean },
 >({ conversationId, greeting, mapMessage, onStreamEnd }: UseChatOptions<T>) {
   const [messages, setMessages] = useState<T[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [loadError, setLoadError] = useState("");
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
+  const [lastFailedInput, setLastFailedInput] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -105,6 +106,7 @@ export function useChat<
               const json = JSON.parse(data);
               if (json.error) {
                 streamFailed = true;
+                setLastFailedInput(msg);
                 setMessages((m) => {
                   const copy = [...m];
                   copy[copy.length - 1] = {
@@ -113,6 +115,7 @@ export function useChat<
                       json.error,
                       "Response interrupted, please try sending that again",
                     ),
+                    isError: true,
                   } as T;
                   return copy;
                 });
@@ -137,6 +140,8 @@ export function useChat<
 
         if (streamFailed) return;
 
+        setLastFailedInput(null);
+
         try {
           const msgs = await api<MessagePayload[]>(
             `/chat/conversations/${conversationId}/messages`,
@@ -155,11 +160,13 @@ export function useChat<
           /* keep the streamed text as-is */
         }
       } catch (e) {
+        setLastFailedInput(msg);
         setMessages((m) => [
           ...m,
           {
             role: "assistant",
             content: errorMessage(e, "Couldn't send message, please try again"),
+            isError: true,
           } as T,
         ]);
       } finally {
@@ -168,6 +175,16 @@ export function useChat<
     },
     [input, isStreaming, conversationId, messages, mapMessage, onStreamEnd],
   );
+
+  const retry = useCallback(() => {
+    if (!lastFailedInput) return;
+    setMessages((prev) => {
+      const last = prev[prev.length - 1];
+      if (last?.isError) return prev.slice(0, -1);
+      return prev;
+    });
+    void send(lastFailedInput);
+  }, [lastFailedInput, send]);
 
   return {
     messages,
@@ -180,5 +197,7 @@ export function useChat<
     loadError,
     scrollRef,
     inputRef,
+    lastFailedInput,
+    retry,
   };
 }

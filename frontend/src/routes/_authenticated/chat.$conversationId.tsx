@@ -25,6 +25,7 @@ type Msg = {
   suggestion: Suggestion | null;
   applied_text: string | null;
   rejected: boolean;
+  isError?: boolean;
 };
 
 function mapMessage(p: MessagePayload): Msg {
@@ -62,6 +63,7 @@ function ConversationPage() {
     loadError,
     scrollRef,
     inputRef,
+    retry,
   } = useChat<Msg>({
     conversationId,
     greeting:
@@ -228,6 +230,16 @@ function ConversationPage() {
             </div>
           </div>
         ))}
+        {!isStreaming &&
+          messages.length > 0 &&
+          messages[messages.length - 1]?.isError && (
+            <button
+              onClick={retry}
+              className="rounded-full bg-white/75 px-4 py-2 text-xs hover:bg-white"
+            >
+              Retry
+            </button>
+          )}
         {isStreaming && messages[messages.length - 1]?.role === "user" && (
           <div className="flex items-center gap-1 text-sm text-pink-300 animate-pulse">
             ✨ Thinking...

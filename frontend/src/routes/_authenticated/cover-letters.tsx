@@ -46,6 +46,7 @@ type Msg = {
   suggestion: MsgSuggestion | null;
   applied_text: string | null;
   rejected: boolean;
+  isError?: boolean;
 };
 
 type Letter = {
@@ -333,6 +334,7 @@ function ConversationView({
     loadError,
     scrollRef,
     inputRef,
+    retry,
   } = useChat<Msg>({
     conversationId,
     greeting: GREETING,
@@ -464,6 +466,16 @@ function ConversationView({
             )}
           </div>
         ))}
+        {!isStreaming &&
+          messages.length > 0 &&
+          messages[messages.length - 1]?.isError && (
+            <button
+              onClick={retry}
+              className="rounded-full bg-white/75 px-4 py-2 text-xs hover:bg-white"
+            >
+              Retry
+            </button>
+          )}
         {isStreaming && messages[messages.length - 1]?.role === "user" && (
           <div className="flex items-center gap-2 text-xs text-foreground/50">
             <Loader2 className="h-3 w-3 animate-spin" /> Bloom is thinking…
