@@ -112,6 +112,13 @@ class ChatRepository:
         await self.db.flush()
         return True
 
+    async def delete_conversation(self, user_id: UUID, conversation_id: UUID) -> None:
+        conv = await self.get_conversation(user_id, conversation_id)
+        if conv is None:
+            raise ValueError("not_found")
+        await self.db.delete(conv)
+        await self.db.flush()
+
     async def mark_applied(self, message: ChatMessage, applied_text: str) -> ChatMessage:
         message.applied_text = applied_text
         await self.db.flush()

@@ -220,3 +220,18 @@ async def delete_message(
     if not deleted:
         raise HTTPException(status_code=404, detail="Message not found")
     return {"ok": True}
+
+
+@router.delete("/conversations/{conversation_id}", status_code=204)
+async def delete_conversation(
+    conversation_id: UUID,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db_for_current_user),
+):
+    repo = ChatRepository(db)
+    conv = await repo.get_conversation(user.user_id, conversation_id)
+    if conv is None:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    if conv.is_career_direction:
+        raise HTTPException(status_code=403, detail="Career direction conversations cannot be deleted")
+    await repo.delete_conversation(user.user_id, conversation_id)

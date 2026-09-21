@@ -90,11 +90,11 @@ function ChatLayout() {
   }
 
   async function handleDelete(id: string) {
-    await api(`/chat/conversations/${id}`, { method: "DELETE" });
-    const remaining = convs.filter((c) => c.id !== id);
-    setConvs(remaining);
+    const snapshot = convs.find((c) => c.id === id);
+    setConvs((prev) => prev.filter((c) => c.id !== id));
     setDeletingId(null);
     if (activeId === id) {
+      const remaining = convs.filter((c) => c.id !== id);
       if (remaining[0]) {
         navigate({
           to: "/chat/$conversationId",
@@ -104,6 +104,13 @@ function ChatLayout() {
       } else {
         navigate({ to: "/chat", replace: true });
       }
+    }
+    try {
+      await api(`/chat/conversations/${id}`, { method: "DELETE" });
+    } catch {
+      if (snapshot) setConvs((prev) => [...prev, snapshot]);
+      setDeletingId(null);
+      setListError("Couldn't delete conversation, please try again");
     }
   }
 
