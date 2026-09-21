@@ -21,10 +21,9 @@ BLOOM_SYSTEM_PROMPT = (
 
 
 COVER_LETTER_SYSTEM_PROMPT = (
-    load("cover_letter")
-    .strip()
+    BLOOM_SYSTEM_PROMPT
     + "\n\n"
-    + SAFETY_BOUNDARY
+    + load("cover_letter")
     + "\n\n"
     + CHAT_APPLY_RULE
 )
