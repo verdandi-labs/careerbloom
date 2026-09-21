@@ -31,14 +31,6 @@ COVER_LETTER_SYSTEM_PROMPT = (
 
 
 def parse_suggestion(full_response: str) -> tuple[str, dict | None]:
-    """Extract and validate a suggestion block from raw model output.
-    Mirrors the frontend's detection pattern (fenced ```json block, or the
-    whole response if no fence is present) but applies stricter server-side
-    validation via ChatSuggestion before trusting the result — this is
-    intentionally stricter than the frontend's loose shape-check.
-    If a block is detected but fails validation, the raw text is returned
-    untouched (including the visible block) rather than silently discarded,
-    so validation failures stay visible/debuggable instead of hidden."""
     match = _SUGGESTION_BLOCK_RE.search(full_response)
     raw_text = match.group(1) if match else full_response
     try:
@@ -80,7 +72,7 @@ async def stream_chat(
     elif cover_letter:
         system = COVER_LETTER_SYSTEM_PROMPT + cv_block + career_block
     else:
-        system = BLOOM_SYSTEM_PROMPT + cv_block + career_block
+        system = BLOOM_SYSTEM_PROMPT + "\n\n" + load("cv") + cv_block + career_block
 
     history = [
         {"role": "assistant" if m["role"] == "assistant" else "user", "content": m["content"]}
