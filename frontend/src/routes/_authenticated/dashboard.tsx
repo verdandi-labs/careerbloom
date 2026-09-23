@@ -88,7 +88,7 @@ function Dashboard() {
               <Sparkles className="h-4 w-4" /> Talk to your coach
             </Link>
             <Link
-              to="/cv"
+              to="/cv-editor"
               className="inline-flex items-center gap-2 rounded-full bg-secondary px-5 py-2.5 text-sm text-secondary-foreground"
             >
               Open CV Builder <ArrowUpRight className="h-4 w-4" />
