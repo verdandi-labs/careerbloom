@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { CvUploadModal } from "@/components/CvUploadModal";
 
-export const Route = createFileRoute("/_authenticated/cv2")({
+export const Route = createFileRoute("/_authenticated/cv-editor")({
   head: () => ({ meta: [{ title: "CV Builder · careerBloom" }] }),
   component: CVPage,
 });
