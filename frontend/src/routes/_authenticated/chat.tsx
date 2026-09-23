@@ -9,7 +9,7 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { api, errorMessage } from "@/lib/api";
-import { createConversation } from "@/lib/chat";
+import { createConversation, deleteConversation } from "@/lib/chat";
 import {
   MessageCircleHeart,
   Plus,
@@ -106,7 +106,7 @@ function ChatLayout() {
       }
     }
     try {
-      await api(`/chat/conversations/${id}`, { method: "DELETE" });
+      await deleteConversation(id);
     } catch {
       if (snapshot) setConvs((prev) => [...prev, snapshot]);
       setDeletingId(null);
