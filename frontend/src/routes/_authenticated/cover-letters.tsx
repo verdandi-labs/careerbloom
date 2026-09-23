@@ -6,10 +6,11 @@ import {
   CoverLetterSuggestionCard,
   type CoverLetterSuggestion,
 } from "@/components/CoverLetterSuggestionCard";
-import { API_BASE, ApiError, api, errorMessage } from "@/lib/api";
+import { API_BASE, api, errorMessage } from "@/lib/api";
 import { useChat, type MessagePayload } from "@/hooks/useChat";
 import {
   createCoverLetterConversation,
+  deleteConversation,
   listCoverLetterConversations,
   type ConversationSummary,
 } from "@/lib/chat";
@@ -94,6 +95,7 @@ function CoverLettersPage() {
   });
 
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [deletingConvId, setDeletingConvId] = useState<string | null>(null);
   const [exporting, setExporting] = useState<string | null>(null);
   const [actionErr, setActionErr] = useState("");
   const [creating, setCreating] = useState(false);
@@ -275,9 +277,8 @@ function CoverLettersPage() {
           {conversations && conversations.length > 0 ? (
             <section className="mt-4 grid grid-cols-1 gap-3">
               {conversations.map((c) => (
-                <button
+                <div
                   key={c.id}
-                  onClick={() => resume(c)}
                   className="glass flex items-center gap-3 p-5 text-left transition hover:bg-white/60"
                 >
                   <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-secondary text-secondary-foreground">
@@ -293,8 +294,58 @@ function CoverLettersPage() {
                       })}
                     </p>
                   </div>
-                  <span className="text-xs text-foreground/40">Resume</span>
-                </button>
+                  {deletingConvId === c.id ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-foreground/60">
+                        Delete?
+                      </span>
+                      <button
+                        onClick={() => setDeletingConvId(null)}
+                        className="text-xs text-foreground/40 hover:text-foreground"
+                      >
+                        No
+                      </button>
+                      <button
+                        onClick={async () => {
+                          setActionErr("");
+                          try {
+                            await deleteConversation(c.id);
+                            setDeletingConvId(null);
+                            void qc.invalidateQueries({
+                              queryKey: ["cover-letter-conversations"],
+                            });
+                          } catch (e) {
+                            setActionErr(
+                              errorMessage(
+                                e,
+                                "Couldn't delete conversation, please try again",
+                              ),
+                            );
+                          }
+                        }}
+                        className="text-xs font-medium text-rose-500 hover:text-rose-700"
+                      >
+                        Yes
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => resume(c)}
+                        className="text-xs text-foreground/40 hover:text-foreground"
+                      >
+                        Resume
+                      </button>
+                      <button
+                        onClick={() => setDeletingConvId(c.id)}
+                        className="grid h-8 w-8 place-items-center rounded-full bg-white/70 text-foreground/60 hover:bg-white"
+                        title="Delete"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               ))}
             </section>
           ) : (
@@ -320,12 +371,9 @@ function ConversationView({
   savedCount: number;
 }) {
   const qc = useQueryClient();
-  const [deleting, setDeleting] = useState<string | null>(null);
-  const [listErr, setListErr] = useState("");
 
   const {
     messages,
-    setMessages,
     input,
     setInput,
     send,
@@ -340,25 +388,6 @@ function ConversationView({
     greeting: GREETING,
     mapMessage,
   });
-
-  async function removeMessage(id: string) {
-    setDeleting(id);
-    setListErr("");
-    try {
-      const res = await fetch(
-        `${API_BASE}/chat/conversations/${conversationId}/messages/${id}`,
-        { method: "DELETE", credentials: "include" },
-      );
-      if (!res.ok) {
-        throw new ApiError(`Delete failed (${res.status})`, res.status);
-      }
-      setMessages((prev) => prev.filter((m) => m.id !== id));
-    } catch (e) {
-      setListErr(errorMessage(e, "Couldn't delete message, please try again"));
-    } finally {
-      setDeleting(null);
-    }
-  }
 
   async function saveLetter(text: string, name: string): Promise<boolean> {
     try {
@@ -407,11 +436,6 @@ function ConversationView({
             <p className="text-sm text-foreground/70">{loadError}</p>
           </div>
         )}
-        {listErr && (
-          <p className="rounded-2xl bg-destructive/10 px-4 py-2 text-xs text-destructive">
-            {listErr}
-          </p>
-        )}
         {messages.map((m, i) => (
           <div
             key={m.id ?? i}
@@ -450,20 +474,6 @@ function ConversationView({
                   </div>
                 )}
             </div>
-            {m.id && (
-              <button
-                onClick={() => void removeMessage(m.id!)}
-                disabled={deleting === m.id}
-                className="mt-1 grid h-7 w-7 shrink-0 place-items-center rounded-full text-foreground/30 opacity-0 transition hover:bg-white hover:text-foreground/70 group-hover:opacity-100 disabled:opacity-30"
-                aria-label="Delete message"
-              >
-                {deleting === m.id ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <Trash2 className="h-3.5 w-3.5" />
-                )}
-              </button>
-            )}
           </div>
         ))}
         {!isStreaming &&
