@@ -1,0 +1,41 @@
+name: Groq Model Check
+
+on:
+  schedule:
+    - cron: '0 9 * * *'  # daily at 9am UTC
+  workflow_dispatch:       # manual trigger for testing
+
+jobs:
+  check-models:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Groq models
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          MODELS=$(curl -s https://api.groq.com/openai/v1/models \
+            -H "Authorization: Bearer $GROQ_API_KEY" | jq -r '.data[].id')
+
+          REQUIRED=("groq/compound" "groq/compound-mini" "moonshotai/kimi-k2-instruct" "moonshotai/kimi-k2-instruct-0905")
+          MISSING=()
+
+          for model in "${REQUIRED[@]}"; do
+            if ! echo "$MODELS" | grep -qx "$model"; then
+              MISSING+=("$model")
+            fi
+          done
+
+          if [ ${#MISSING[@]} -gt 0 ]; then
+            BODY="The following Groq models are no longer available:\n\n"
+            for m in "${MISSING[@]}"; do
+              BODY+="- \`$m\`\n"
+            done
+            BODY+="\nUpdate \`MODELS\` in \`backend/shared/ai_client.py\` and redeploy."
+
+            gh issue create \
+              --repo ${{ github.repository }} \
+              --title "⚠️ Groq model unavailable: ${MISSING[*]}" \
+              --body "$(printf "$BODY")" \
+              --label "bug"
+          fi
