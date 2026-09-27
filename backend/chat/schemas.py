@@ -48,26 +48,13 @@ class ChatRequest(BaseModel):
 
 class CoverLetterSuggestion(BaseModel):
     type: Literal["cover_letter"]
-    options: list[str]
-
-    @field_validator("options")
-    @classmethod
-    def _three_options(cls, v: list[str]) -> list[str]:
-        if len(v) != 3:
-            raise ValueError("must have exactly 3 options")
-        for opt in v:
-            if not opt.strip():
-                raise ValueError("options must not be empty")
-            if len(opt) > 5000:
-                raise ValueError("option too long")
-        return v
+    text: str = Field(..., max_length=5000)
 
 
 class ChatSuggestion(BaseModel):
     type: str
     section: str
-    original: str
-    options: list[str]
+    text: str = Field(..., max_length=2000)
 
     @field_validator("type")
     @classmethod
@@ -81,21 +68,4 @@ class ChatSuggestion(BaseModel):
     def _section_must_be_text_field(cls, v: str) -> str:
         if v not in TEXT_FIELDS:
             raise ValueError("section must be a text field")
-        return v
-
-    @field_validator("original")
-    @classmethod
-    def _original_length(cls, v: str) -> str:
-        if len(v) > 2000:
-            raise ValueError("original too long")
-        return v
-
-    @field_validator("options")
-    @classmethod
-    def _options_valid(cls, v: list[str]) -> list[str]:
-        if not v or len(v) > 5:
-            raise ValueError("options must have 1-5 items")
-        for o in v:
-            if not o.strip() or len(o) > 2000:
-                raise ValueError("invalid option")
         return v
