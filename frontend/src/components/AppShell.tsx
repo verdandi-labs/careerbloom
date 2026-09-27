@@ -28,6 +28,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   const signOut = useSignOut();
   const [uploadOpen, setUploadOpen] = useState(false);
 
+  const isActive = (to: string) =>
+    pathname === to || pathname.startsWith(`${to}/`);
+
   function handleSignOut() {
     signOut();
     navigate({ to: "/auth", search: {} });
@@ -47,10 +50,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
           <nav className="hidden items-center gap-1 md:flex">
             {nav.map((item) => {
-              const active =
-                item.to === "/dashboard"
-                  ? pathname === "/dashboard"
-                  : pathname.startsWith(item.to);
+              const active = isActive(item.to);
               return (
                 <Link
                   key={item.to}
@@ -107,10 +107,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <nav className="glass-strong fixed inset-x-4 bottom-4 z-20 flex items-stretch justify-around p-2 max-[374px]:p-2.5 md:hidden">
         {nav.map((item) => {
-          const active =
-            item.to === "/dashboard"
-              ? pathname === "/dashboard"
-              : pathname.startsWith(item.to);
+          const active = isActive(item.to);
           const Icon = item.icon;
           return (
             <Link
