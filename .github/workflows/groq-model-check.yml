@@ -36,6 +36,5 @@ jobs:
             gh issue create \
               --repo ${{ github.repository }} \
               --title "⚠️ Groq model unavailable: ${MISSING[*]}" \
-              --body "$(printf "$BODY")" \
-              --label "bug"
+              --body "$(printf "$BODY")"
           fi
