@@ -82,7 +82,7 @@ function Dashboard() {
 
           <div className="mt-7 flex flex-wrap gap-2">
             <Link
-              to="/chat"
+              to="/cv-chat"
               className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm text-background"
             >
               <Sparkles className="h-4 w-4" /> Talk to your coach
@@ -110,7 +110,7 @@ function Dashboard() {
           </div>
 
           <Link
-            to="/chat"
+            to="/cv-chat"
             className="mt-5 flex items-center justify-center gap-2 rounded-2xl bg-foreground py-3 text-sm font-medium text-background"
           >
             Chat with Bloom → <ArrowUpRight className="h-4 w-4" />

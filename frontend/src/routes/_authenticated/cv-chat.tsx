@@ -21,8 +21,8 @@ import {
   History,
 } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/chat")({
-  head: () => ({ meta: [{ title: "Chat · careerBloom" }] }),
+export const Route = createFileRoute("/_authenticated/cv-chat")({
+  head: () => ({ meta: [{ title: "CV Chat · careerBloom" }] }),
   component: ChatLayout,
 });
 
@@ -61,7 +61,7 @@ function ChatLayout() {
 
   useEffect(() => {
     if (activeId) return;
-    if (pathname !== "/chat") return;
+    if (pathname !== "/cv-chat") return;
     (async () => {
       setListError("");
       try {
@@ -69,7 +69,7 @@ function ChatLayout() {
         const id = data?.[0]?.id ?? (await createConversation());
         if (id)
           navigate({
-            to: "/chat/$conversationId",
+            to: "/cv-chat/$conversationId",
             params: { conversationId: id },
             replace: true,
           });
@@ -85,7 +85,10 @@ function ChatLayout() {
     const id = await createConversation();
     if (id) {
       await load();
-      navigate({ to: "/chat/$conversationId", params: { conversationId: id } });
+      navigate({
+        to: "/cv-chat/$conversationId",
+        params: { conversationId: id },
+      });
     }
   }
 
@@ -97,12 +100,12 @@ function ChatLayout() {
       const remaining = convs.filter((c) => c.id !== id);
       if (remaining[0]) {
         navigate({
-          to: "/chat/$conversationId",
+          to: "/cv-chat/$conversationId",
           params: { conversationId: remaining[0].id },
           replace: true,
         });
       } else {
-        navigate({ to: "/chat", replace: true });
+        navigate({ to: "/cv-chat", replace: true });
       }
     }
     try {
@@ -227,7 +230,7 @@ function ChatLayout() {
                   ) : (
                     <>
                       <Link
-                        to="/chat/$conversationId"
+                        to="/cv-chat/$conversationId"
                         params={{ conversationId: c.id }}
                         onClick={() => setDrawerOpen(false)}
                         className="flex flex-1 items-center gap-2 truncate text-xs"

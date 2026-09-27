@@ -76,6 +76,7 @@ function CareerDirectionPage() {
     retry,
   } = useChat<Msg>({
     conversationId,
+    context: "career_direction",
     greeting:
       "Hi, I'm Bloom your career companion. Tell me a little about where you are and where you'd like to go.",
     mapMessage,

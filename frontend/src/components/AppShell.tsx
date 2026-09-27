@@ -15,7 +15,7 @@ import { CvUploadModal } from "./CvUploadModal";
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/chat", label: "Chat", icon: MessageCircleHeart },
+  { to: "/cv-chat", label: "CV Chat", icon: MessageCircleHeart },
   { to: "/cv", label: "My CV", icon: FileText },
   { to: "/cover-letters", label: "Cover Letters", icon: Mail },
   { to: "/career-direction", label: "Career Direction", icon: Compass },

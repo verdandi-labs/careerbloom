@@ -6,10 +6,12 @@ import { useChat, type MessagePayload } from "@/hooks/useChat";
 import { createConversation } from "@/lib/chat";
 import { Check, Loader2, Plus, Send, Sparkles, X } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/chat/$conversationId")({
-  head: () => ({ meta: [{ title: "Chat · careerBloom" }] }),
-  component: ConversationPage,
-});
+export const Route = createFileRoute("/_authenticated/cv-chat/$conversationId")(
+  {
+    head: () => ({ meta: [{ title: "CV Chat · careerBloom" }] }),
+    component: ConversationPage,
+  },
+);
 
 type Suggestion = {
   type: "suggestion";
@@ -66,6 +68,7 @@ function ConversationPage() {
     retry,
   } = useChat<Msg>({
     conversationId,
+    context: "cv_chat",
     greeting:
       "Hi, I'm Bloom your career companion. Tell me a little about where you are and where you'd like to go.",
     mapMessage,
@@ -146,7 +149,10 @@ function ConversationPage() {
   async function startNewChat() {
     const id = await createConversation();
     if (id)
-      navigate({ to: "/chat/$conversationId", params: { conversationId: id } });
+      navigate({
+        to: "/cv-chat/$conversationId",
+        params: { conversationId: id },
+      });
   }
 
   return (

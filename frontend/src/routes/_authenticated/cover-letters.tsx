@@ -385,6 +385,7 @@ function ConversationView({
     retry,
   } = useChat<Msg>({
     conversationId,
+    context: "cover_letter",
     greeting: GREETING,
     mapMessage,
   });
