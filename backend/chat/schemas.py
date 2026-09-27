@@ -22,6 +22,7 @@ class ConversationResponse(BaseModel):
 
 class MessageCreate(BaseModel):
     content: str = Field(..., max_length=10_000)
+    context: Literal["cv_chat", "cover_letter", "career_direction"] = "cv_chat"
 
 
 class ApplySuggestionRequest(BaseModel):

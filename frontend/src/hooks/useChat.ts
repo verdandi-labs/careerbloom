@@ -13,6 +13,7 @@ export type MessagePayload = {
 interface UseChatOptions<T> {
   conversationId: string | null;
   greeting: string;
+  context?: "cv_chat" | "cover_letter" | "career_direction";
   mapMessage: (payload: MessagePayload) => T;
   onStreamEnd?: (
     lastServerMessage: MessagePayload,
@@ -22,7 +23,13 @@ interface UseChatOptions<T> {
 
 export function useChat<
   T extends { id?: string; role: string; content: string; isError?: boolean },
->({ conversationId, greeting, mapMessage, onStreamEnd }: UseChatOptions<T>) {
+>({
+  conversationId,
+  greeting,
+  context = "cv_chat",
+  mapMessage,
+  onStreamEnd,
+}: UseChatOptions<T>) {
   const [messages, setMessages] = useState<T[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [loadError, setLoadError] = useState("");
@@ -81,7 +88,7 @@ export function useChat<
       try {
         const stream = await apiStream(
           `/chat/conversations/${conversationId}/messages`,
-          { method: "POST", json: { content: msg } },
+          { method: "POST", json: { content: msg, context } },
         );
 
         const reader = stream.getReader();
@@ -173,7 +180,15 @@ export function useChat<
         setIsStreaming(false);
       }
     },
-    [input, isStreaming, conversationId, messages, mapMessage, onStreamEnd],
+    [
+      input,
+      isStreaming,
+      conversationId,
+      context,
+      messages,
+      mapMessage,
+      onStreamEnd,
+    ],
   );
 
   const retry = useCallback(() => {
