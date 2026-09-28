@@ -25,17 +25,11 @@ class MessageCreate(BaseModel):
     context: Literal["cv_chat", "cover_letter", "career_direction"] = "cv_chat"
 
 
-class ApplySuggestionRequest(BaseModel):
-    chosen: str = Field(..., max_length=2000)
-
-
 class MessageResponse(BaseModel):
     id: UUID
     role: str
     content: str
     suggestion: dict | None = None
-    applied_text: str | None = None
-    rejected: bool
     created_at: datetime
 
     model_config = {"from_attributes": True}

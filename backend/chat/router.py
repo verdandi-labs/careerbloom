@@ -4,12 +4,10 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from database import get_db
 from shared.deps import get_current_user, get_db_for_current_user, rotated_session_headers
 from shared.models.user import User
 from chat.repository import ChatRepository
 from chat.schemas import (
-    ApplySuggestionRequest,
     ConversationCreate,
     ConversationResponse,
     MessageCreate,
@@ -156,56 +154,6 @@ async def send_message(
         media_type="text/event-stream",
         headers=rotated_session_headers(request),
     )
-
-
-@router.post("/conversations/{conversation_id}/messages/{message_id}/apply", response_model=MessageResponse)
-async def apply_suggestion(
-    conversation_id: UUID,
-    message_id: UUID,
-    body: ApplySuggestionRequest,
-    user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-):
-    repo = ChatRepository(db)
-    message = await repo.get_message(user.user_id, conversation_id, message_id)
-    if message is None:
-        raise HTTPException(status_code=404, detail="Message not found")
-    if message.suggestion is None:
-        raise HTTPException(status_code=400, detail="This message has no suggestion to apply")
-    if message.applied_text is not None or message.rejected:
-        raise HTTPException(status_code=409, detail="This suggestion was already handled")
-
-    options = [o.strip() for o in message.suggestion.get("options", [])]
-    if body.chosen.strip() not in options:
-        raise HTTPException(status_code=400, detail="Chosen text must match one of the suggested options")
-
-    cv_repo = CvRepository(db)
-    upload = await cv_repo.get_latest_upload(user.user_id)
-    if upload is None:
-        raise HTTPException(status_code=404, detail="Please upload a CV before continuing")
-
-    section = message.suggestion["section"]
-    await cv_repo.create_edit(user.user_id, upload.upload_id, section, body.chosen)
-    return await repo.mark_applied(message, body.chosen)
-
-
-@router.post("/conversations/{conversation_id}/messages/{message_id}/reject", response_model=MessageResponse)
-async def reject_suggestion(
-    conversation_id: UUID,
-    message_id: UUID,
-    user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-):
-    repo = ChatRepository(db)
-    message = await repo.get_message(user.user_id, conversation_id, message_id)
-    if message is None:
-        raise HTTPException(status_code=404, detail="Message not found")
-    if message.suggestion is None:
-        raise HTTPException(status_code=400, detail="This message has no suggestion to reject")
-    if message.applied_text is not None or message.rejected:
-        raise HTTPException(status_code=409, detail="This suggestion was already handled")
-
-    return await repo.mark_rejected(message)
 
 
 @router.delete("/conversations/{conversation_id}/messages/{message_id}")

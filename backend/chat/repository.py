@@ -119,19 +119,9 @@ class ChatRepository:
         await self.db.delete(conv)
         await self.db.flush()
 
-    async def mark_applied(self, message: ChatMessage, applied_text: str) -> ChatMessage:
-        message.applied_text = applied_text
-        await self.db.flush()
-        return message
-
-    async def mark_rejected(self, message: ChatMessage) -> ChatMessage:
-        message.rejected = True
-        await self.db.flush()
-        return message
-
     async def add_message(
         self, user_id: UUID, conversation_id: UUID, role: str, content: str,
-        suggestion: dict | None = None, applied_text: str | None = None
+        suggestion: dict | None = None
     ) -> ChatMessage:
         msg = ChatMessage(
             conversation_id=conversation_id,
@@ -139,7 +129,6 @@ class ChatRepository:
             role=role,
             content=content,
             suggestion=suggestion,
-            applied_text=applied_text,
         )
         self.db.add(msg)
         await self.db.flush()
