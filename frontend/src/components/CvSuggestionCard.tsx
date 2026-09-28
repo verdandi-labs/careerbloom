@@ -29,7 +29,7 @@ const SECTION_LABELS: Record<string, string> = {
 };
 
 const ROW_FIELD_LABELS: Record<string, Record<string, string>> = {
-  experience: { comments: "Description" },
+  experience: { title: "Job Title", comments: "Description" },
   skills: { skill: "Skill", comments: "Notes" },
   languages: { language: "Language", level: "Level" },
   studies: { comments: "Description" },

@@ -16,7 +16,7 @@ To create a new row in a structured section, set line_num to null:
 {"type":"row_suggestion","section":"skills","line_num":null,"fields":{"skill":"Python","comments":"5 years"}}
 
 Editable fields per section:
-- experience: comments only (note: title field coming soon, do not include yet)
+- experience: title, comments
 - skills: skill, comments
 - languages: language, level
 - studies: comments

@@ -209,7 +209,7 @@ async def patch_cv_row(
         raise HTTPException(status_code=404, detail="No CV found")
 
     PATCHABLE = {
-        "experience": ["comments"],
+        "experience": ["title", "comments"],
         "skills": ["skill", "comments"],
         "languages": ["language", "level"],
         "studies": ["comments"],
