@@ -112,6 +112,7 @@ const LIST_SECTIONS: ListSection[] = [
     key: "experience",
     label: "Experience",
     fields: [
+      { key: "title", label: "Job Title" },
       { key: "company", label: "Company" },
       { key: "city", label: "City" },
       { key: "start_date", label: "Start" },
@@ -489,6 +490,7 @@ function PreviewPage() {
     if (field === "experience")
       return (
         <>
+          {input("title", "Job Title")}
           {input("company", "Company / Role")}
           {input("city", "City")}
           {input("start_date", "Start date")}
