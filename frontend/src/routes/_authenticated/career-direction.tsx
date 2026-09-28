@@ -2,9 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
+import { ChatPanel } from "@/components/ChatPanel";
 import { api, ApiError, errorMessage } from "@/lib/api";
-import { useChat, type MessagePayload } from "@/hooks/useChat";
-import { Compass, Loader2, Send, Sparkles } from "lucide-react";
+import { type MessagePayload } from "@/hooks/useChat";
+import { Compass, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/career-direction")({
   head: () => ({ meta: [{ title: "My Career Direction · careerBloom" }] }),
@@ -62,25 +63,6 @@ function CareerDirectionPage() {
       }
     })();
   }, []);
-
-  const {
-    messages,
-    input,
-    setInput,
-    send,
-    isStreaming,
-    loaded,
-    loadError,
-    scrollRef,
-    inputRef,
-    retry,
-  } = useChat<Msg>({
-    conversationId,
-    context: "career_direction",
-    greeting:
-      "Hi, I'm Bloom your career companion. Tell me a little about where you are and where you'd like to go.",
-    mapMessage,
-  });
 
   async function saveAsCareerDirection(content: string) {
     if (!conversationId) return;
@@ -145,96 +127,38 @@ function CareerDirectionPage() {
             </p>
           )}
 
-          <div
-            ref={scrollRef}
-            className="flex-1 space-y-4 overflow-y-auto py-4 pr-1"
-          >
-            {!loaded && (
-              <div className="grid place-items-center py-10 text-xs text-foreground/50">
-                <Loader2 className="h-4 w-4 animate-spin" />
-              </div>
-            )}
-            {loaded && loadError && (
-              <div className="flex flex-col items-center gap-3 py-10 text-center">
-                <p className="text-sm text-foreground/70">{loadError}</p>
-              </div>
-            )}
-            {messages.map((m, i) => (
-              <div
-                key={m.id ?? i}
-                className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} gap-2`}
-              >
-                {m.role === "assistant" && (
-                  <div className="mt-1 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-secondary text-secondary-foreground">
-                    <Sparkles className="h-3.5 w-3.5" />
-                  </div>
-                )}
-                <div className="max-w-[75%] space-y-2">
-                  <div
-                    className={`rounded-3xl px-5 py-3 text-sm leading-relaxed whitespace-pre-wrap ${m.role === "user" ? "rounded-tr-md bg-secondary text-secondary-foreground" : "rounded-tl-md bg-white/75 backdrop-blur"}`}
-                  >
-                    {m.content}
-                  </div>
-                  {m.role === "assistant" &&
-                    m.content &&
-                    m.id &&
-                    !m.content.startsWith("Hi, I'm Bloom") && (
-                      <button
-                        onClick={() => void saveAsCareerDirection(m.content)}
-                        disabled={savingId === m.content}
-                        className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-3 py-1.5 text-xs text-background hover:opacity-80 transition disabled:opacity-50"
-                      >
-                        {savingId === m.content ? (
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                        ) : (
-                          <Compass className="h-3 w-3" />
-                        )}
-                        Save as career direction
-                      </button>
-                    )}
-                </div>
-              </div>
-            ))}
-            {!isStreaming &&
-              messages.length > 0 &&
-              messages[messages.length - 1]?.isError && (
+          <ChatPanel
+            conversationId={conversationId}
+            context="career_direction"
+            greeting="Hi, I'm Bloom your career companion. Tell me a little about where you are and where you'd like to go."
+            placeholder="Tell me about your career goals..."
+            inputDisabled={!conversationId}
+            mapMessage={mapMessage}
+            className="flex-1"
+            renderMessageExtra={(msg) => {
+              if (
+                msg.role !== "assistant" ||
+                !msg.content ||
+                !(msg as Msg).id ||
+                msg.content.startsWith("Hi, I'm Bloom")
+              )
+                return null;
+              return (
                 <button
-                  onClick={retry}
-                  className="rounded-full bg-white/75 px-4 py-2 text-xs hover:bg-white"
+                  onClick={() => void saveAsCareerDirection(msg.content)}
+                  disabled={savingId === msg.content}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-3 py-1.5 text-xs text-background hover:opacity-80 transition disabled:opacity-50"
                 >
-                  Retry
+                  {savingId === msg.content ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Compass className="h-3 w-3" />
+                  )}
+                  Save as career direction
                 </button>
-              )}
-            {isStreaming && messages[messages.length - 1]?.role === "user" && (
-              <div className="flex items-center gap-1 text-sm text-pink-300 animate-pulse">
-                Thinking...
-              </div>
-            )}
-          </div>
-
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              void send();
+              );
             }}
-            className="flex items-center gap-2 rounded-full bg-white/75 p-2 pl-5 backdrop-blur mt-3"
-          >
-            <input
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              disabled={isStreaming || !conversationId}
-              className="flex-1 bg-transparent text-base outline-none placeholder:text-foreground/40 disabled:opacity-60"
-              placeholder="Tell me about your career goals..."
-            />
-            <button
-              type="submit"
-              disabled={isStreaming || !input.trim() || !conversationId}
-              className="grid h-10 w-10 place-items-center rounded-full bg-secondary text-secondary-foreground disabled:opacity-50"
-            >
-              <Send className="h-4 w-4" />
-            </button>
-          </form>
+          />
         </section>
       </div>
     </AppShell>
