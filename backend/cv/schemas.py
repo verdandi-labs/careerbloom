@@ -164,6 +164,10 @@ class CvEditRequest(BaseModel):
     value: str | list[dict] | None = None
 
 
+class CvRowPatchRequest(BaseModel):
+    fields: dict[str, str | None]
+
+
 class CvTranslateRequest(BaseModel):
     language: str = Field(..., min_length=2, max_length=5)
 

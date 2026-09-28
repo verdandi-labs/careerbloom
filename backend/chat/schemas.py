@@ -51,6 +51,13 @@ class CoverLetterSuggestion(BaseModel):
     text: str = Field(..., max_length=5000)
 
 
+class CvRowSuggestion(BaseModel):
+    type: Literal["row_suggestion"]
+    section: str
+    line_num: int | None = None
+    fields: dict[str, str]
+
+
 class ChatSuggestion(BaseModel):
     type: str
     section: str

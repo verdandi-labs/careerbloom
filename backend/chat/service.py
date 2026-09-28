@@ -5,7 +5,7 @@ from collections.abc import AsyncIterator
 from prompts import load
 from shared.prompts import SAFETY_BOUNDARY
 from shared.ai_client import stream_chat_completion
-from chat.schemas import ChatSuggestion, CoverLetterSuggestion
+from chat.schemas import ChatSuggestion, CoverLetterSuggestion, CvRowSuggestion
 
 _SUGGESTION_BLOCK_RE = re.compile(r"```json\s*([\s\S]*?)```")
 
@@ -36,6 +36,8 @@ def parse_suggestion(full_response: str) -> tuple[str, dict | None]:
         raw = json.loads(raw_text.strip())
         if raw.get("type") == "cover_letter":
             suggestion = CoverLetterSuggestion.model_validate(raw)
+        elif raw.get("type") == "row_suggestion":
+            suggestion = CvRowSuggestion.model_validate(raw)
         else:
             suggestion = ChatSuggestion.model_validate(raw)
     except Exception:
