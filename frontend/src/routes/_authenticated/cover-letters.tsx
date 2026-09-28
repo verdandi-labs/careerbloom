@@ -2,12 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
+import { ChatPanel } from "@/components/ChatPanel";
 import {
   CoverLetterSuggestionCard,
   type CoverLetterSuggestion,
 } from "@/components/CoverLetterSuggestionCard";
 import { API_BASE, api, errorMessage } from "@/lib/api";
-import { useChat, type MessagePayload } from "@/hooks/useChat";
+import { type MessagePayload } from "@/hooks/useChat";
 import {
   createCoverLetterConversation,
   deleteConversation,
@@ -21,8 +22,6 @@ import {
   Loader2,
   Mail,
   Plus,
-  Send,
-  Sparkles,
   Trash2,
 } from "lucide-react";
 
@@ -372,24 +371,6 @@ function ConversationView({
 }) {
   const qc = useQueryClient();
 
-  const {
-    messages,
-    input,
-    setInput,
-    send,
-    isStreaming,
-    loaded,
-    loadError,
-    scrollRef,
-    inputRef,
-    retry,
-  } = useChat<Msg>({
-    conversationId,
-    context: "cover_letter",
-    greeting: GREETING,
-    mapMessage,
-  });
-
   async function saveLetter(text: string, name: string): Promise<boolean> {
     try {
       await api("/cover-letters/save", {
@@ -423,100 +404,29 @@ function ConversationView({
         </div>
       </header>
 
-      <div
-        ref={scrollRef}
-        className="flex-1 space-y-4 overflow-y-auto py-6 pr-1"
-      >
-        {!loaded && (
-          <div className="grid place-items-center py-10 text-xs text-foreground/50">
-            <Loader2 className="h-4 w-4 animate-spin" />
-          </div>
-        )}
-        {loaded && loadError && (
-          <div className="flex flex-col items-center gap-3 py-10 text-center">
-            <p className="text-sm text-foreground/70">{loadError}</p>
-          </div>
-        )}
-        {messages.map((m, i) => (
-          <div
-            key={m.id ?? i}
-            className={`group flex items-start ${m.role === "user" ? "justify-end" : "justify-start"} gap-2`}
-          >
-            {m.role === "assistant" && (
-              <div className="mt-1 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-secondary text-secondary-foreground">
-                <Sparkles className="h-3.5 w-3.5" />
-              </div>
-            )}
-            <div className="max-w-[75%] space-y-3">
-              {m.content && (
-                <div
-                  className={`rounded-3xl px-5 py-3 text-sm leading-relaxed whitespace-pre-wrap ${m.role === "user" ? "rounded-tr-md bg-secondary text-secondary-foreground" : "rounded-tl-md bg-white/75 backdrop-blur"}`}
-                >
-                  {m.content}
-                </div>
-              )}
-              {m.role === "assistant" &&
-                m.suggestion &&
-                m.suggestion.type === "cover_letter" && (
-                  <CoverLetterSuggestionCard
-                    suggestion={m.suggestion}
-                    onSave={saveLetter}
-                    onDislike={() => send("I don't like any of these options.")}
-                    savedCount={savedCount}
-                  />
-                )}
-              {m.role === "assistant" &&
-                m.suggestion &&
-                m.suggestion.type !== "cover_letter" && (
-                  <div className="rounded-3xl border border-white/60 bg-white/70 p-4 backdrop-blur shadow-[0_8px_24px_-12px_rgba(248,175,166,0.6)]">
-                    <p className="text-sm text-foreground/70">
-                      Bloom returned an unexpected response. Please try again.
-                    </p>
-                  </div>
-                )}
-            </div>
-          </div>
-        ))}
-        {!isStreaming &&
-          messages.length > 0 &&
-          messages[messages.length - 1]?.isError && (
-            <button
-              onClick={retry}
-              className="rounded-full bg-white/75 px-4 py-2 text-xs hover:bg-white"
-            >
-              Retry
-            </button>
-          )}
-        {isStreaming && messages[messages.length - 1]?.role === "user" && (
-          <div className="flex items-center gap-2 text-xs text-foreground/50">
-            <Loader2 className="h-3 w-3 animate-spin" /> Bloom is thinking…
-          </div>
-        )}
-      </div>
-
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          send();
+      <ChatPanel
+        conversationId={conversationId}
+        context="cover_letter"
+        greeting={GREETING}
+        placeholder="Which role are you applying for?"
+        mapMessage={mapMessage}
+        className="flex-1"
+        renderMessageExtra={(msg, send) => {
+          const s = (msg as Msg).suggestion;
+          if (!s || s.type !== "cover_letter") return null;
+          return (
+            <CoverLetterSuggestionCard
+              suggestion={s as CoverLetterSuggestion}
+              onSave={saveLetter}
+              onDislike={() =>
+                send(
+                  "I don't like this suggestion, ask me questions to understand what I'm looking for",
+                )
+              }
+            />
+          );
         }}
-        className="flex items-center gap-2 rounded-full bg-white/75 p-2 pl-5 backdrop-blur"
-      >
-        <input
-          ref={inputRef}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          disabled={isStreaming}
-          className="flex-1 bg-transparent text-base outline-none placeholder:text-foreground/40 disabled:opacity-60"
-          placeholder="Which role are you applying for?"
-        />
-        <button
-          type="submit"
-          disabled={isStreaming || !input.trim()}
-          className="grid h-10 w-10 place-items-center rounded-full bg-secondary text-secondary-foreground disabled:opacity-50"
-        >
-          <Send className="h-4 w-4" />
-        </button>
-      </form>
+      />
     </section>
   );
 }
