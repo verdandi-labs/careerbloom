@@ -326,7 +326,9 @@ function CVPage() {
               },
             ]
           : rows.map((r) =>
-              r.line_num === d.lineNum ? { ...values, line_num: d.lineNum } : r,
+              r.line_num === d.lineNum
+                ? { ...r, ...values, line_num: d.lineNum }
+                : r,
             );
       await save(d.section.key, next);
     }
