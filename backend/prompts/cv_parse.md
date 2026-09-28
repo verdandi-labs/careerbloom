@@ -6,7 +6,7 @@ full_name: string | null
 title: string | null
 self_summary: string | null
 contact_details: array of objects with only the key detail
-experience: array of objects with only the keys company, city, start_date, end_date, comments
+experience: array of objects with only the keys title, company, city, start_date, end_date, comments
 skills: array of objects with only the keys skill, comments
 studies: array of objects with only the keys edu_center, city, start_date, end_date, comments
 awards: array of objects with only the keys name, date, comments
