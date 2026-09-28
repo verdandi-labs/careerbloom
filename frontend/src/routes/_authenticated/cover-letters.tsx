@@ -166,7 +166,6 @@ function CoverLettersPage() {
           conversationId={activeId}
           fresh={fresh}
           onBack={back}
-          savedCount={letters?.length ?? 0}
         />
       ) : (
         <>
@@ -362,12 +361,10 @@ function ConversationView({
   conversationId,
   fresh,
   onBack,
-  savedCount,
 }: {
   conversationId: string;
   fresh: boolean;
   onBack: () => void;
-  savedCount: number;
 }) {
   const qc = useQueryClient();
 
