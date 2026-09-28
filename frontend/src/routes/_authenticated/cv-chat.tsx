@@ -14,8 +14,6 @@ import {
   MessageCircleHeart,
   Plus,
   Trash2,
-  Pencil,
-  Check,
   X,
   Pin,
   History,
@@ -34,9 +32,7 @@ function ChatLayout() {
   const params = useParams({ strict: false }) as { conversationId?: string };
   const activeId = params.conversationId;
   const [convs, setConvs] = useState<Conversation[]>([]);
-  const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [draftTitle, setDraftTitle] = useState("");
   const [listError, setListError] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -117,16 +113,6 @@ function ChatLayout() {
     }
   }
 
-  async function saveTitle(id: string) {
-    const title = draftTitle.trim() || "Untitled";
-    await api(`/chat/conversations/${id}`, {
-      method: "PATCH",
-      json: { title },
-    });
-    setConvs((cs) => cs.map((c) => (c.id === id ? { ...c, title } : c)));
-    setEditingId(null);
-  }
-
   return (
     <AppShell>
       <div className="relative flex h-[calc(100vh-9rem)] min-h-0 supports-[height:100dvh]:h-[calc(100dvh-9rem)] gap-4 md:grid md:grid-cols-[280px_1fr]">
@@ -170,7 +156,6 @@ function ChatLayout() {
             )}
             {convs.map((c) => {
               const active = c.id === activeId;
-              const isEditing = editingId === c.id;
               const isDeleting = deletingId === c.id;
               const pinned = c.is_career_direction;
               return (
@@ -178,32 +163,7 @@ function ChatLayout() {
                   key={c.id}
                   className={`group flex items-center gap-1 rounded-2xl px-2 py-1.5 transition ${active ? "bg-sidebar-accent" : "hover:bg-white/50"}`}
                 >
-                  {isEditing ? (
-                    <>
-                      <input
-                        autoFocus
-                        value={draftTitle}
-                        onChange={(e) => setDraftTitle(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") saveTitle(c.id);
-                          if (e.key === "Escape") setEditingId(null);
-                        }}
-                        className="flex-1 rounded-lg bg-white/90 px-2 py-1 text-base outline-none"
-                      />
-                      <button
-                        onClick={() => saveTitle(c.id)}
-                        className="grid h-6 w-6 place-items-center rounded-full hover:bg-white"
-                      >
-                        <Check className="h-3 w-3" />
-                      </button>
-                      <button
-                        onClick={() => setEditingId(null)}
-                        className="grid h-6 w-6 place-items-center rounded-full hover:bg-white"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </>
-                  ) : isDeleting ? (
+                  {isDeleting ? (
                     <>
                       <span className="flex-1 truncate px-1 text-xs text-foreground/70">
                         Delete?
@@ -249,16 +209,6 @@ function ChatLayout() {
                       </Link>
                       {!pinned && (
                         <>
-                          <button
-                            onClick={() => {
-                              setEditingId(c.id);
-                              setDraftTitle(c.title);
-                            }}
-                            className="grid h-6 w-6 place-items-center rounded-full text-foreground/50 opacity-70 transition hover:bg-white hover:text-foreground md:opacity-0 md:group-hover:opacity-100"
-                            title="Rename"
-                          >
-                            <Pencil className="h-3 w-3" />
-                          </button>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
