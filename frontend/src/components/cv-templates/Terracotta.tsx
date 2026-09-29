@@ -178,8 +178,13 @@ export function Terracotta({
                       }}
                       className="text-sm font-semibold"
                     >
-                      {item.company}
+                      {item.title ?? item.company}
                     </p>
+                    {item.title && item.company && (
+                      <p className="text-[10px]" style={{ color: TERRACOTTA }}>
+                        {item.company}
+                      </p>
+                    )}
                     {item.city && (
                       <p className="text-[10px]" style={{ color: TERRACOTTA }}>
                         {item.city}

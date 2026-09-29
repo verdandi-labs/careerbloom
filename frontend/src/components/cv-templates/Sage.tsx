@@ -139,8 +139,16 @@ export function Sage({
                       }}
                       className="text-sm font-semibold"
                     >
-                      {item.company}
+                      {item.title ?? item.company}
                     </p>
+                    {item.title && item.company && (
+                      <p
+                        className="text-[10px] font-medium"
+                        style={{ color: SAGE }}
+                      >
+                        {item.company}
+                      </p>
+                    )}
                     {item.city && (
                       <p
                         className="text-[10px] font-medium"

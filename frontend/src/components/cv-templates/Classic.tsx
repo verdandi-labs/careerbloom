@@ -62,7 +62,7 @@ export function Classic({
                     }}
                     className="text-sm font-semibold"
                   >
-                    {item.company}
+                    {item.title ?? item.company}
                   </p>
                   {(item.start_date || item.end_date) && (
                     <span
@@ -75,6 +75,11 @@ export function Classic({
                     </span>
                   )}
                 </div>
+                {item.title && item.company && (
+                  <p className="text-[10px] italic" style={{ color: MUTED }}>
+                    {item.company}
+                  </p>
+                )}
                 {item.city && (
                   <p
                     className="text-[10px] italic mb-1"

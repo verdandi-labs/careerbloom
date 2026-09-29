@@ -21,6 +21,7 @@ export type CVData = {
 
 export type ContactItem = { detail?: string; line_num: number };
 export type ExperienceItem = {
+  title?: string;
   company?: string;
   city?: string;
   start_date?: string;
