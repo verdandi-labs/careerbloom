@@ -6,8 +6,6 @@ export type MessagePayload = {
   role: string;
   content: string;
   suggestion: unknown;
-  applied_text: string | null;
-  rejected: boolean;
 };
 
 interface UseChatOptions<T> {

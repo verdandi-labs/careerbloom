@@ -44,8 +44,6 @@ type Msg = {
   role: "user" | "assistant";
   content: string;
   suggestion: MsgSuggestion | null;
-  applied_text: string | null;
-  rejected: boolean;
   isError?: boolean;
 };
 
@@ -65,8 +63,6 @@ function mapMessage(p: MessagePayload): Msg {
     role: p.role as "user" | "assistant",
     content: p.content,
     suggestion: (p.suggestion as MsgSuggestion) ?? null,
-    applied_text: p.applied_text,
-    rejected: p.rejected,
   };
 }
 
@@ -82,7 +78,6 @@ async function downloadBlob(blob: Blob, filename: string) {
 function CoverLettersPage() {
   const qc = useQueryClient();
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [fresh, setFresh] = useState(false);
 
   const { data: letters, isPending } = useQuery({
     queryKey: ["cover-letters"],
@@ -105,7 +100,6 @@ function CoverLettersPage() {
     try {
       const id = await createCoverLetterConversation();
       if (id) {
-        setFresh(true);
         setActiveId(id);
       }
     } catch (e) {
@@ -118,13 +112,11 @@ function CoverLettersPage() {
   }
 
   function resume(c: ConversationSummary) {
-    setFresh(false);
     setActiveId(c.id);
   }
 
   function back() {
     setActiveId(null);
-    setFresh(false);
     void qc.invalidateQueries({ queryKey: ["cover-letter-conversations"] });
   }
 
@@ -162,11 +154,7 @@ function CoverLettersPage() {
   return (
     <AppShell>
       {activeId ? (
-        <ConversationView
-          conversationId={activeId}
-          fresh={fresh}
-          onBack={back}
-        />
+        <ConversationView conversationId={activeId} onBack={back} />
       ) : (
         <>
           <header className="flex flex-wrap items-end justify-between gap-4 rounded-[20px] bg-secondary/70 px-7 py-7 backdrop-blur-md shadow-[0_16px_40px_-18px_rgba(248,175,166,0.8)]">
@@ -359,11 +347,9 @@ function CoverLettersPage() {
 
 function ConversationView({
   conversationId,
-  fresh,
   onBack,
 }: {
   conversationId: string;
-  fresh: boolean;
   onBack: () => void;
 }) {
   const qc = useQueryClient();
