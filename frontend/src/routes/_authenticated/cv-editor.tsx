@@ -110,7 +110,12 @@ const LIST_SECTIONS: ListSection[] = [
       { key: "comments", label: "Comments", textarea: true },
     ],
     text: (r) =>
-      range(r, ["company", "city"], ["start_date", "end_date"], "comments"),
+      range(
+        r,
+        ["title", "company", "city"],
+        ["start_date", "end_date"],
+        "comments",
+      ),
   },
   {
     key: "skills",

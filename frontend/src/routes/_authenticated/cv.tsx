@@ -120,7 +120,12 @@ const LIST_SECTIONS: ListSection[] = [
       { key: "comments", label: "Comments", textarea: true },
     ],
     text: (r) =>
-      range(r, ["company", "city"], ["start_date", "end_date"], "comments"),
+      range(
+        r,
+        ["title", "company", "city"],
+        ["start_date", "end_date"],
+        "comments",
+      ),
   },
   {
     key: "skills",
@@ -210,7 +215,7 @@ const listText = (data: CvData, key: string): string => {
         case "experience":
           return range(
             r,
-            ["company", "city"],
+            ["title", "company", "city"],
             ["start_date", "end_date"],
             "comments",
           );
