@@ -1,5 +1,12 @@
 import { api } from "@/lib/api";
 
+export type ConversationSummary = {
+  id: string;
+  title: string;
+  is_cover_letter: boolean;
+  created_at: string;
+};
+
 export async function createConversation(
   title?: string,
 ): Promise<string | null> {
@@ -8,6 +15,23 @@ export async function createConversation(
     json: { title },
   });
   return data?.id ?? null;
+}
+
+export async function deleteConversation(id: string): Promise<void> {
+  await api(`/chat/conversations/${id}`, { method: "DELETE" });
+}
+
+export async function createCoverLetterConversation(): Promise<string | null> {
+  const data = await api<{ id: string }>("/chat/cover-letter-conversations", {
+    method: "POST",
+  });
+  return data?.id ?? null;
+}
+
+export async function listCoverLetterConversations(): Promise<
+  ConversationSummary[]
+> {
+  return api<ConversationSummary[]>("/chat/cover-letter-conversations");
 }
 
 export async function getOrCreateCareerDirection(): Promise<string | null> {

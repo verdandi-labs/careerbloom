@@ -1,0 +1,43 @@
+.cv-page {
+  min-height: 1123px !important;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.cv-page.terracotta > .grid,
+.cv-page.sage > .grid {
+  align-items: stretch;
+  min-height: 1123px;
+}
+
+.cv-page.terracotta > .grid > div,
+.cv-page.sage > .grid > div {
+  align-self: stretch;
+}
+
+/* A4 page boundary indicators — purely decorative, no effect on content */
+.cv-page::before,
+.cv-page::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #fabdc5;
+  box-shadow:
+    0 2px 10px rgba(235, 170, 187, 0.45),
+    0 0 20px rgba(248, 211, 220, 0.55),
+    0 0 3px rgba(235, 170, 187, 0.7);
+  filter: blur(0.6px);
+  pointer-events: none;
+  z-index: 20;
+}
+
+.cv-page::before {
+  top: 1123px;
+}
+
+.cv-page::after {
+  top: 2246px;
+}

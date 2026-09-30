@@ -27,16 +27,38 @@ class ChatRepository:
         return result.scalar_one_or_none()
 
     async def create_conversation(
-        self, user_id: UUID, title: str | None = None, is_career_direction: bool = False
+        self, user_id: UUID, title: str | None = None,
+        is_career_direction: bool = False, is_cover_letter: bool = False
     ) -> ChatConversation:
         conv = ChatConversation(
             user_id=user_id,
             title=title or f"Conversation - {datetime.utcnow().strftime('%b %d, %Y')}",
             is_career_direction=is_career_direction,
+            is_cover_letter=is_cover_letter,
         )
         self.db.add(conv)
         await self.db.flush()
         return conv
+
+    async def get_or_create_cover_letter_conversation(self, user_id: UUID) -> ChatConversation:
+        conv = await self.create_conversation(
+            user_id,
+            f"Cover Letter - {datetime.utcnow().strftime('%b %d, %Y')}",
+            is_cover_letter=True,
+        )
+        await self.db.flush()
+        return conv
+
+    async def list_cover_letter_conversations(self, user_id: UUID) -> list[ChatConversation]:
+        result = await self.db.execute(
+            select(ChatConversation)
+            .where(
+                ChatConversation.user_id == user_id,
+                ChatConversation.is_cover_letter.is_(True),
+            )
+            .order_by(ChatConversation.created_at.desc())
+        )
+        return list(result.scalars().all())
 
     async def get_or_create_career_direction(self, user_id: UUID) -> ChatConversation:
         result = await self.db.execute(
@@ -82,19 +104,24 @@ class ChatRepository:
         )
         return result.scalar_one_or_none()
 
-    async def mark_applied(self, message: ChatMessage, applied_text: str) -> ChatMessage:
-        message.applied_text = applied_text
+    async def delete_message(self, user_id: UUID, conversation_id: UUID, message_id: UUID) -> bool:
+        message = await self.get_message(user_id, conversation_id, message_id)
+        if message is None:
+            return False
+        await self.db.delete(message)
         await self.db.flush()
-        return message
+        return True
 
-    async def mark_rejected(self, message: ChatMessage) -> ChatMessage:
-        message.rejected = True
+    async def delete_conversation(self, user_id: UUID, conversation_id: UUID) -> None:
+        conv = await self.get_conversation(user_id, conversation_id)
+        if conv is None:
+            raise ValueError("not_found")
+        await self.db.delete(conv)
         await self.db.flush()
-        return message
 
     async def add_message(
         self, user_id: UUID, conversation_id: UUID, role: str, content: str,
-        suggestion: dict | None = None, applied_text: str | None = None
+        suggestion: dict | None = None
     ) -> ChatMessage:
         msg = ChatMessage(
             conversation_id=conversation_id,
@@ -102,7 +129,6 @@ class ChatRepository:
             role=role,
             content=content,
             suggestion=suggestion,
-            applied_text=applied_text,
         )
         self.db.add(msg)
         await self.db.flush()

@@ -62,12 +62,12 @@ class CvEdit(Base):
     edit_date = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
 
-class CvTranslate(Base):
-    __tablename__ = "cv_translate"
+class CvSavedVersion(Base):
+    __tablename__ = "cv_saved_versions"
 
-    translate_id = Column(UUID, primary_key=True, default=uuid4)
+    version_id = Column(UUID, primary_key=True, default=uuid4)
     user_id = Column(UUID, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
-    language = Column(Text, nullable=False)
+    cv_name = Column(Text, nullable=False)
     full_name = Column(Text)
     title = Column(Text)
     self_summary = Column(Text)

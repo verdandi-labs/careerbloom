@@ -1,0 +1,44 @@
+.cv-page-break-label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 21;
+  pointer-events: none;
+  padding: 0 32px;
+}
+
+.cv-page-break-label__inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cv-page-break-label__rule {
+  flex: 1;
+  height: 1px;
+  background-color: #b0a9a4;
+}
+
+.cv-page-break-label__center {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.cv-page-break-label__logo {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  opacity: 0.55;
+  display: block;
+}
+
+.cv-page-break-label__text {
+  font-family: 'Georgia', serif;
+  font-size: 13px;
+  color: #9b9189;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  user-select: none;
+}

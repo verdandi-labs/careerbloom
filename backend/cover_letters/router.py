@@ -8,9 +8,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from shared.deps import get_current_user, get_db_for_current_user
 from shared.models.user import User
 from cover_letters.repository import CoverLetterRepository
-from cover_letters.schemas import CoverLetterGenerateRequest, CoverLetterResponse
+from cover_letters.schemas import (
+    CoverLetterGenerateRequest,
+    CoverLetterResponse,
+    SaveCoverLetterRequest,
+)
 from cv.service import generate_cover_letter_ai, limiter
-from shared.constants import ALLOWED_LANGUAGES
+from career_direction.repository import CareerDirectionRepository
+from shared.crypto import decrypt, decrypt_user_key
 
 router = APIRouter(prefix="/cover-letters", tags=["cover-letters"])
 logger = logging.getLogger(__name__)
@@ -24,22 +29,40 @@ async def generate_letter(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_for_current_user),
 ):
-    if body.language not in ALLOWED_LANGUAGES:
-        raise HTTPException(status_code=400, detail=f"Unsupported language. Supported codes: {', '.join(sorted(ALLOWED_LANGUAGES))}")
-
     try:
+        career_direction = None
+        try:
+            cd_repo = CareerDirectionRepository(db)
+            latest_cd = await cd_repo.get_latest(user.user_id)
+            if latest_cd:
+                user_key = decrypt_user_key(user.encryption_key)
+                career_direction = decrypt(latest_cd.summary, user_key)
+        except Exception:
+            logger.exception("Failed to load career direction for cover letter")
+
         text = await generate_cover_letter_ai(
             body.job_title,
             body.company,
             (body.job_description or "")[:5_000],
             body.context or "",
-            body.language,
+            career_direction=career_direction,
         )
     except Exception:
         logger.error("Cover letter generation failed", exc_info=True)
         raise HTTPException(status_code=500, detail="Cover letter generation failed, please try again")
     repo = CoverLetterRepository(db)
-    letter = await repo.create(user.user_id, body.name, body.language, text)
+    letter = await repo.create(user.user_id, body.name, text)
+    return CoverLetterResponse.model_validate(letter)
+
+
+@router.post("/save", response_model=CoverLetterResponse)
+async def save_letter(
+    body: SaveCoverLetterRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db_for_current_user),
+):
+    repo = CoverLetterRepository(db)
+    letter = await repo.create(user.user_id, body.name, body.text)
     return CoverLetterResponse.model_validate(letter)
 
 
@@ -115,11 +138,6 @@ async def export_letter_pdf(
                 ),
             )
         )
-    if letter_model.language:
-        elements.append(
-            Paragraph(f"Language: {letter_model.language.upper()}", styles["Normal"])
-        )
-        elements.append(Spacer(1, 14))
 
     for para in letter_model.text.split("\n\n"):
         if para.strip():

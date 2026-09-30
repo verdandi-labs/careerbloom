@@ -18,6 +18,7 @@ class ContactDetailRaw(_RawEntry):
 
 
 class ExperienceRaw(_RawEntry):
+    title: str | None = None
     company: str | None = None
     city: str | None = None
     start_date: str | None = None
@@ -164,8 +165,25 @@ class CvEditRequest(BaseModel):
     value: str | list[dict] | None = None
 
 
+class CvRowPatchRequest(BaseModel):
+    fields: dict[str, str | None]
+
+
 class CvTranslateRequest(BaseModel):
     language: str = Field(..., min_length=2, max_length=5)
+
+
+class SaveVersionRequest(BaseModel):
+    cv_name: str = Field(..., min_length=1, max_length=100)
+    data: CvData | None = None
+
+
+class VersionListItem(BaseModel):
+    version_id: str
+    cv_name: str
+    created_at: str
+
+    model_config = {"from_attributes": True}
 
 
 class CvExportPdfRequest(BaseModel):

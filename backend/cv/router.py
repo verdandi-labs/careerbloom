@@ -6,7 +6,7 @@ from io import BytesIO
 import pypdfium2 as pdfium
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.shared import Pt, Inches
+from docx.shared import Pt, Inches, RGBColor
 from docx2python import docx2python
 from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 from fastapi.responses import StreamingResponse
@@ -18,14 +18,17 @@ from cv.schemas import (
     CvEditRequest,
     CvExportDocxRequest,
     CvRawText,
+    CvRowPatchRequest,
     CvTranslateRequest,
     FIELD_MODELS,
+    SaveVersionRequest,
     TEXT_FIELDS,
+    VersionListItem,
 )
 from cv.service import extract_raw_text, limiter, parse_all_sections, translate_cv
 from database import get_db
 from shared.constants import ALLOWED_LANGUAGES
-from shared.deps import get_current_user, rotated_session_headers
+from shared.deps import get_current_user, get_db_for_current_user, rotated_session_headers
 from shared.models.cv import CV_FIELDS
 from shared.models.user import User
 
@@ -192,6 +195,60 @@ async def edit_cv(
     return await repo.get_current_cv(user.user_id)
 
 
+@router.patch("/sections/{section}/rows/{line_num}", response_model=dict)
+async def patch_cv_row(
+    section: str,
+    line_num: int,
+    body: CvRowPatchRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db_for_current_user),
+):
+    repo = CvRepository(db)
+    cv = await repo.get_current_cv(user.user_id)
+    if not cv:
+        raise HTTPException(status_code=404, detail="No CV found")
+
+    PATCHABLE = {
+        "experience": ["title", "comments"],
+        "skills": ["skill", "comments"],
+        "languages": ["language", "level"],
+        "studies": ["comments"],
+        "awards": ["comments"],
+        "publications": ["comments"],
+        "volunteering": ["comments"],
+        "projects": ["comments"],
+    }
+
+    if section not in PATCHABLE:
+        raise HTTPException(status_code=400, detail=f"Section '{section}' is not patchable")
+
+    allowed = PATCHABLE[section]
+    fields = {k: v for k, v in body.fields.items() if k in allowed}
+    if not fields:
+        raise HTTPException(status_code=400, detail="No valid fields to patch")
+
+    rows = [r.model_dump() for r in (getattr(cv, section, None) or [])]
+
+    if line_num == -1:
+        next_line_num = max((r.get("line_num", 0) for r in rows), default=0) + 1
+        new_row = {k: v for k, v in fields.items() if v is not None}
+        new_row["line_num"] = next_line_num
+        rows.append(new_row)
+        updated_row = new_row
+    else:
+        match = next((r for r in rows if r.get("line_num") == line_num), None)
+        if not match:
+            raise HTTPException(status_code=404, detail="Row not found")
+        match.update({k: v for k, v in fields.items()})
+        updated_row = match
+
+    upload = await repo.get_latest_upload(user.user_id)
+    if upload is None:
+        raise HTTPException(status_code=404, detail="Please upload a CV before continuing")
+    await repo.create_edit(user.user_id, upload.upload_id, section, rows)
+    return updated_row
+
+
 @router.post("/translate", response_model=CvData)
 @limiter.limit("5/minute")
 async def translate(
@@ -216,12 +273,20 @@ async def translate(
     if _check_suspicious(translated.model_dump_json()):
         logger.warning("Suspicious CV translation rejected")
         raise HTTPException(status_code=400, detail="CV content could not be processed — please check your file and try again")
-    await repo.create_translate(user.user_id, body.language, translated)
     return translated
 
 
 @router.post("/export/docx")
 async def export_docx(body: CvExportDocxRequest, user: User = Depends(get_current_user)):
+    TEMPLATE_ACCENTS = {
+        "editorial": "B96A4B",
+        "classic": "5C5C5C",
+        "editorialBig": "3D3D3D",
+        "geometric": "B47A5C",
+        "soft": "E8C5D0",
+    }
+    accent = TEMPLATE_ACCENTS.get(body.template, "B96A4B")
+
     doc = Document()
     style = doc.styles["Normal"]
     style.font.name = "Calibri"
@@ -234,6 +299,7 @@ async def export_docx(body: CvExportDocxRequest, user: User = Depends(get_curren
         run = p.add_run(data["name"])
         run.bold = True
         run.font.size = Pt(18)
+        run.font.color.rgb = RGBColor.from_string(accent)
 
     if data.get("title"):
         p = doc.add_paragraph()
@@ -247,7 +313,8 @@ async def export_docx(body: CvExportDocxRequest, user: User = Depends(get_curren
         if isinstance(section_data, dict):
             section_data = section_data.get("en", "") or section_data.get("es", "")
         if section_data:
-            doc.add_heading(section_key.replace("_", " ").title(), level=2)
+            heading_para = doc.add_heading(section_key.replace("_", " ").title(), level=2)
+            heading_para.runs[0].font.color.rgb = RGBColor.from_string(accent)
             for para in section_data.split("\n\n"):
                 if para.strip():
                     doc.add_paragraph(para.strip())
@@ -260,3 +327,84 @@ async def export_docx(body: CvExportDocxRequest, user: User = Depends(get_curren
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         headers={"Content-Disposition": "attachment; filename=careerBloom-cv.docx"},
     )
+
+
+@router.get("/versions", response_model=list[VersionListItem])
+async def list_versions(
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    repo = CvRepository(db)
+    versions = await repo.list_versions(user.user_id)
+    return [
+        VersionListItem(
+            version_id=str(v.version_id),
+            cv_name=v.cv_name,
+            created_at=v.created_at.isoformat(),
+        )
+        for v in versions
+    ]
+
+
+@router.get("/versions/{version_id}", response_model=CvData)
+async def get_version(
+    version_id: str,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    repo = CvRepository(db)
+    version = await repo.get_version(user.user_id, version_id)
+    if not version:
+        raise HTTPException(status_code=404, detail="Version not found")
+    return CvData(**{f: getattr(version, f) for f in CV_FIELDS})
+
+
+@router.post("/versions", response_model=VersionListItem, status_code=201)
+async def create_version(
+    body: SaveVersionRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    repo = CvRepository(db)
+    data = body.data if body.data is not None else await repo.get_current_cv(user.user_id)
+    try:
+        version = await repo.save_version(user.user_id, body.cv_name, data)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return VersionListItem(
+        version_id=str(version.version_id),
+        cv_name=version.cv_name,
+        created_at=version.created_at.isoformat(),
+    )
+
+
+@router.put("/versions/{version_id}", response_model=VersionListItem)
+async def update_version(
+    version_id: str,
+    body: SaveVersionRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    repo = CvRepository(db)
+    data = body.data if body.data is not None else await repo.get_current_cv(user.user_id)
+    version = await repo.replace_version(user.user_id, version_id, body.cv_name, data)
+    if version is None:
+        raise HTTPException(status_code=404, detail="Version not found")
+    return VersionListItem(
+        version_id=str(version.version_id),
+        cv_name=version.cv_name,
+        created_at=version.created_at.isoformat(),
+    )
+
+
+@router.delete("/versions/{version_id}")
+async def delete_version(
+    version_id: str,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    repo = CvRepository(db)
+    deleted = await repo.delete_version(user.user_id, version_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Version not found")
+    return {"ok": True}

@@ -19,8 +19,79 @@ export type CVData = {
   other: string;
 };
 
+export type ContactItem = { detail?: string; line_num: number };
+export type ExperienceItem = {
+  title?: string;
+  company?: string;
+  city?: string;
+  start_date?: string;
+  end_date?: string;
+  comments?: string;
+  line_num: number;
+};
+export type SkillItem = { skill?: string; comments?: string; line_num: number };
+export type StudyItem = {
+  edu_center?: string;
+  city?: string;
+  start_date?: string;
+  end_date?: string;
+  comments?: string;
+  line_num: number;
+};
+export type LanguageItem = {
+  language?: string;
+  level?: string;
+  comments?: string;
+  line_num: number;
+};
+export type AwardItem = {
+  name?: string;
+  date?: string;
+  comments?: string;
+  line_num: number;
+};
+export type PublicationItem = {
+  name?: string;
+  date?: string;
+  comments?: string;
+  line_num: number;
+};
+export type VolunteeringItem = {
+  center?: string;
+  city?: string;
+  start_date?: string;
+  end_date?: string;
+  comments?: string;
+  line_num: number;
+};
+export type ProjectItem = {
+  name?: string;
+  url?: string;
+  comments?: string;
+  line_num: number;
+};
+
+export type StructuredCVData = {
+  name: string;
+  title: string;
+  summary: string;
+  contact: ContactItem[];
+  experience: ExperienceItem[];
+  education: StudyItem[];
+  skills: SkillItem[];
+  languages: LanguageItem[];
+  awards: AwardItem[];
+  publications: PublicationItem[];
+  volunteer: VolunteeringItem[];
+  projects: ProjectItem[];
+  certifications: string;
+  references: string;
+  other: string;
+  photo?: string;
+};
+
 export type CVTemplateId =
-  "editorial" | "classic" | "editorialBig" | "geometric" | "soft";
+  "terracotta" | "sage" | "classic" | "bold" | "minimal";
 
 export type CVTemplateMeta = {
   id: CVTemplateId;
@@ -34,61 +105,115 @@ export type CVTemplateMeta = {
     | "split"
     | "banner"
     | "editorial-banner"
-    | "geometric-band"
-    | "soft-hero";
+    | "soft-hero"
+    | "single"
+    | "editorial";
 };
 
 export const CV_TEMPLATES: CVTemplateMeta[] = [
   {
-    id: "editorial",
-    name: "Editorial",
-    blurb: "Elegant serif with a quiet terracotta accent.",
-    accent: "#B96A4B",
-    bg: "#FFFFFF",
-    font: "serif",
-    layout: "split",
-  },
-  {
-    id: "classic",
-    name: "Classic",
-    blurb: "Centered letter-spaced name. Two-column sidebar.",
-    accent: "#5C5C5C",
+    id: "terracotta",
+    name: "Terracotta",
+    blurb: "Warm sidebar, Playfair accents.",
+    accent: "#CB6843",
     bg: "#FFFFFF",
     font: "sans",
     layout: "sidebar",
   },
   {
-    id: "editorialBig",
-
-    name: "Statement",
-    blurb: "Huge display name on a beige backdrop.",
-    accent: "#3D3D3D",
-    bg: "#EFEAE3",
-    font: "display-serif",
-    layout: "editorial-banner",
-  },
-  {
-    id: "geometric",
-    name: "Geometric",
-    blurb: "Soft sage band, copper rules.",
-    accent: "#B47A5C",
+    id: "sage",
+    name: "Sage",
+    blurb: "Clean editorial layout with sage green accents.",
+    accent: "#7B9E87",
     bg: "#FFFFFF",
     font: "sans",
-    layout: "geometric-band",
+    layout: "split",
   },
   {
-    id: "soft",
-    name: "Soft",
-    blurb: "Pink blossom blob, pill headers.",
-    accent: "#E8C5D0",
+    id: "classic",
+    name: "Classic",
+    blurb: "Centered header, clean rules, timeless.",
+    accent: "#111111",
     bg: "#FFFFFF",
     font: "sans",
-    layout: "soft-hero",
+    layout: "single",
+  },
+  {
+    id: "bold",
+    name: "Bold",
+    blurb: "Editorial layout, strong typography.",
+    accent: "#111111",
+    bg: "#E8E5DC",
+    font: "sans",
+    layout: "editorial",
+  },
+  {
+    id: "minimal",
+    name: "Minimal",
+    blurb: "Clean sidebar, photo, structured.",
+    accent: "#111111",
+    bg: "#FFFFFF",
+    font: "sans",
+    layout: "sidebar",
   },
 ];
 
-export const DEFAULT_TEMPLATE: CVTemplateId = "editorial";
+export type SectionOrderItem =
+  { type: "section"; key: keyof StructuredCVData } | { type: "page-break" };
+
+export const DEFAULT_SECTION_ORDER: SectionOrderItem[] = [
+  { type: "section", key: "experience" },
+  { type: "section", key: "education" },
+  { type: "section", key: "skills" },
+  { type: "section", key: "languages" },
+  { type: "section", key: "contact" },
+  { type: "section", key: "awards" },
+  { type: "section", key: "publications" },
+  { type: "section", key: "volunteer" },
+  { type: "section", key: "projects" },
+];
+
+export const DEFAULT_TEMPLATE: CVTemplateId = "terracotta";
 
 export function getTemplate(id?: string | null): CVTemplateMeta {
   return CV_TEMPLATES.find((t) => t.id === id) ?? CV_TEMPLATES[0];
+}
+
+export function orderedSections(
+  order: SectionOrderItem[] | undefined,
+  keys: (keyof StructuredCVData)[],
+): (keyof StructuredCVData)[] {
+  if (!order) return keys;
+  const ordered = order
+    .filter(
+      (item): item is { type: "section"; key: keyof StructuredCVData } =>
+        item.type === "section" &&
+        keys.includes(item.key as keyof StructuredCVData),
+    )
+    .map((item) => item.key);
+  const missing = keys.filter((k) => !ordered.includes(k));
+  return [...ordered, ...missing];
+}
+
+export function splitAtPageBreaks(
+  order: SectionOrderItem[] | undefined,
+  keys: (keyof StructuredCVData)[],
+): (keyof StructuredCVData)[][] {
+  if (!order) return [keys];
+  const groups: (keyof StructuredCVData)[][] = [[]];
+  for (const item of order) {
+    if (item.type === "page-break") {
+      groups.push([]);
+    } else if (
+      item.type === "section" &&
+      keys.includes(item.key as keyof StructuredCVData)
+    ) {
+      groups[groups.length - 1].push(item.key as keyof StructuredCVData);
+    }
+  }
+  const missing = keys.filter((k) => !groups.some((g) => g.includes(k)));
+  if (missing.length > 0) {
+    groups[groups.length - 1].push(...missing);
+  }
+  return groups.filter((g) => g.length > 0);
 }
