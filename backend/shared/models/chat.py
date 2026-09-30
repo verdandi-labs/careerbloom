@@ -29,6 +29,4 @@ class ChatMessage(Base):
     role = Column(Text, nullable=False)
     content = Column(Text, nullable=False)
     suggestion = Column(JSONB)
-    applied_text = Column(Text)
-    rejected = Column(Boolean, nullable=False, default=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())

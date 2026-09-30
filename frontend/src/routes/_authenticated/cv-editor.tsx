@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { CvUploadModal } from "@/components/CvUploadModal";
 
-export const Route = createFileRoute("/_authenticated/cv2")({
+export const Route = createFileRoute("/_authenticated/cv-editor")({
   head: () => ({ meta: [{ title: "CV Builder · careerBloom" }] }),
   component: CVPage,
 });
@@ -102,6 +102,7 @@ const LIST_SECTIONS: ListSection[] = [
     key: "experience",
     label: "Experience",
     fields: [
+      { key: "title", label: "Job Title" },
       { key: "company", label: "Company" },
       { key: "city", label: "City" },
       { key: "start_date", label: "Start" },
@@ -109,7 +110,12 @@ const LIST_SECTIONS: ListSection[] = [
       { key: "comments", label: "Comments", textarea: true },
     ],
     text: (r) =>
-      range(r, ["company", "city"], ["start_date", "end_date"], "comments"),
+      range(
+        r,
+        ["title", "company", "city"],
+        ["start_date", "end_date"],
+        "comments",
+      ),
   },
   {
     key: "skills",
@@ -326,7 +332,9 @@ function CVPage() {
               },
             ]
           : rows.map((r) =>
-              r.line_num === d.lineNum ? { ...values, line_num: d.lineNum } : r,
+              r.line_num === d.lineNum
+                ? { ...r, ...values, line_num: d.lineNum }
+                : r,
             );
       await save(d.section.key, next);
     }

@@ -1,0 +1,4 @@
+-- Add title field to experience entries in cv_raw_edits and cv_saved_versions
+-- title is a string field inside the JSONB array objects — no schema change needed,
+-- JSONB is schemaless. This migration is a no-op marker that the field is now supported.
+-- The application layer will start reading and writing it after this migration runs.

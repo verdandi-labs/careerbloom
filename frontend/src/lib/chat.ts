@@ -17,6 +17,10 @@ export async function createConversation(
   return data?.id ?? null;
 }
 
+export async function deleteConversation(id: string): Promise<void> {
+  await api(`/chat/conversations/${id}`, { method: "DELETE" });
+}
+
 export async function createCoverLetterConversation(): Promise<string | null> {
   const data = await api<{ id: string }>("/chat/cover-letter-conversations", {
     method: "POST",

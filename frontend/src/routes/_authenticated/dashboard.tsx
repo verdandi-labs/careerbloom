@@ -82,13 +82,13 @@ function Dashboard() {
 
           <div className="mt-7 flex flex-wrap gap-2">
             <Link
-              to="/chat"
+              to="/cv-chat"
               className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm text-background"
             >
               <Sparkles className="h-4 w-4" /> Talk to your coach
             </Link>
             <Link
-              to="/cv"
+              to="/cv-editor"
               className="inline-flex items-center gap-2 rounded-full bg-secondary px-5 py-2.5 text-sm text-secondary-foreground"
             >
               Open CV Builder <ArrowUpRight className="h-4 w-4" />
@@ -110,7 +110,7 @@ function Dashboard() {
           </div>
 
           <Link
-            to="/chat"
+            to="/cv-chat"
             className="mt-5 flex items-center justify-center gap-2 rounded-2xl bg-foreground py-3 text-sm font-medium text-background"
           >
             Chat with Bloom → <ArrowUpRight className="h-4 w-4" />
@@ -161,8 +161,7 @@ function Dashboard() {
             const id = await getOrCreateCareerDirection();
             if (id)
               navigate({
-                to: "/chat/$conversationId",
-                params: { conversationId: id },
+                to: "/career-direction",
               });
           }}
           className="group relative flex flex-col justify-between overflow-hidden rounded-[20px] border border-white/40 bg-white/30 p-6 text-left backdrop-blur-xl shadow-[0_16px_40px_-18px_rgba(248,175,166,0.6)] transition hover:bg-white/40 lg:col-span-8 min-h-[200px]"

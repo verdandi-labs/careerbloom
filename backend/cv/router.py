@@ -18,6 +18,7 @@ from cv.schemas import (
     CvEditRequest,
     CvExportDocxRequest,
     CvRawText,
+    CvRowPatchRequest,
     CvTranslateRequest,
     FIELD_MODELS,
     SaveVersionRequest,
@@ -27,7 +28,7 @@ from cv.schemas import (
 from cv.service import extract_raw_text, limiter, parse_all_sections, translate_cv
 from database import get_db
 from shared.constants import ALLOWED_LANGUAGES
-from shared.deps import get_current_user, rotated_session_headers
+from shared.deps import get_current_user, get_db_for_current_user, rotated_session_headers
 from shared.models.cv import CV_FIELDS
 from shared.models.user import User
 
@@ -192,6 +193,60 @@ async def edit_cv(
 
     await repo.create_edit(user.user_id, upload.upload_id, body.field, value)
     return await repo.get_current_cv(user.user_id)
+
+
+@router.patch("/sections/{section}/rows/{line_num}", response_model=dict)
+async def patch_cv_row(
+    section: str,
+    line_num: int,
+    body: CvRowPatchRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db_for_current_user),
+):
+    repo = CvRepository(db)
+    cv = await repo.get_current_cv(user.user_id)
+    if not cv:
+        raise HTTPException(status_code=404, detail="No CV found")
+
+    PATCHABLE = {
+        "experience": ["title", "comments"],
+        "skills": ["skill", "comments"],
+        "languages": ["language", "level"],
+        "studies": ["comments"],
+        "awards": ["comments"],
+        "publications": ["comments"],
+        "volunteering": ["comments"],
+        "projects": ["comments"],
+    }
+
+    if section not in PATCHABLE:
+        raise HTTPException(status_code=400, detail=f"Section '{section}' is not patchable")
+
+    allowed = PATCHABLE[section]
+    fields = {k: v for k, v in body.fields.items() if k in allowed}
+    if not fields:
+        raise HTTPException(status_code=400, detail="No valid fields to patch")
+
+    rows = [r.model_dump() for r in (getattr(cv, section, None) or [])]
+
+    if line_num == -1:
+        next_line_num = max((r.get("line_num", 0) for r in rows), default=0) + 1
+        new_row = {k: v for k, v in fields.items() if v is not None}
+        new_row["line_num"] = next_line_num
+        rows.append(new_row)
+        updated_row = new_row
+    else:
+        match = next((r for r in rows if r.get("line_num") == line_num), None)
+        if not match:
+            raise HTTPException(status_code=404, detail="Row not found")
+        match.update({k: v for k, v in fields.items()})
+        updated_row = match
+
+    upload = await repo.get_latest_upload(user.user_id)
+    if upload is None:
+        raise HTTPException(status_code=404, detail="Please upload a CV before continuing")
+    await repo.create_edit(user.user_id, upload.upload_id, section, rows)
+    return updated_row
 
 
 @router.post("/translate", response_model=CvData)

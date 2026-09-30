@@ -22,10 +22,7 @@ class ConversationResponse(BaseModel):
 
 class MessageCreate(BaseModel):
     content: str = Field(..., max_length=10_000)
-
-
-class ApplySuggestionRequest(BaseModel):
-    chosen: str = Field(..., max_length=2000)
+    context: Literal["cv_chat", "cover_letter", "career_direction"] = "cv_chat"
 
 
 class MessageResponse(BaseModel):
@@ -33,8 +30,6 @@ class MessageResponse(BaseModel):
     role: str
     content: str
     suggestion: dict | None = None
-    applied_text: str | None = None
-    rejected: bool
     created_at: datetime
 
     model_config = {"from_attributes": True}
@@ -47,26 +42,20 @@ class ChatRequest(BaseModel):
 
 class CoverLetterSuggestion(BaseModel):
     type: Literal["cover_letter"]
-    options: list[str]
+    text: str = Field(..., max_length=5000)
 
-    @field_validator("options")
-    @classmethod
-    def _three_options(cls, v: list[str]) -> list[str]:
-        if len(v) != 3:
-            raise ValueError("must have exactly 3 options")
-        for opt in v:
-            if not opt.strip():
-                raise ValueError("options must not be empty")
-            if len(opt) > 5000:
-                raise ValueError("option too long")
-        return v
+
+class CvRowSuggestion(BaseModel):
+    type: Literal["row_suggestion"]
+    section: str
+    line_num: int | None = None
+    fields: dict[str, str]
 
 
 class ChatSuggestion(BaseModel):
     type: str
     section: str
-    original: str
-    options: list[str]
+    text: str = Field(..., max_length=2000)
 
     @field_validator("type")
     @classmethod
@@ -80,21 +69,4 @@ class ChatSuggestion(BaseModel):
     def _section_must_be_text_field(cls, v: str) -> str:
         if v not in TEXT_FIELDS:
             raise ValueError("section must be a text field")
-        return v
-
-    @field_validator("original")
-    @classmethod
-    def _original_length(cls, v: str) -> str:
-        if len(v) > 2000:
-            raise ValueError("original too long")
-        return v
-
-    @field_validator("options")
-    @classmethod
-    def _options_valid(cls, v: list[str]) -> list[str]:
-        if not v or len(v) > 5:
-            raise ValueError("options must have 1-5 items")
-        for o in v:
-            if not o.strip() or len(o) > 2000:
-                raise ValueError("invalid option")
         return v

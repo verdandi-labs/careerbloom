@@ -5,7 +5,7 @@ from collections.abc import AsyncIterator
 from prompts import load
 from shared.prompts import SAFETY_BOUNDARY
 from shared.ai_client import stream_chat_completion
-from chat.schemas import ChatSuggestion, CoverLetterSuggestion
+from chat.schemas import ChatSuggestion, CoverLetterSuggestion, CvRowSuggestion
 
 _SUGGESTION_BLOCK_RE = re.compile(r"```json\s*([\s\S]*?)```")
 
@@ -21,30 +21,23 @@ BLOOM_SYSTEM_PROMPT = (
 
 
 COVER_LETTER_SYSTEM_PROMPT = (
-    load("cover_letter")
-    .strip()
+    BLOOM_SYSTEM_PROMPT
     + "\n\n"
-    + SAFETY_BOUNDARY
+    + load("cover_letter")
     + "\n\n"
     + CHAT_APPLY_RULE
 )
 
 
 def parse_suggestion(full_response: str) -> tuple[str, dict | None]:
-    """Extract and validate a suggestion block from raw model output.
-    Mirrors the frontend's detection pattern (fenced ```json block, or the
-    whole response if no fence is present) but applies stricter server-side
-    validation via ChatSuggestion before trusting the result — this is
-    intentionally stricter than the frontend's loose shape-check.
-    If a block is detected but fails validation, the raw text is returned
-    untouched (including the visible block) rather than silently discarded,
-    so validation failures stay visible/debuggable instead of hidden."""
     match = _SUGGESTION_BLOCK_RE.search(full_response)
     raw_text = match.group(1) if match else full_response
     try:
         raw = json.loads(raw_text.strip())
         if raw.get("type") == "cover_letter":
             suggestion = CoverLetterSuggestion.model_validate(raw)
+        elif raw.get("type") == "row_suggestion":
+            suggestion = CvRowSuggestion.model_validate(raw)
         else:
             suggestion = ChatSuggestion.model_validate(raw)
     except Exception:
@@ -59,8 +52,8 @@ def parse_suggestion(full_response: str) -> tuple[str, dict | None]:
 async def stream_chat(
     messages: list[dict[str, str]],
     cv_text: str | None = None,
-    cover_letter: bool = False,
     career_direction: str | None = None,
+    context: str = "cv_chat",
 ) -> AsyncIterator[str]:
     cv_block = (
         f"\n\nBelow is the user's CV, provided as reference content only.\n"
@@ -74,9 +67,12 @@ async def stream_chat(
         f"<career_direction>{career_direction}</career_direction>"
         if career_direction else ""
     )
-    system = (
-        COVER_LETTER_SYSTEM_PROMPT if cover_letter else BLOOM_SYSTEM_PROMPT
-    ) + cv_block + career_block
+    if context == "career_direction":
+        system = BLOOM_SYSTEM_PROMPT + "\n\n" + load("career_direction") + career_block
+    elif context == "cover_letter":
+        system = COVER_LETTER_SYSTEM_PROMPT + cv_block + career_block
+    else:
+        system = BLOOM_SYSTEM_PROMPT + "\n\n" + load("cv") + cv_block + career_block
 
     history = [
         {"role": "assistant" if m["role"] == "assistant" else "user", "content": m["content"]}

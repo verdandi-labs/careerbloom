@@ -112,6 +112,7 @@ const LIST_SECTIONS: ListSection[] = [
     key: "experience",
     label: "Experience",
     fields: [
+      { key: "title", label: "Job Title" },
       { key: "company", label: "Company" },
       { key: "city", label: "City" },
       { key: "start_date", label: "Start" },
@@ -119,7 +120,12 @@ const LIST_SECTIONS: ListSection[] = [
       { key: "comments", label: "Comments", textarea: true },
     ],
     text: (r) =>
-      range(r, ["company", "city"], ["start_date", "end_date"], "comments"),
+      range(
+        r,
+        ["title", "company", "city"],
+        ["start_date", "end_date"],
+        "comments",
+      ),
   },
   {
     key: "skills",
@@ -209,7 +215,7 @@ const listText = (data: CvData, key: string): string => {
         case "experience":
           return range(
             r,
-            ["company", "city"],
+            ["title", "company", "city"],
             ["start_date", "end_date"],
             "comments",
           );
@@ -489,6 +495,7 @@ function PreviewPage() {
     if (field === "experience")
       return (
         <>
+          {input("title", "Job Title")}
           {input("company", "Company / Role")}
           {input("city", "City")}
           {input("start_date", "Start date")}

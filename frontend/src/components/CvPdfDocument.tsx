@@ -315,7 +315,12 @@ function TerracottaPdfDocument({
               <View key={i} style={styles.experienceItem}>
                 <View style={styles.expHeader}>
                   <View>
-                    <Text style={styles.expCompany}>{item.company}</Text>
+                    <Text style={styles.expCompany}>
+                      {item.title ?? item.company}
+                    </Text>
+                    {item.title && item.company && (
+                      <Text style={styles.expCity}>{item.company}</Text>
+                    )}
                     {item.city && (
                       <Text style={styles.expCity}>{item.city}</Text>
                     )}
@@ -623,7 +628,12 @@ function SagePdfDocument({
             <View key={i} style={styles.experienceItem}>
               <View style={styles.expHeader}>
                 <View>
-                  <Text style={styles.expCompany}>{item.company}</Text>
+                  <Text style={styles.expCompany}>
+                    {item.title ?? item.company}
+                  </Text>
+                  {item.title && item.company && (
+                    <Text style={styles.expCity}>{item.company}</Text>
+                  )}
                   {item.city && <Text style={styles.expCity}>{item.city}</Text>}
                 </View>
                 {(item.start_date || item.end_date) && (
@@ -882,7 +892,7 @@ function ClassicPdfDocument({
                   marginBottom: 2,
                 }}
               >
-                <Text style={styles.expRole}>{item.company}</Text>
+                <Text style={styles.expRole}>{item.title ?? item.company}</Text>
                 {(item.start_date || item.end_date) && (
                   <Text style={styles.expDate}>
                     {item.start_date && item.end_date
@@ -891,6 +901,9 @@ function ClassicPdfDocument({
                   </Text>
                 )}
               </View>
+              {item.title && item.company && (
+                <Text style={styles.expCompany}>{item.company}</Text>
+              )}
               {item.city && <Text style={styles.expCompany}>{item.city}</Text>}
               {item.comments && (
                 <Text style={styles.expComment}>{item.comments}</Text>
@@ -1156,7 +1169,9 @@ function BoldPdfDocument({
                   justifyContent: "space-between",
                 }}
               >
-                <Text style={styles.expCompany}>{item.company}</Text>
+                <Text style={styles.expCompany}>
+                  {item.title ?? item.company}
+                </Text>
                 {(item.start_date || item.end_date) && (
                   <Text style={styles.expDate}>
                     {item.start_date && item.end_date
@@ -1165,6 +1180,9 @@ function BoldPdfDocument({
                   </Text>
                 )}
               </View>
+              {item.title && item.company && (
+                <Text style={styles.expCity}>{item.company}</Text>
+              )}
               {item.city && <Text style={styles.expCity}>{item.city}</Text>}
               {item.comments && (
                 <Text style={styles.expComment}>{item.comments}</Text>
@@ -1623,7 +1641,9 @@ function MinimalPdfDocument({
                   justifyContent: "space-between",
                 }}
               >
-                <Text style={styles.expCompany}>{item.company}</Text>
+                <Text style={styles.expCompany}>
+                  {item.title ?? item.company}
+                </Text>
                 {(item.start_date || item.end_date) && (
                   <Text style={styles.expDate}>
                     {item.start_date && item.end_date
@@ -1632,6 +1652,9 @@ function MinimalPdfDocument({
                   </Text>
                 )}
               </View>
+              {item.title && item.company && (
+                <Text style={styles.expCity}>{item.company}</Text>
+              )}
               {item.city && <Text style={styles.expCity}>{item.city}</Text>}
               {item.comments && (
                 <Text style={styles.expComment}>{item.comments}</Text>

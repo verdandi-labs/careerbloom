@@ -78,6 +78,7 @@ export async function api<T = unknown>(
     );
   }
 
+  if (res.status === 204) return null as T;
   return res.json();
 }
 
