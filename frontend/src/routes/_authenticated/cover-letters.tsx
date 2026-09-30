@@ -3,15 +3,16 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { ChatPanel } from "@/components/ChatPanel";
+import { ConversationDeleteControl } from "@/components/ConversationDeleteControl";
 import {
   CoverLetterSuggestionCard,
   type CoverLetterSuggestion,
 } from "@/components/CoverLetterSuggestionCard";
 import { API_BASE, api, errorMessage } from "@/lib/api";
 import { type MessagePayload } from "@/hooks/useChat";
+import { useDeleteConversation } from "@/hooks/useDeleteConversation";
 import {
   createCoverLetterConversation,
-  deleteConversation,
   listCoverLetterConversations,
   type ConversationSummary,
 } from "@/lib/chat";
@@ -89,10 +90,21 @@ function CoverLettersPage() {
   });
 
   const [deleting, setDeleting] = useState<string | null>(null);
-  const [deletingConvId, setDeletingConvId] = useState<string | null>(null);
   const [exporting, setExporting] = useState<string | null>(null);
   const [actionErr, setActionErr] = useState("");
   const [creating, setCreating] = useState(false);
+  const {
+    deletingId: deletingConvId,
+    setDeletingId: setDeletingConvId,
+    confirmDelete: confirmDeleteConv,
+  } = useDeleteConversation({
+    items: conversations ?? [],
+    setItems: (updated) =>
+      qc.setQueryData(["cover-letter-conversations"], updated),
+    onSuccess: () =>
+      void qc.invalidateQueries({ queryKey: ["cover-letter-conversations"] }),
+    onError: (_, message) => setActionErr(message),
+  });
 
   async function newCoverLetter() {
     setCreating(true);
@@ -280,57 +292,20 @@ function CoverLettersPage() {
                       })}
                     </p>
                   </div>
-                  {deletingConvId === c.id ? (
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-foreground/60">
-                        Delete?
-                      </span>
-                      <button
-                        onClick={() => setDeletingConvId(null)}
-                        className="text-xs text-foreground/40 hover:text-foreground"
-                      >
-                        No
-                      </button>
-                      <button
-                        onClick={async () => {
-                          setActionErr("");
-                          try {
-                            await deleteConversation(c.id);
-                            setDeletingConvId(null);
-                            void qc.invalidateQueries({
-                              queryKey: ["cover-letter-conversations"],
-                            });
-                          } catch (e) {
-                            setActionErr(
-                              errorMessage(
-                                e,
-                                "Couldn't delete conversation, please try again",
-                              ),
-                            );
-                          }
-                        }}
-                        className="text-xs font-medium text-rose-500 hover:text-rose-700"
-                      >
-                        Yes
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => resume(c)}
-                        className="text-xs text-foreground/40 hover:text-foreground"
-                      >
-                        Resume
-                      </button>
-                      <button
-                        onClick={() => setDeletingConvId(c.id)}
-                        className="grid h-8 w-8 place-items-center rounded-full bg-white/70 text-foreground/60 hover:bg-white"
-                        title="Delete"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
+                  {deletingConvId !== c.id && (
+                    <button
+                      onClick={() => resume(c)}
+                      className="text-xs text-foreground/40 hover:text-foreground"
+                    >
+                      Resume
+                    </button>
                   )}
+                  <ConversationDeleteControl
+                    isDeleting={deletingConvId === c.id}
+                    onDelete={() => setDeletingConvId(c.id)}
+                    onCancel={() => setDeletingConvId(null)}
+                    onConfirm={() => void confirmDeleteConv(c.id)}
+                  />
                 </div>
               ))}
             </section>

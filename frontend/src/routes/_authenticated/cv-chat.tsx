@@ -8,16 +8,11 @@ import {
 } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
+import { ConversationDeleteControl } from "@/components/ConversationDeleteControl";
 import { api, errorMessage } from "@/lib/api";
-import { createConversation, deleteConversation } from "@/lib/chat";
-import {
-  MessageCircleHeart,
-  Plus,
-  Trash2,
-  X,
-  Pin,
-  History,
-} from "lucide-react";
+import { createConversation } from "@/lib/chat";
+import { useDeleteConversation } from "@/hooks/useDeleteConversation";
+import { MessageCircleHeart, Plus, X, Pin, History } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cv-chat")({
   head: () => ({ meta: [{ title: "CV Chat · careerBloom" }] }),
@@ -32,9 +27,27 @@ function ChatLayout() {
   const params = useParams({ strict: false }) as { conversationId?: string };
   const activeId = params.conversationId;
   const [convs, setConvs] = useState<Conversation[]>([]);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [listError, setListError] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { deletingId, setDeletingId, confirmDelete } = useDeleteConversation({
+    items: convs,
+    setItems: setConvs,
+    onBeforeDelete: (id) => {
+      if (activeId === id) {
+        const remaining = convs.filter((c) => c.id !== id);
+        if (remaining[0]) {
+          navigate({
+            to: "/cv-chat/$conversationId",
+            params: { conversationId: remaining[0].id },
+            replace: true,
+          });
+        } else {
+          navigate({ to: "/cv-chat", replace: true });
+        }
+      }
+    },
+    onError: (_, message) => setListError(message),
+  });
 
   const load = useCallback(async () => {
     setListError("");
@@ -88,31 +101,6 @@ function ChatLayout() {
     }
   }
 
-  async function handleDelete(id: string) {
-    const snapshot = convs.find((c) => c.id === id);
-    setConvs((prev) => prev.filter((c) => c.id !== id));
-    setDeletingId(null);
-    if (activeId === id) {
-      const remaining = convs.filter((c) => c.id !== id);
-      if (remaining[0]) {
-        navigate({
-          to: "/cv-chat/$conversationId",
-          params: { conversationId: remaining[0].id },
-          replace: true,
-        });
-      } else {
-        navigate({ to: "/cv-chat", replace: true });
-      }
-    }
-    try {
-      await deleteConversation(id);
-    } catch {
-      if (snapshot) setConvs((prev) => [...prev, snapshot]);
-      setDeletingId(null);
-      setListError("Couldn't delete conversation, please try again");
-    }
-  }
-
   return (
     <AppShell>
       <div className="relative flex h-[calc(100vh-9rem)] min-h-0 supports-[height:100dvh]:h-[calc(100dvh-9rem)] gap-4 md:grid md:grid-cols-[280px_1fr]">
@@ -156,72 +144,35 @@ function ChatLayout() {
             )}
             {convs.map((c) => {
               const active = c.id === activeId;
-              const isDeleting = deletingId === c.id;
               const pinned = c.is_career_direction;
               return (
                 <div
                   key={c.id}
                   className={`group flex items-center gap-1 rounded-2xl px-2 py-1.5 transition ${active ? "bg-sidebar-accent" : "hover:bg-white/50"}`}
                 >
-                  {isDeleting ? (
-                    <>
-                      <span className="flex-1 truncate px-1 text-xs text-foreground/70">
-                        Delete?
-                      </span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setDeletingId(null);
-                        }}
-                        className="grid h-6 w-6 place-items-center rounded-full text-xs text-foreground/40 hover:text-foreground hover:bg-white"
-                      >
-                        No
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(c.id);
-                        }}
-                        className="grid h-6 w-6 place-items-center rounded-full bg-rose-50 text-xs font-medium text-rose-500 hover:bg-rose-100"
-                      >
-                        Yes
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <Link
-                        to="/cv-chat/$conversationId"
-                        params={{ conversationId: c.id }}
-                        onClick={() => setDrawerOpen(false)}
-                        className="flex flex-1 items-center gap-2 truncate text-xs"
-                        title={c.title}
-                      >
-                        {pinned ? (
-                          <Pin className="h-3.5 w-3.5 shrink-0 text-secondary-foreground" />
-                        ) : (
-                          <MessageCircleHeart className="h-3.5 w-3.5 shrink-0 text-foreground/60" />
-                        )}
-                        <span
-                          className={`truncate ${pinned ? "font-medium" : ""}`}
-                        >
-                          {c.title}
-                        </span>
-                      </Link>
-                      {!pinned && (
-                        <>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setDeletingId(c.id);
-                            }}
-                            className="grid h-6 w-6 place-items-center rounded-full text-foreground/50 opacity-70 transition hover:bg-white hover:text-foreground md:opacity-0 md:group-hover:opacity-100"
-                            title="Delete"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </button>
-                        </>
-                      )}
-                    </>
+                  <Link
+                    to="/cv-chat/$conversationId"
+                    params={{ conversationId: c.id }}
+                    onClick={() => setDrawerOpen(false)}
+                    className="flex flex-1 items-center gap-2 truncate text-xs"
+                    title={c.title}
+                  >
+                    {pinned ? (
+                      <Pin className="h-3.5 w-3.5 shrink-0 text-secondary-foreground" />
+                    ) : (
+                      <MessageCircleHeart className="h-3.5 w-3.5 shrink-0 text-foreground/60" />
+                    )}
+                    <span className={`truncate ${pinned ? "font-medium" : ""}`}>
+                      {c.title}
+                    </span>
+                  </Link>
+                  {!pinned && (
+                    <ConversationDeleteControl
+                      isDeleting={deletingId === c.id}
+                      onDelete={() => setDeletingId(c.id)}
+                      onCancel={() => setDeletingId(null)}
+                      onConfirm={() => void confirmDelete(c.id)}
+                    />
                   )}
                 </div>
               );
