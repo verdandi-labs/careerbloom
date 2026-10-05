@@ -1,6 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import { fetchMe, requestMagicLink } from "./api";
+import { fetchMe } from "./api";
 
 export const sessionKeys = {
   all: ["session"] as const,
@@ -13,10 +13,6 @@ export function useSession() {
     retry: false,
     staleTime: 5 * 60 * 1000,
   });
-}
-
-export function useSendMagicLink() {
-  return useMutation({ mutationFn: requestMagicLink });
 }
 
 export function useSignOut() {

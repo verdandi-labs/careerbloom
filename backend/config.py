@@ -1,5 +1,6 @@
-from pydantic_settings import BaseSettings
 from functools import lru_cache
+
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -12,18 +13,18 @@ class Settings(BaseSettings):
     # Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
     MASTER_KEY: str
 
-    # OpenCode Zen
-    ZEN_API_KEY: str = ""
-    ZEN_BASE_URL: str = "https://opencode.ai/zen/v1"
-    ZEN_MODEL_REFRESH_HOURS: int = 6
-
-    # OpenAI
+    # OpenAI (Groq, OpenAI compatible)
     OPENAI_API_KEY: str = ""
     OPENAI_BASE_URL: str = "https://api.openai.com/v1"
-    OPENAI_MODEL: str = "llama-3.3-70b-versatile"
+    OPENAI_MODEL: str = "openai/gpt-oss-120b"
 
-    # SendGrid
-    SENDGRID_API_KEY: str = ""
+    # Mistral (fallback)
+    MISTRAL_API_KEY: str = ""
+    MISTRAL_BASE_URL: str = "https://api.mistral.ai/v1"
+    MISTRAL_MODEL: str = "mistral-large-latest"
+
+    # OpenRouter (fallback)
+    OPENROUTER_API_KEY: str = ""
 
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""

@@ -1,12 +1,11 @@
 import {
   Outlet,
   createFileRoute,
-  useNavigate,
   useRouterState,
 } from "@tanstack/react-router";
 import { z } from "zod";
 import { API_BASE } from "@/lib/api";
-import { Chrome, Github, Mail } from "lucide-react";
+import { Chrome, Github } from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -42,7 +41,6 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 function LoginPage() {
   const { error } = Route.useSearch();
-  const navigate = useNavigate();
   const errorMessage = error ? ERROR_MESSAGES[error] : undefined;
 
   return (
@@ -81,13 +79,6 @@ function LoginPage() {
             <Github className="h-4 w-4" />
             GitHub
           </a>
-          <button
-            onClick={() => navigate({ to: "/auth/mail", search: {} })}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary/40 px-6 py-3.5 text-sm font-bold text-secondary-foreground backdrop-blur-sm transition hover:bg-secondary/60"
-          >
-            <Mail className="h-4 w-4" />
-            Mail
-          </button>
         </div>
       </section>
       <Footer />

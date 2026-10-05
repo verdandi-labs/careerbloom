@@ -27,10 +27,10 @@ Run through in a normal browser against a fresh deploy before trusting it. Base 
 - **Pass**: lands on `/dashboard`
 - **Fail**: lands on `/onboarding`, disconnects the account, or any error
 
-## 4. Email conflict
+## 4. Cross provider email conflict
 
-1. Sign up with a magic link using email X
-2. Try Google sign-in with the same email X
+1. Sign up with Google using email X
+2. Sign out, then sign in with GitHub using the same email X
 
 - **Pass**: redirects to `/auth?error=email_exists` with the conflict banner shown
 - **Fail**: proceeds to login, shows an internal error, or no banner
