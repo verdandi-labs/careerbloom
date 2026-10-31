@@ -35,7 +35,6 @@ export type Props = {
   onDragSection?: (fromIndex: number, toIndex: number) => void;
   activeDragIndex?: number | null;
   setActiveDragIndex?: (index: number | null) => void;
-  photoUploading?: boolean;
   pdfScale?: number;
 };
 

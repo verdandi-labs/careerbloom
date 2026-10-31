@@ -87,7 +87,6 @@ export type StructuredCVData = {
   certifications: string;
   references: string;
   other: string;
-  photo?: string;
 };
 
 export type CVTemplateId =
@@ -150,7 +149,7 @@ export const CV_TEMPLATES: CVTemplateMeta[] = [
   {
     id: "minimal",
     name: "Minimal",
-    blurb: "Clean sidebar, photo, structured.",
+    blurb: "Clean sidebar, structured.",
     accent: "#111111",
     bg: "#FFFFFF",
     font: "sans",

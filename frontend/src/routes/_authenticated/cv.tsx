@@ -22,7 +22,6 @@ import {
   Loader2,
   Save,
   X,
-  ImageIcon,
 } from "lucide-react";
 import { pdf } from "@react-pdf/renderer";
 import { CvPdfDocument } from "@/components/CvPdfDocument";
@@ -287,7 +286,6 @@ function toStructuredData(data: CvData): StructuredCVData {
     certifications: "",
     references: "",
     other: "",
-    photo: undefined,
   };
 }
 
@@ -353,11 +351,6 @@ function PreviewPage() {
     null,
   );
   const [exporting, setExporting] = useState(false);
-  const [photo, setPhoto] = useState<string | null>(() =>
-    localStorage.getItem("cv-preview-photo"),
-  );
-  const [photoUploading, setPhotoUploading] = useState(false);
-  const photoInputRef = useRef<HTMLInputElement>(null);
   const [editingItem, setEditingItem] = useState<{
     field: keyof StructuredCVData;
     index: number;
@@ -430,7 +423,6 @@ function PreviewPage() {
   function handleReset() {
     localStorage.removeItem("cv-preview-local-edits");
     localStorage.removeItem("cv-preview-structured-edits");
-    localStorage.removeItem("cv-preview-photo");
     localStorage.removeItem("cv-preview-section-order");
     if (cv) {
       setMergedData(toDocxData(cv));
@@ -442,7 +434,6 @@ function PreviewPage() {
         JSON.stringify(balanced),
       );
     }
-    setPhoto(null);
   }
 
   useEffect(() => {
@@ -667,62 +658,6 @@ function PreviewPage() {
     }
   }
 
-  async function handlePhotoUpload(file: File) {
-    const VALID_TYPES = ["image/jpeg", "image/png", "image/webp"];
-    const MIN_SIZE = 50 * 1024;
-    const MAX_SIZE = 5 * 1024 * 1024;
-
-    if (!VALID_TYPES.includes(file.type)) {
-      setActionErr("Please upload a JPEG, PNG or WebP image");
-      return;
-    }
-    if (file.size < MIN_SIZE) {
-      setActionErr("Image is too small — minimum 50KB");
-      return;
-    }
-    if (file.size > MAX_SIZE) {
-      setActionErr("Image is too large — maximum 5MB");
-      return;
-    }
-
-    setPhotoUploading(true);
-    try {
-      const arrayBuffer = await file.arrayBuffer();
-      const bytes = new Uint8Array(arrayBuffer);
-      const isJpeg = bytes[0] === 0xff && bytes[1] === 0xd8;
-      const isPng = bytes[0] === 0x89 && bytes[1] === 0x50;
-      const isWebp = bytes[8] === 0x57 && bytes[9] === 0x45;
-      if (!isJpeg && !isPng && !isWebp) {
-        setActionErr("Invalid image file");
-        return;
-      }
-
-      const img = new Image();
-      const objectUrl = URL.createObjectURL(file);
-      img.src = objectUrl;
-
-      await new Promise<void>((resolve) => {
-        img.onload = () => resolve();
-      });
-
-      const MAX_W = 400;
-      const MAX_H = 500;
-      const ratio = Math.min(MAX_W / img.width, MAX_H / img.height, 1);
-      const canvas = document.createElement("canvas");
-      canvas.width = Math.round(img.width * ratio);
-      canvas.height = Math.round(img.height * ratio);
-      const ctx = canvas.getContext("2d")!;
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      URL.revokeObjectURL(objectUrl);
-
-      const compressed = canvas.toDataURL("image/jpeg", 0.8);
-      localStorage.setItem("cv-preview-photo", compressed);
-      setPhoto(compressed);
-    } finally {
-      setPhotoUploading(false);
-    }
-  }
-
   async function handleExportPdf() {
     if (!structuredData) return;
     setExporting(true);
@@ -730,7 +665,7 @@ function PreviewPage() {
       await registerFonts();
       const blob = await pdf(
         <CvPdfDocument
-          data={{ ...structuredData, photo: photo ?? undefined }}
+          data={structuredData}
           template={selectedTemplate}
           sectionOrder={sectionOrder}
           pdfScale={pdfScale}
@@ -868,35 +803,6 @@ function PreviewPage() {
               )}
               Export PDF
             </button>
-            <input
-              ref={photoInputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) void handlePhotoUpload(file);
-                e.target.value = "";
-              }}
-            />
-            <button
-              onClick={() => photoInputRef.current?.click()}
-              className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs text-foreground hover:bg-white"
-            >
-              <ImageIcon className="h-3 w-3" />{" "}
-              {photo ? "Change Photo" : "Add Photo"}
-            </button>
-            {photo && (
-              <button
-                onClick={() => {
-                  localStorage.removeItem("cv-preview-photo");
-                  setPhoto(null);
-                }}
-                className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs text-foreground hover:bg-white"
-              >
-                Remove Photo
-              </button>
-            )}
             <button
               onClick={() => {
                 setVersionsOpen(true);
@@ -966,7 +872,7 @@ function PreviewPage() {
                 </div>
                 <CvDocument
                   pdfScale={pdfScale}
-                  data={{ ...structuredData, photo: photo ?? undefined }}
+                  data={structuredData}
                   template={selectedTemplate}
                   editable={true}
                   onChange={handleChange}
@@ -988,7 +894,6 @@ function PreviewPage() {
                   }}
                   activeDragIndex={activeDragIndex}
                   setActiveDragIndex={setActiveDragIndex}
-                  photoUploading={photoUploading}
                 />
               </>
             )}
