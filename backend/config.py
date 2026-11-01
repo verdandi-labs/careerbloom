@@ -1,5 +1,6 @@
-from pydantic_settings import BaseSettings
 from functools import lru_cache
+
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -22,8 +23,8 @@ class Settings(BaseSettings):
     OPENAI_BASE_URL: str = "https://api.openai.com/v1"
     OPENAI_MODEL: str = "llama-3.3-70b-versatile"
 
-    # SendGrid
-    SENDGRID_API_KEY: str = ""
+    # OpenRouter
+    OPENROUTER_API_KEY: str = ""
 
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
@@ -33,7 +34,6 @@ class Settings(BaseSettings):
 
     # App
     DEBUG: bool = False
-    FRONTEND_URL: str = "https://careerbloom-e5ne.onrender.com"
     CORS_ORIGINS: str = "http://localhost:5173,https://careerbloom-e5ne.onrender.com"
     API_V1_PREFIX: str = "/api/v1"
 

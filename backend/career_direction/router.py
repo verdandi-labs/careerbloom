@@ -2,11 +2,12 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from career_direction.repository import CareerDirectionRepository
+from career_direction.schemas import CareerDirectionCreate, CareerDirectionResponse
 from shared.crypto import decrypt, decrypt_user_key, encrypt
 from shared.deps import get_current_user, get_db_for_current_user
 from shared.models.user import User
-from career_direction.repository import CareerDirectionRepository
-from career_direction.schemas import CareerDirectionCreate, CareerDirectionResponse
 
 router = APIRouter(prefix="/career-direction", tags=["career-direction"])
 

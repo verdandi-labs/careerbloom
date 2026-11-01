@@ -1,6 +1,6 @@
 # careerBloom
 
-Career growth app: build your CV, cover letters, and get AI-powered guidance — with magic-link authentication and optional bring-your-own-database.
+Career transition app: build your CV, cover letters, and get AI-powered guidance — with Google and GitHub sign in and optional bring-your-own-database.
 
 ## Stack
 
@@ -34,16 +34,14 @@ Required env vars:
 | Var | Description |
 | --- | ----------- |
 | `NEON_DATABASE_URL` | PostgreSQL connection string |
-| `HMAC_SECRET` | Secret for hashing emails and magic-link tokens |
+| `HMAC_SECRET` | Secret for hashing emails |
 | `MASTER_KEY` | Fernet master key that wraps per-user encryption keys (32-byte base64-urlsafe, no default) |
 | `SESSION_SECRET` | Secret for signing session cookies (no default — app refuses to start without it) |
-| `SENDGRID_API_KEY` | For magic-link emails |
 | `GOOGLE_CLIENT_ID` | For Google sign-in |
 | `GOOGLE_CLIENT_SECRET` | For Google sign-in |
 | `GITHUB_CLIENT_ID` | For GitHub sign-in |
 | `GITHUB_CLIENT_SECRET` | For GitHub sign-in |
 | `GEMINI_API_KEY` | For AI features |
-| `FRONTEND_URL` | Frontend origin (used in magic-link emails) |
 | `CORS_ORIGINS` | Comma-separated allowed origins |
 
 Generate the `MASTER_KEY` with:
@@ -73,11 +71,11 @@ Convention: `001_description.sql`, `002_description.sql`, etc.
 
 ## Auth
 
-Sign in with a one-time email magic link (valid 15 min) or Google/GitHub OAuth. Sessions are 7-day httpOnly cookies; the raw token is stored only as a hash.
+Sign in with Google or GitHub OAuth. Sessions are 7-day httpOnly cookies; the raw token is stored only as a hash.
 
 ## Deploy
 
-Single Docker image (Dockerfile) builds the frontend and serves it from FastAPI. Set `CORS_ORIGINS`, `FRONTEND_URL` and `MASTER_KEY` to the deployed values in the host's env vars — `.env` files do not ship with the image.
+Single Docker image (Dockerfile) builds the frontend and serves it from FastAPI. Set `CORS_ORIGINS` and `MASTER_KEY` to the deployed values in the host's env vars — `.env` files do not ship with the image.
 
 ## License
 

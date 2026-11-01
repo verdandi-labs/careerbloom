@@ -29,7 +29,9 @@ def decrypt(value: str, key: bytes) -> str:
 
 def hash_email(email: str) -> str:
     normalized = email.strip().lower()
-    return hmac.new(settings.HMAC_SECRET.encode(), normalized.encode(), hashlib.sha256).hexdigest()
+    return hmac.new(
+        settings.HMAC_SECRET.encode(), normalized.encode(), hashlib.sha256
+    ).hexdigest()
 
 
 def generate_user_key() -> bytes:

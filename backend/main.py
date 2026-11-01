@@ -2,24 +2,30 @@ import logging
 import re
 from contextlib import asynccontextmanager
 from pathlib import Path
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from slowapi.errors import RateLimitExceeded
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
+
 from config import get_settings
-from database import Base, router as db_router, global_engine
+from database import Base, global_engine
+from database import router as db_router
 
 logger = logging.getLogger("startup")
 
 
 class ScrubFilter(logging.Filter):
     PATTERNS = [
-        (re.compile(r"Bearer\s+\S+", re.I), "Bearer [REDACTED]"),
-        (re.compile(r"session=[^\s&;]+", re.I), "session=[REDACTED]"),
-        (re.compile(r"token=[^\s&;]+", re.I), "token=[REDACTED]"),
-        (re.compile(r"database_url=[^\s&;]+", re.I), "database_url=[REDACTED]"),
+        (re.compile(r"Bearer\s+\S+", re.IGNORECASE), "Bearer [REDACTED]"),
+        (re.compile(r"session=[^\s&;]+", re.IGNORECASE), "session=[REDACTED]"),
+        (re.compile(r"token=[^\s&;]+", re.IGNORECASE), "token=[REDACTED]"),
+        (
+            re.compile(r"database_url=[^\s&;]+", re.IGNORECASE),
+            "database_url=[REDACTED]",
+        ),
     ]
 
     def filter(self, record):
@@ -34,7 +40,9 @@ class ScrubFilter(logging.Filter):
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
         response = await call_next(request)
-        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        response.headers["Strict-Transport-Security"] = (
+            "max-age=31536000; includeSubDomains"
+        )
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
@@ -95,24 +103,24 @@ app.add_middleware(
     same_site="lax",
 )
 
-from auth.router import router as auth_router
-from auth.magic_router import router as magic_auth_router
 from auth.oauth_router import router as oauth_router
-from cv.router import router as cv_router
+from auth.router import router as auth_router
+from career_direction.router import router as career_direction_router
 from chat.router import router as chat_router
 from cover_letters.router import router as cover_letters_router
-from tenant.router import router as tenant_router
-from career_direction.router import router as career_direction_router
+from cv.router import router as cv_router
 from cv.service import limiter
+from tenant.router import router as tenant_router
 
 app.state.limiter = limiter
 app.add_exception_handler(
     RateLimitExceeded,
-    lambda req, exc: JSONResponse({"detail": "Too many requests, please slow down"}, status_code=429),
+    lambda req, exc: JSONResponse(
+        {"detail": "Too many requests, please slow down"}, status_code=429
+    ),
 )
 
 app.include_router(auth_router, prefix=settings.API_V1_PREFIX)
-app.include_router(magic_auth_router, prefix=settings.API_V1_PREFIX)
 app.include_router(oauth_router, prefix=settings.API_V1_PREFIX)
 app.include_router(cv_router, prefix=settings.API_V1_PREFIX)
 app.include_router(chat_router, prefix=settings.API_V1_PREFIX)
@@ -132,6 +140,7 @@ if not frontend_dist.exists():
 api_prefix = settings.API_V1_PREFIX.strip("/")
 
 if frontend_dist.exists():
+
     @app.get("/{full_path:path}")
     async def serve_frontend(full_path: str):
         if full_path.startswith(f"{api_prefix}/") or full_path == api_prefix:

@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import UUID
 
 from sqlalchemy import delete, func, select
@@ -17,7 +17,9 @@ class CvRepository:
         self.db = db
 
     async def count_uploads(self, user_id: UUID) -> int:
-        result = await self.db.execute(select(CvUpload.upload_id).where(CvUpload.user_id == user_id))
+        result = await self.db.execute(
+            select(CvUpload.upload_id).where(CvUpload.user_id == user_id)
+        )
         return len(result.scalars().all())
 
     async def get_latest_upload(self, user_id: UUID) -> CvUpload | None:
@@ -37,13 +39,17 @@ class CvRepository:
         )
         existing = result.scalars().all()
         if len(existing) >= MAX_UPLOADS:
-            await self.db.execute(delete(CvUpload).where(CvUpload.upload_id == existing[0]))
+            await self.db.execute(
+                delete(CvUpload).where(CvUpload.upload_id == existing[0])
+            )
         row = CvUpload(user_id=user_id, **data.model_dump())
         self.db.add(row)
         await self.db.flush()
         return row
 
-    async def create_edit(self, user_id: UUID, upload_id: UUID, field: str, value) -> CvEdit:
+    async def create_edit(
+        self, user_id: UUID, upload_id: UUID, field: str, value
+    ) -> CvEdit:
         column = getattr(CvEdit, field)
         result = await self.db.execute(
             select(CvEdit.edit_id)
@@ -54,7 +60,7 @@ class CvRepository:
         if len(existing) >= MAX_EDITS_PER_FIELD:
             row = await self.db.get(CvEdit, existing[0])
             setattr(row, field, value)
-            row.edit_date = datetime.now(timezone.utc)
+            row.edit_date = datetime.now(UTC)
             return row
         row = CvEdit(user_id=user_id, upload_id=upload_id, **{field: value})
         self.db.add(row)
@@ -69,7 +75,9 @@ class CvRepository:
         )
         return list(result.scalars().all())
 
-    async def save_version(self, user_id: UUID, cv_name: str, data: CvData) -> CvSavedVersion:
+    async def save_version(
+        self, user_id: UUID, cv_name: str, data: CvData
+    ) -> CvSavedVersion:
         result = await self.db.execute(
             select(func.count()).where(CvSavedVersion.user_id == user_id)
         )
@@ -82,7 +90,9 @@ class CvRepository:
         await self.db.flush()
         return row
 
-    async def replace_version(self, user_id: UUID, version_id: UUID, cv_name: str, data: CvData) -> CvSavedVersion | None:
+    async def replace_version(
+        self, user_id: UUID, version_id: UUID, cv_name: str, data: CvData
+    ) -> CvSavedVersion | None:
         row = await self.db.get(CvSavedVersion, version_id)
         if row is None or row.user_id != user_id:
             return None
@@ -101,7 +111,9 @@ class CvRepository:
         await self.db.flush()
         return True
 
-    async def get_version(self, user_id: UUID, version_id: UUID) -> CvSavedVersion | None:
+    async def get_version(
+        self, user_id: UUID, version_id: UUID
+    ) -> CvSavedVersion | None:
         result = await self.db.execute(
             select(CvSavedVersion).where(
                 CvSavedVersion.version_id == version_id,

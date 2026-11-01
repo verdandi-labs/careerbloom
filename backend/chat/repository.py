@@ -1,7 +1,9 @@
-from uuid import UUID
 from datetime import datetime
+from uuid import UUID
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from shared.models.chat import ChatConversation, ChatMessage
 
 
@@ -17,7 +19,9 @@ class ChatRepository:
         )
         return list(result.scalars().all())
 
-    async def get_conversation(self, user_id: UUID, conversation_id: UUID) -> ChatConversation | None:
+    async def get_conversation(
+        self, user_id: UUID, conversation_id: UUID
+    ) -> ChatConversation | None:
         result = await self.db.execute(
             select(ChatConversation).where(
                 ChatConversation.id == conversation_id,
@@ -27,8 +31,11 @@ class ChatRepository:
         return result.scalar_one_or_none()
 
     async def create_conversation(
-        self, user_id: UUID, title: str | None = None,
-        is_career_direction: bool = False, is_cover_letter: bool = False
+        self,
+        user_id: UUID,
+        title: str | None = None,
+        is_career_direction: bool = False,
+        is_cover_letter: bool = False,
     ) -> ChatConversation:
         conv = ChatConversation(
             user_id=user_id,
@@ -40,7 +47,9 @@ class ChatRepository:
         await self.db.flush()
         return conv
 
-    async def get_or_create_cover_letter_conversation(self, user_id: UUID) -> ChatConversation:
+    async def get_or_create_cover_letter_conversation(
+        self, user_id: UUID
+    ) -> ChatConversation:
         conv = await self.create_conversation(
             user_id,
             f"Cover Letter - {datetime.utcnow().strftime('%b %d, %Y')}",
@@ -49,7 +58,9 @@ class ChatRepository:
         await self.db.flush()
         return conv
 
-    async def list_cover_letter_conversations(self, user_id: UUID) -> list[ChatConversation]:
+    async def list_cover_letter_conversations(
+        self, user_id: UUID
+    ) -> list[ChatConversation]:
         result = await self.db.execute(
             select(ChatConversation)
             .where(
@@ -71,7 +82,9 @@ class ChatRepository:
         if existing:
             return existing
 
-        conv = await self.create_conversation(user_id, "Career Direction", is_career_direction=True)
+        conv = await self.create_conversation(
+            user_id, "Career Direction", is_career_direction=True
+        )
         opening = "Hi, I'm Bloom \U0001f338 Let's talk about where you want to go \u2014 no pressure, no perfect answers needed.\n\nWhat does your ideal career look like, even if it feels far away right now? What pulls at you, what lights you up?"
         msg = ChatMessage(
             conversation_id=conv.id,
@@ -83,7 +96,9 @@ class ChatRepository:
         await self.db.flush()
         return conv
 
-    async def get_messages(self, user_id: UUID, conversation_id: UUID) -> list[ChatMessage]:
+    async def get_messages(
+        self, user_id: UUID, conversation_id: UUID
+    ) -> list[ChatMessage]:
         result = await self.db.execute(
             select(ChatMessage)
             .where(
@@ -94,7 +109,9 @@ class ChatRepository:
         )
         return list(result.scalars().all())
 
-    async def get_message(self, user_id: UUID, conversation_id: UUID, message_id: UUID) -> ChatMessage | None:
+    async def get_message(
+        self, user_id: UUID, conversation_id: UUID, message_id: UUID
+    ) -> ChatMessage | None:
         result = await self.db.execute(
             select(ChatMessage).where(
                 ChatMessage.id == message_id,
@@ -104,7 +121,9 @@ class ChatRepository:
         )
         return result.scalar_one_or_none()
 
-    async def delete_message(self, user_id: UUID, conversation_id: UUID, message_id: UUID) -> bool:
+    async def delete_message(
+        self, user_id: UUID, conversation_id: UUID, message_id: UUID
+    ) -> bool:
         message = await self.get_message(user_id, conversation_id, message_id)
         if message is None:
             return False
@@ -120,8 +139,12 @@ class ChatRepository:
         await self.db.flush()
 
     async def add_message(
-        self, user_id: UUID, conversation_id: UUID, role: str, content: str,
-        suggestion: dict | None = None
+        self,
+        user_id: UUID,
+        conversation_id: UUID,
+        role: str,
+        content: str,
+        suggestion: dict | None = None,
     ) -> ChatMessage:
         msg = ChatMessage(
             conversation_id=conversation_id,

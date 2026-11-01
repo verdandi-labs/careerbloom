@@ -9,7 +9,9 @@ def build_db_url(connection_string: str) -> str:
         return connection_string.replace("postgresql://", "postgresql+asyncpg://", 1)
     if connection_string.startswith("postgres://"):
         return connection_string.replace("postgres://", "postgresql+asyncpg://", 1)
-    raise ValueError("Invalid PostgreSQL connection string. Must start with postgresql:// or postgres://")
+    raise ValueError(
+        "Invalid PostgreSQL connection string. Must start with postgresql:// or postgres://"
+    )
 
 
 async def validate_connection(connection_string: str) -> bool:
