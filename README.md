@@ -78,3 +78,7 @@ Sign in with a one-time email magic link (valid 15 min) or Google/GitHub OAuth. 
 ## Deploy
 
 Single Docker image (Dockerfile) builds the frontend and serves it from FastAPI. Set `CORS_ORIGINS`, `FRONTEND_URL` and `MASTER_KEY` to the deployed values in the host's env vars — `.env` files do not ship with the image.
+
+## License
+
+Source-available, not open source. Licensed under the PolyForm Noncommercial License 1.0.0. Free for personal, educational and research use. Any commercial use requires a separate licence: verdandi.labs@gmail.com
