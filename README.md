@@ -8,7 +8,7 @@ Career growth app: build your CV, cover letters, and get AI-powered guidance —
 | -------- | ---- |
 | Frontend | Vite + React 19, TanStack Router + Query, Zustand, Tailwind CSS 4, bun |
 | Backend  | FastAPI, SQLAlchemy (async), PostgreSQL (Neon), uv |
-| Auth     | Email magic links (SendGrid), Google + GitHub OAuth, httpOnly session cookies |
+| Auth     | Google + GitHub OAuth, httpOnly session cookies |
 | Deploy   | Docker, Render |
 
 ## Repo layout
