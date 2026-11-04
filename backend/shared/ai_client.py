@@ -9,10 +9,9 @@ from config import get_settings
 logger = logging.getLogger(__name__)
 
 MODELS = [
-    "groq/compound",
-    "groq/compound-mini",
-    "moonshotai/kimi-k2-instruct",
-    "moonshotai/kimi-k2-instruct-0905",
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b",
+    "qwen/qwen3.8-27b",
 ]
 
 
