@@ -9,11 +9,11 @@ class Settings(BaseSettings):
     HMAC_SECRET: str
     MASTER_KEY: str
 
-    OPENAI_API_KEY: str = ""
-    OPENAI_BASE_URL: str = "https://api.openai.com/v1"
+    GROQ_API_KEY: str = ""
+    GROQ_BASE_URL: str = "https://api.groq.com/openai/v1"
 
-    OPENROUTER_API_KEY: str = ""
-    OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
+    CLOUDFLARE_API_KEY: str = ""
+    CLOUDFLARE_ACCOUNT_ID: str = ""
 
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
@@ -21,13 +21,16 @@ class Settings(BaseSettings):
     GITHUB_CLIENT_SECRET: str = ""
     SESSION_SECRET: str = ""
 
-    # App
     DEBUG: bool = False
     CORS_ORIGINS: str = "http://localhost:5173,https://careerbloom-e5ne.onrender.com"
     API_V1_PREFIX: str = "/api/v1"
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 
+
+@property
+def CLOUDFLARE_BASE_URL(self) -> str:
+    return f"https://api.cloudflare.com/client/v4/accounts/{self.CLOUDFLARE_ACCOUNT_ID}/ai/v1"
 
 @lru_cache
 def get_settings() -> Settings:

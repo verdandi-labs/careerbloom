@@ -10,6 +10,10 @@ MAX_TOKENS_PER_DAY = 50000
 TIMEOUT_SECONDS = 60
 
 
+class LimitExceededError(Exception):
+    pass
+
+
 async def check_daily_limits(user_id: str, db: AsyncSession) -> None:
     result = await db.execute(
         text("""
@@ -35,7 +39,7 @@ async def register_request(
     await db.execute(
         text("""
              INSERT INTO usage (user_id, date, request_count, tokens_used)
-             VALUES (:user_id, :today, 1, :tokens)
+             VALUES (:user_id::uuid, :today, 1, :tokens)
                  ON CONFLICT (user_id, date)
             DO UPDATE SET
                  request_count = usage.request_count + 1,
@@ -44,7 +48,3 @@ async def register_request(
         {"user_id": user_id, "today": date.today(), "tokens": tokens_used},
     )
     await db.commit()
-
-
-class LimitExceededError(Exception):
-    pass

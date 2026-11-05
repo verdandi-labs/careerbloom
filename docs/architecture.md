@@ -24,15 +24,15 @@ Refactored to LangGraph in progress. Each workflow is a compiled `StateGraph` op
 
 Adding a workflow is two files. Changing shared behaviour is one function. Prompt injection hardening and output validation are nodes that run on every workflow by graph structure, not by convention.
 
-## Groq primary, OpenRouter fallback
+## ## Cloudflare Workers AI primary, Groq fallback
 
-CareerBloom targets free and open-weight models to keep operational cost at zero during development and early users. Groq provides the lowest latency inference for the models available on its free tier.
+CareerBloom is built for people navigating career transitions. Users share sensitive personal data: employment history, reasons for leaving jobs, salary expectations, personal goals, and uncertainty about their future. Privacy is a core product value, and that extends to which models process user data.
 
-The tradeoff is that free model availability on Groq is unstable — models are added, renamed, and removed without notice. The architecture accounts for this at two levels: a runtime fallback cascade and a daily CI availability check.
+The primary model list is deliberately chosen with this in mind. Cloudflare's own models (clef-flash, clef-omni) run with zero data retention enforced at the infrastructure level. Mistral is a European company under GDPR with a strong no training on user data stance. Qwen and GLM-4.7-Flash run on Cloudflare's edge infrastructure, so Cloudflare's zero retention guarantee applies regardless of model origin. Meta and OpenAI models are available on Cloudflare Workers AI but excluded since their data policies are not aligned.
 
-OpenRouter is fallback only. It aggregates free models from multiple providers and allows defining a default model that is always available. Its free model list is fetched dynamically at startup via `/api/v1/models`, filtered against a blocked model set, so the fallback pool stays current without code changes. A hardcoded final fallback (`openrouter/free`) is tried last before returning a failure status to the user.
+Groq is fallback only. It is fast and reliable but has weaker data retention guarantees. Acceptable as a fallback for rare availability gaps, not as the primary surface for user data. Within the Groq cascade, `qwen/qwen3.8-27b` is the default model, the same model family as the Cloudflare primary list, keeping the privacy reasoning consistent even in fallback scenarios.
 
-All LLM calls go through `run_with_fallback` in `llm/fallback.py`. No workflow, node, or service instantiates a provider client directly.
+Both providers expose an OpenAI-compatible endpoint, so `ChatOpenAI` from `langchain-openai` covers both with no additional dependencies.
 
 ### Daily model health check
 

@@ -3,6 +3,7 @@ from collections.abc import AsyncIterator
 from dataclasses import dataclass
 
 from langchain_core.messages import BaseMessage
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 @dataclass
@@ -18,6 +19,7 @@ class BaseLLMClient(ABC):
             self,
             prompt: list[BaseMessage],
             user_id: str,
+            db: AsyncSession,
             bypass_limits: bool = False,
     ) -> LLMResponse:
         pass
@@ -27,6 +29,7 @@ class BaseLLMClient(ABC):
             self,
             prompt: list[BaseMessage],
             user_id: str,
+            db: AsyncSession,
             bypass_limits: bool = False,
     ) -> AsyncIterator[str]:
         pass
