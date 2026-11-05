@@ -120,8 +120,10 @@ export const CV_TEMPLATES: CVTemplateMeta[] = [
   },
 ];
 
-export type SectionOrderItem =
-  { type: "section"; key: keyof StructuredCVData } | { type: "page-break" };
+export type SectionOrderItem = {
+  type: "section";
+  key: keyof StructuredCVData;
+};
 
 export const DEFAULT_SECTION_ORDER: SectionOrderItem[] = [
   { type: "section", key: "experience" },
@@ -155,27 +157,4 @@ export function orderedSections(
     .map((item) => item.key);
   const missing = keys.filter((k) => !ordered.includes(k));
   return [...ordered, ...missing];
-}
-
-export function splitAtPageBreaks(
-  order: SectionOrderItem[] | undefined,
-  keys: (keyof StructuredCVData)[],
-): (keyof StructuredCVData)[][] {
-  if (!order) return [keys];
-  const groups: (keyof StructuredCVData)[][] = [[]];
-  for (const item of order) {
-    if (item.type === "page-break") {
-      groups.push([]);
-    } else if (
-      item.type === "section" &&
-      keys.includes(item.key as keyof StructuredCVData)
-    ) {
-      groups[groups.length - 1].push(item.key as keyof StructuredCVData);
-    }
-  }
-  const missing = keys.filter((k) => !groups.some((g) => g.includes(k)));
-  if (missing.length > 0) {
-    groups[groups.length - 1].push(...missing);
-  }
-  return groups.filter((g) => g.length > 0);
 }

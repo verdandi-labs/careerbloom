@@ -1,6 +1,6 @@
 import React, { type CSSProperties } from "react";
 import type { StructuredCVData } from "@/lib/cv-templates";
-import { orderedSections, splitAtPageBreaks } from "@/lib/cv-templates";
+import { orderedSections } from "@/lib/cv-templates";
 import { Editable, DragSection, type Props } from "../CvDocument";
 
 import "./Classic.css";
@@ -27,7 +27,6 @@ export function Classic({
     "skills",
     "languages",
   ]);
-  const groups = splitAtPageBreaks(sectionOrder, allKeys);
 
   function SectionHeading({ children }: { children: React.ReactNode }) {
     return (
@@ -194,117 +193,100 @@ export function Classic({
   }
 
   return (
-    <>
-      {groups.map((group, gi) => (
+    <div
+      className="cv-page classic px-12 pt-[30px] pb-10"
+      style={
+        {
+          fontFamily: "DM Sans, sans-serif",
+          backgroundColor: "#ffffff",
+          "--cv-scale": pdfScale,
+        } as CSSProperties
+      }
+    >
+      <div className="text-center mb-5">
+        {(/\S/.test(data.name ?? "") || e) && (
+          <h1
+            style={{
+              fontFamily: "Playfair Display, serif",
+              color: INK,
+            }}
+            className="text-5xl font-bold leading-tight mb-3"
+          >
+            <Editable
+              value={data.name}
+              field="name"
+              editable={e}
+              onChange={onChange}
+              as="span"
+              multiline={false}
+            />
+          </h1>
+        )}
         <div
-          key={gi}
-          className="cv-page classic px-12 pt-[30px] pb-10"
-          style={
-            {
-              fontFamily: "DM Sans, sans-serif",
-              backgroundColor: "#ffffff",
-              "--cv-scale": pdfScale,
-            } as CSSProperties
-          }
+          className="flex items-center justify-center flex-wrap text-xs tracking-widest uppercase"
+          style={{ color: MUTED }}
         >
-          {gi === 0 && (
-            <>
-              <div className="text-center mb-5">
-                {(/\S/.test(data.name ?? "") || e) && (
-                  <h1
-                    style={{
-                      fontFamily: "Playfair Display, serif",
-                      color: INK,
-                    }}
-                    className="text-5xl font-bold leading-tight mb-3"
-                  >
-                    <Editable
-                      value={data.name}
-                      field="name"
-                      editable={e}
-                      onChange={onChange}
-                      as="span"
-                      multiline={false}
-                    />
-                  </h1>
-                )}
-                <div
-                  className="flex items-center justify-center flex-wrap text-xs tracking-widest uppercase"
-                  style={{ color: MUTED }}
-                >
-                  {(/\S/.test(data.title ?? "") || e) && (
-                    <Editable
-                      value={data.title}
-                      field="title"
-                      editable={e}
-                      onChange={onChange}
-                      as="span"
-                      multiline={false}
-                      className="font-medium"
-                    />
-                  )}
-                  {data.title && data.contact.length > 0 && (
-                    <span className="mx-2">·</span>
-                  )}
-                  {data.contact.map((item, i) => (
-                    <span
-                      key={item.line_num}
-                      onClick={() => onEditItem?.("contact", i, item)}
-                      className="cursor-pointer"
-                    >
-                      {item.detail || " "}
-                      {i < data.contact.length - 1 && (
-                        <span className="mx-2">·</span>
-                      )}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div
-                className="h-px w-full my-5"
-                style={{ backgroundColor: RULE }}
-              />
-              {(/\S/.test(data.summary ?? "") || e) && (
-                <div className="mb-5">
-                  <SectionHeading>Profile</SectionHeading>
-                  <Editable
-                    value={data.summary}
-                    field="summary"
-                    editable={e}
-                    onChange={onChange}
-                    className="text-xs leading-relaxed"
-                    style={{ color: MUTED }}
-                  />
-                </div>
-              )}
-              <div
-                className="h-px w-full my-5"
-                style={{ backgroundColor: RULE }}
-              />
-            </>
+          {(/\S/.test(data.title ?? "") || e) && (
+            <Editable
+              value={data.title}
+              field="title"
+              editable={e}
+              onChange={onChange}
+              as="span"
+              multiline={false}
+              className="font-medium"
+            />
           )}
-
-          {group.map((key) => {
-            const idx = sectionOrder.findIndex(
-              (s) => s.type === "section" && s.key === key,
-            );
-            return (
-              <DragSection
-                key={key as string}
-                index={idx}
-                onDrop={onDragSection ?? (() => {})}
-                isActive={activeDragIndex === idx}
-              >
-                {renderSection(key)}
-                <div
-                  className="h-px w-full my-5"
-                  style={{ backgroundColor: RULE }}
-                />
-              </DragSection>
-            );
-          })}
+          {data.title && data.contact.length > 0 && (
+            <span className="mx-2">·</span>
+          )}
+          {data.contact.map((item, i) => (
+            <span
+              key={item.line_num}
+              onClick={() => onEditItem?.("contact", i, item)}
+              className="cursor-pointer"
+            >
+              {item.detail || " "}
+              {i < data.contact.length - 1 && <span className="mx-2">·</span>}
+            </span>
+          ))}
         </div>
-      ))}
-    </>
+      </div>
+      <div className="h-px w-full my-5" style={{ backgroundColor: RULE }} />
+      {(/\S/.test(data.summary ?? "") || e) && (
+        <div className="mb-5">
+          <SectionHeading>Profile</SectionHeading>
+          <Editable
+            value={data.summary}
+            field="summary"
+            editable={e}
+            onChange={onChange}
+            className="text-xs leading-relaxed"
+            style={{ color: MUTED }}
+          />
+        </div>
+      )}
+      <div className="h-px w-full my-5" style={{ backgroundColor: RULE }} />
+
+      {allKeys.map((key) => {
+        const idx = sectionOrder.findIndex(
+          (s) => s.type === "section" && s.key === key,
+        );
+        return (
+          <DragSection
+            key={key as string}
+            index={idx}
+            onDrop={onDragSection ?? (() => {})}
+            isActive={activeDragIndex === idx}
+          >
+            {renderSection(key)}
+            <div
+              className="h-px w-full my-5"
+              style={{ backgroundColor: RULE }}
+            />
+          </DragSection>
+        );
+      })}
+    </div>
   );
 }

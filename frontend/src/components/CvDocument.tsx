@@ -6,7 +6,6 @@ import type {
 } from "@/lib/cv-templates";
 import { GripVertical } from "lucide-react";
 import { Classic } from "./cv-templates/Classic";
-import { PageBreakLabel } from "./cv-templates/PageBreak";
 import "./cv-templates/common.css";
 
 export type EditableField =
@@ -198,11 +197,7 @@ export function CvDocument(props: Props) {
 
   return (
     <div className="mx-auto w-full max-w-[820px] rounded-md shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)] ring-1 ring-black/5">
-      <div style={{ position: "relative" }}>
-        {inner}
-        <PageBreakLabel top={1123} />
-        <PageBreakLabel top={2246} />
-      </div>
+      <div style={{ position: "relative" }}>{inner}</div>
       <style>{`
         .cv-editable[contenteditable="true"]:empty::before {
           content: attr(data-placeholder);

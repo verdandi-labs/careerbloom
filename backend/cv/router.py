@@ -326,13 +326,9 @@ async def export_docx(
     body: CvExportDocxRequest, user: User = Depends(get_current_user)
 ):
     TEMPLATE_ACCENTS = {
-        "editorial": "B96A4B",
         "classic": "5C5C5C",
-        "editorialBig": "3D3D3D",
-        "geometric": "B47A5C",
-        "soft": "E8C5D0",
     }
-    accent = TEMPLATE_ACCENTS.get(body.template, "B96A4B")
+    accent = TEMPLATE_ACCENTS.get(body.template, "5C5C5C")
 
     doc = Document()
     style = doc.styles["Normal"]

@@ -4,7 +4,7 @@ import type {
   StructuredCVData,
   SectionOrderItem,
 } from "@/lib/cv-templates";
-import { orderedSections, splitAtPageBreaks } from "@/lib/cv-templates";
+import { orderedSections } from "@/lib/cv-templates";
 
 function groupHasContent(keys: string[], data: StructuredCVData): boolean {
   return keys.some((key) => {
@@ -73,7 +73,6 @@ function ClassicPdfDocument({
     "skills",
     "languages",
   ]);
-  const groups = splitAtPageBreaks(sectionOrder, allKeys);
 
   const sc = 0.75 * pdfScale;
 
@@ -265,47 +264,29 @@ function ClassicPdfDocument({
 
   return (
     <Document>
-      {groups.map((group, gi) => {
-        if (!groupHasContent(group, data)) return null;
-        return (
-          <Page key={gi} size="A4" style={styles.page}>
-            {gi === 0 && (
-              <>
-                <Text style={styles.name}>{data.name}</Text>
-                <Text style={styles.contactLine}>
-                  {data.title ? `${data.title}${contactText ? " · " : ""}` : ""}
-                  {contactText}
-                </Text>
-                <View style={styles.rule} />
-                {data.summary && (
-                  <View style={{ marginBottom: 20 }}>
-                    <Text style={styles.sectionLabel}>Profile</Text>
-                    <Text style={styles.summaryText}>{data.summary}</Text>
-                  </View>
-                )}
-                <View style={styles.rule} />
-              </>
-            )}
-            {gi > 0 && (
-              <View
-                style={{
-                  marginTop: 24,
-                  borderTopWidth: 1,
-                  borderTopColor: "#e5e7eb",
-                  borderTopStyle: "dashed",
-                  paddingTop: 24,
-                }}
-              />
-            )}
-            {group.map((key) => (
-              <View key={key}>
-                {renderSection(key)}
-                <View style={styles.rule} />
-              </View>
-            ))}
-          </Page>
-        );
-      })}
+      {groupHasContent(allKeys, data) && (
+        <Page size="A4" style={styles.page}>
+          <Text style={styles.name}>{data.name}</Text>
+          <Text style={styles.contactLine}>
+            {data.title ? `${data.title}${contactText ? " · " : ""}` : ""}
+            {contactText}
+          </Text>
+          <View style={styles.rule} />
+          {data.summary && (
+            <View style={{ marginBottom: 20 }}>
+              <Text style={styles.sectionLabel}>Profile</Text>
+              <Text style={styles.summaryText}>{data.summary}</Text>
+            </View>
+          )}
+          <View style={styles.rule} />
+          {allKeys.map((key) => (
+            <View key={key}>
+              {renderSection(key)}
+              <View style={styles.rule} />
+            </View>
+          ))}
+        </Page>
+      )}
     </Document>
   );
 }
