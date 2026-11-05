@@ -4,26 +4,14 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    # Neon / PostgreSQL
     NEON_DATABASE_URL: str = ""
 
-    # Crypto
     HMAC_SECRET: str
-    # 32-byte base64-urlsafe Fernet master key that wraps per-user encryption keys
-    # Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
     MASTER_KEY: str
 
-    # OpenCode Zen
-    ZEN_API_KEY: str = ""
-    ZEN_BASE_URL: str = "https://opencode.ai/zen/v1"
-    ZEN_MODEL_REFRESH_HOURS: int = 6
-
-    # OpenAI
     OPENAI_API_KEY: str = ""
     OPENAI_BASE_URL: str = "https://api.openai.com/v1"
-    OPENAI_MODEL: str = "llama-3.3-70b-versatile"
 
-    # OpenRouter
     OPENROUTER_API_KEY: str = ""
 
     GOOGLE_CLIENT_ID: str = ""
