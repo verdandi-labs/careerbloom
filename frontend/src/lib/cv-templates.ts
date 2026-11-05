@@ -89,8 +89,7 @@ export type StructuredCVData = {
   other: string;
 };
 
-export type CVTemplateId =
-  "terracotta" | "sage" | "classic" | "bold" | "minimal";
+export type CVTemplateId = "classic";
 
 export type CVTemplateMeta = {
   id: CVTemplateId;
@@ -111,24 +110,6 @@ export type CVTemplateMeta = {
 
 export const CV_TEMPLATES: CVTemplateMeta[] = [
   {
-    id: "terracotta",
-    name: "Terracotta",
-    blurb: "Warm sidebar, Playfair accents.",
-    accent: "#CB6843",
-    bg: "#FFFFFF",
-    font: "sans",
-    layout: "sidebar",
-  },
-  {
-    id: "sage",
-    name: "Sage",
-    blurb: "Clean editorial layout with sage green accents.",
-    accent: "#7B9E87",
-    bg: "#FFFFFF",
-    font: "sans",
-    layout: "split",
-  },
-  {
     id: "classic",
     name: "Classic",
     blurb: "Centered header, clean rules, timeless.",
@@ -136,24 +117,6 @@ export const CV_TEMPLATES: CVTemplateMeta[] = [
     bg: "#FFFFFF",
     font: "sans",
     layout: "single",
-  },
-  {
-    id: "bold",
-    name: "Bold",
-    blurb: "Editorial layout, strong typography.",
-    accent: "#111111",
-    bg: "#E8E5DC",
-    font: "sans",
-    layout: "editorial",
-  },
-  {
-    id: "minimal",
-    name: "Minimal",
-    blurb: "Clean sidebar, structured.",
-    accent: "#111111",
-    bg: "#FFFFFF",
-    font: "sans",
-    layout: "sidebar",
   },
 ];
 
@@ -172,7 +135,7 @@ export const DEFAULT_SECTION_ORDER: SectionOrderItem[] = [
   { type: "section", key: "projects" },
 ];
 
-export const DEFAULT_TEMPLATE: CVTemplateId = "terracotta";
+export const DEFAULT_TEMPLATE: CVTemplateId = "classic";
 
 export function getTemplate(id?: string | null): CVTemplateMeta {
   return CV_TEMPLATES.find((t) => t.id === id) ?? CV_TEMPLATES[0];

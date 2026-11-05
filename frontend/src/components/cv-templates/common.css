@@ -5,17 +5,6 @@
   position: relative;
 }
 
-.cv-page.terracotta > .grid,
-.cv-page.sage > .grid {
-  align-items: stretch;
-  min-height: 1123px;
-}
-
-.cv-page.terracotta > .grid > div,
-.cv-page.sage > .grid > div {
-  align-self: stretch;
-}
-
 /* A4 page boundary indicators — purely decorative, no effect on content */
 .cv-page::before,
 .cv-page::after {

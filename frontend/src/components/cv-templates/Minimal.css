@@ -1,5 +1,0 @@
-.cv-page.minimal .text-\[9px\] { font-size: calc(9px * var(--cv-scale, 1)); }
-.cv-page.minimal .text-\[10px\] { font-size: calc(10px * var(--cv-scale, 1)); }
-.cv-page.minimal .text-\[11px\] { font-size: calc(11px * var(--cv-scale, 1)); }
-.cv-page.minimal .text-xs { font-size: calc(12px * var(--cv-scale, 1)); }
-.cv-page.minimal .text-\[30px\] { font-size: calc(30px * var(--cv-scale, 1)); }

@@ -20,7 +20,7 @@ jobs:
           MODELS=$(curl -s https://api.groq.com/openai/v1/models \
             -H "Authorization: Bearer $GROQ_API_KEY" | jq -r '.data[].id')
 
-          REQUIRED=("groq/compound" "groq/compound-mini" "moonshotai/kimi-k2-instruct" "moonshotai/kimi-k2-instruct-0905")
+          REQUIRED=("openai/gpt-oss-120b" "openai/gpt-oss-20b" "qwen/qwen3.8-27b")
           MISSING=()
 
           for model in "${REQUIRED[@]}"; do

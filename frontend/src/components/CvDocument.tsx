@@ -5,11 +5,7 @@ import type {
   SectionOrderItem,
 } from "@/lib/cv-templates";
 import { GripVertical } from "lucide-react";
-import { Terracotta } from "./cv-templates/Terracotta";
-import { Sage } from "./cv-templates/Sage";
 import { Classic } from "./cv-templates/Classic";
-import { Bold } from "./cv-templates/Bold";
-import { Minimal } from "./cv-templates/Minimal";
 import { PageBreakLabel } from "./cv-templates/PageBreak";
 import "./cv-templates/common.css";
 
@@ -198,18 +194,7 @@ export function DragSection({
 
 export function CvDocument(props: Props) {
   const { pdfScale } = props;
-  const inner =
-    props.template === "sage" ? (
-      <Sage {...props} pdfScale={pdfScale} />
-    ) : props.template === "classic" ? (
-      <Classic {...props} pdfScale={pdfScale} />
-    ) : props.template === "bold" ? (
-      <Bold {...props} pdfScale={pdfScale} />
-    ) : props.template === "minimal" ? (
-      <Minimal {...props} pdfScale={pdfScale} />
-    ) : (
-      <Terracotta {...props} pdfScale={pdfScale} />
-    );
+  const inner = <Classic {...props} pdfScale={pdfScale} />;
 
   return (
     <div className="mx-auto w-full max-w-[820px] rounded-md shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)] ring-1 ring-black/5">
