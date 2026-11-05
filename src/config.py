@@ -27,10 +27,10 @@ class Settings(BaseSettings):
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 
+    @property
+    def CLOUDFLARE_BASE_URL(self) -> str:
+        return f"https://api.cloudflare.com/client/v4/accounts/{self.CLOUDFLARE_ACCOUNT_ID}/ai/v1"
 
-@property
-def CLOUDFLARE_BASE_URL(self) -> str:
-    return f"https://api.cloudflare.com/client/v4/accounts/{self.CLOUDFLARE_ACCOUNT_ID}/ai/v1"
 
 @lru_cache
 def get_settings() -> Settings:
