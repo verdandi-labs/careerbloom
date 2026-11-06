@@ -24,21 +24,32 @@ Refactored to LangGraph in progress. Each workflow is a compiled `StateGraph` op
 
 Adding a workflow is two files. Changing shared behaviour is one function. Prompt injection hardening and output validation are nodes that run on every workflow by graph structure, not by convention.
 
-## ## Cloudflare Workers AI primary, Groq fallback
+## Models
+### Groq primary, Cloudflare Workers AI fallback
 
-CareerBloom is built for people navigating career transitions. Users share sensitive personal data: employment history, reasons for leaving jobs, salary expectations, personal goals, and uncertainty about their future. Privacy is a core product value, and that extends to which models process user data.
+CareerBloom is built for people navigating career transitions. Users share sensitive personal data: employment history, reasons for leaving jobs, salary expectations, uncertainty about their future, etc. Privacy is a core product value, and that extends to which models process user data.
 
-The primary model list is deliberately chosen with this in mind. Cloudflare's own models (clef-flash, clef-omni) run with zero data retention enforced at the infrastructure level. Mistral is a European company under GDPR with a strong no training on user data stance. Qwen and GLM-4.7-Flash run on Cloudflare's edge infrastructure, so Cloudflare's zero retention guarantee applies regardless of model origin. Meta and OpenAI models are available on Cloudflare Workers AI but excluded since their data policies are not aligned.
+Groq is primary for the MVP. It provides the lowest latency of any free inference provider, a stable model list, and a DPA — GDPR compliant. All workflows use Groq by default.
 
-Groq is fallback only. It is fast and reliable but has weaker data retention guarantees. Acceptable as a fallback for rare availability gaps, not as the primary surface for user data. Within the Groq cascade, `qwen/qwen3.8-27b` is the default model, the same model family as the Cloudflare primary list, keeping the privacy reasoning consistent even in fallback scenarios.
+Cloudflare Workers AI is used as fallback and can be chosen for secure tasks, workflows that process raw CV text or sensitive personal context directly. Cloudflare enforces zero data retention at the infrastructure level: requests are processed at the edge and never logged, stored, or used for training. This is a technical constraint, not a policy the user has to trust.
 
-Both providers expose an OpenAI-compatible endpoint, so `ChatOpenAI` from `langchain-openai` covers both with no additional dependencies.
+The model selection on both providers prioritises privacy. Groq's default model is `qwen/qwen3.8-27b` — same model family as the Cloudflare list, keeping the privacy reasoning consistent across providers. Cloudflare's model list excludes Meta and OpenAI models despite their availability, since their data policies are not aligned.
+
+Both providers expose an OpenAI-compatible endpoint, so `ChatOpenAI` from `langchain-openai` covers both clients with no additional dependencies.
+
+### No persistent model preference
+
+Users can select a model from the current available list, but the selection is not persisted to the database. Free model providers change their model lists frequently — a stored model ID can become invalid between sessions, creating a silent failure or a confusing error. The cascade handles unavailable models gracefully, but a stored preference pointing at a deleted model is a bug waiting to happen with no clean recovery path. Session-scoped selection only.
 
 ### Daily model health check
 
 Without proactive detection, the first signal of a missing model is a user-facing error in production.
 
-GitHub Actions workflow on a daily cron (`0 9 * * *`). Calls `https://api.groq.com/openai/v1/models`, diffs the response against the required model list defined in `llm/groq.py`, and opens a GitHub issue automatically if any are missing. The issue names each missing model and points to the exact constant to update. Also `workflow_dispatch` triggerable for immediate verification after a Groq incident.
+Two GitHub Actions workflows run on a daily cron (`0 9 * * *`), one per provider. Both are also `workflow_dispatch` triggerable for immediate verification after an incident.
+
+**Groq:** calls `https://api.groq.com/openai/v1/models`, diffs against `AVAILABLE_MODELS` in `llm/groq.py`, opens a GitHub issue if any are missing.
+
+**Cloudflare:** calls `https://api.cloudflare.com/client/v4/accounts/{ACCOUNT_ID}/ai/models/search`, diffs against `AVAILABLE_MODELS` in `llm/cloudflare.py`, opens a GitHub issue if any are missing.
 
 ## Single shared state — `CareerBloomState`
 

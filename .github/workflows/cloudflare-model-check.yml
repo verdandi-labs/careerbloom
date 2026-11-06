@@ -1,0 +1,50 @@
+name: Cloudflare Model Check
+
+on:
+  schedule:
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  check-models:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Cloudflare models
+        env:
+          CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_KEY }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          MODELS=$(curl -s "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/ai/models/search?task=Text%20Generation" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_KEY" | jq -r '.result[].name')
+
+          REQUIRED=(
+            "@cf/cloudflare/clef-flash"
+            "@cf/cloudflare/clef-omni"
+            "@cf/mistral/mistral-small-3.1-24b-instruct"
+            "@cf/qwen/qwen3.8-27b"
+            "@cf/zai-org/glm-4.7-flash"
+          )
+          MISSING=()
+
+          for model in "${REQUIRED[@]}"; do
+            if ! echo "$MODELS" | grep -qx "$model"; then
+              MISSING+=("$model")
+            fi
+          done
+
+          if [ ${#MISSING[@]} -gt 0 ]; then
+            BODY="The following Cloudflare Workers AI models are no longer available:\n\n"
+            for m in "${MISSING[@]}"; do
+              BODY+="- \`$m\`\n"
+            done
+            BODY+="\nUpdate \`AVAILABLE_MODELS\` in \`src/llm/cloudflare.py\` and redeploy."
+
+            gh issue create \
+              --repo ${{ github.repository }} \
+              --title "⚠️ Cloudflare model unavailable: ${MISSING[*]}" \
+              --body "$(printf "$BODY")"
+          fi
