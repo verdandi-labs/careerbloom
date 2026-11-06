@@ -15,3 +15,4 @@ class CareerBloomState(TypedDict):
     company_name: str | None
     application_intent: bool | None
     career_context: str | None
+    retry_count: int
