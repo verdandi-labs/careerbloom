@@ -1,30 +1,36 @@
 import logging
 import time
-from uuid import UUID
 
 from langchain_core.messages import BaseMessage, HumanMessage
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from graph.security import (
-    MAX_RETRIES,
+    MAX_STRIKES,
     build_validated_message,
     check_strike,
+    get_strike_message,
     register_strike,
     validate_output,
 )
 from graph.state import CareerBloomState
-from llm.fallback import AllModelsUnavailableError, run_invoke_with_fallback, run_with_fallback
+from llm.fallback import (
+    AllModelsUnavailableError,
+    run_invoke_with_fallback,
+    run_with_fallback,
+)
 from llm.security import LimitExceededError
 
 logger = logging.getLogger(__name__)
 
 SAFE_RESPONSE_FAILURE = "I wasn't able to generate a response with this model. Please select a different model and try again."
-STRIKE_BLOCK_MESSAGE = "Your session has been blocked due to repeated policy violations."
+STRIKE_BLOCK_MESSAGE = (
+    "Your session has been blocked due to repeated policy violations."
+)
 
 
 async def input_validation_node(
-        state: CareerBloomState,
-        db: AsyncSession,
+    state: CareerBloomState,
+    db: AsyncSession,
 ) -> dict:
     user_id = state["user_id"]
     message_history = state["message_history"]
@@ -39,10 +45,10 @@ async def input_validation_node(
     validated_content = build_validated_message(str(last_message.content))
 
     if validated_content is None:
-        register_strike(user_id)
+        strike_count = register_strike(user_id)
         if check_strike(user_id):
-            return {"response": STRIKE_BLOCK_MESSAGE}
-        return {"response": "I can only help with career-related topics. Please keep our conversation focused on your career journey."}
+            return {"response": get_strike_message(MAX_STRIKES)}
+        return {"response": get_strike_message(strike_count)}
 
     updated_history = list(message_history[:-1]) + [
         HumanMessage(content=validated_content)
@@ -51,9 +57,9 @@ async def input_validation_node(
 
 
 async def llm_call_node(
-        state: CareerBloomState,
-        db: AsyncSession,
-        selected_model: str | None = None,
+    state: CareerBloomState,
+    db: AsyncSession,
+    selected_model: str | None = None,
 ) -> dict:
     if state.get("response") in (SAFE_RESPONSE_FAILURE, STRIKE_BLOCK_MESSAGE):
         return {}
@@ -65,10 +71,10 @@ async def llm_call_node(
 
     try:
         async for update in run_with_fallback(
-                prompt=state["message_history"],
-                user_id=state["user_id"],
-                db=db,
-                selected_model=selected_model,
+            prompt=state["message_history"],
+            user_id=state["user_id"],
+            db=db,
+            selected_model=selected_model,
         ):
             if update.chunk:
                 full_response += update.chunk
@@ -97,8 +103,8 @@ async def llm_call_node(
 
 
 async def output_validation_node(
-        state: CareerBloomState,
-        db: AsyncSession,
+    state: CareerBloomState,
+    db: AsyncSession,
 ) -> dict:
     response = state.get("response", "")
 
@@ -133,8 +139,8 @@ async def output_validation_node(
 
 
 async def application_intent_node(
-        state: CareerBloomState,
-        db: AsyncSession,
+    state: CareerBloomState,
+    db: AsyncSession,
 ) -> dict:
     response = state.get("response", "")
 
@@ -165,13 +171,14 @@ async def application_intent_node(
 
 
 async def _log_event(
-        user_id: str,
-        feature: str,
-        duration_ms: int,
-        suspicious: bool,
-        db: AsyncSession,
+    user_id: str,
+    feature: str,
+    duration_ms: int,
+    suspicious: bool,
+    db: AsyncSession,
 ) -> None:
     from sqlalchemy import text
+
     try:
         await db.execute(
             text("""
