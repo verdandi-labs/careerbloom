@@ -1,11 +1,12 @@
 from typing import TypedDict
 
+from cv.schemas import CvData
 from langchain_core.messages import BaseMessage
 
 
 class CareerBloomState(TypedDict):
     user_id: str
-    cv_data: dict | None
+    cv_data: CvData | None
     message_history: list[BaseMessage]
     response: str
     tokens_used: int
