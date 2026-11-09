@@ -27,22 +27,14 @@ Run through in a normal browser against a fresh deploy before trusting it. Base 
 - **Pass**: lands on `/dashboard`
 - **Fail**: lands on `/onboarding`, disconnects the account, or any error
 
-## 4. Email conflict
-
-1. Sign up with a magic link using email X
-2. Try Google sign-in with the same email X
-
-- **Pass**: redirects to `/auth?error=email_exists` with the conflict banner shown
-- **Fail**: proceeds to login, shows an internal error, or no banner
-
-## 5. GitHub OAuth — new user
+## 4. GitHub OAuth — new user
 
 Same as step 1 but via "Continue with GitHub"
 
 - **Pass**: lands on `/onboarding`
 - **Fail**: lands on `/dashboard`, errors out, or bounces back to `/auth`
 
-## 6. GitHub OAuth — existing user
+## 5. GitHub OAuth — existing user
 
 Same as step 3 but via GitHub
 

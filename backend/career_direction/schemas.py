@@ -15,7 +15,9 @@ class CareerDirectionCreate(BaseModel):
     def validate_length(cls, v: str) -> str:
         v = v.strip()
         if len(v) < MIN_SUMMARY_LENGTH:
-            raise ValueError(f"Summary must be at least {MIN_SUMMARY_LENGTH} characters")
+            raise ValueError(
+                f"Summary must be at least {MIN_SUMMARY_LENGTH} characters"
+            )
         if len(v) > MAX_SUMMARY_LENGTH:
             raise ValueError(f"Summary must be at most {MAX_SUMMARY_LENGTH} characters")
         return v

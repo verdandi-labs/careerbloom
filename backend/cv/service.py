@@ -5,10 +5,10 @@ import re
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
+from cv.schemas import FIELD_MODELS, RAW_MODELS, TEXT_FIELDS, CvData
 from prompts import load
-from cv.schemas import CvData, FIELD_MODELS, RAW_MODELS, TEXT_FIELDS
-from shared.prompts import SAFETY_BOUNDARY, wrap_untrusted
 from shared.ai_client import AllModelsFailedError, chat_completion
+from shared.prompts import SAFETY_BOUNDARY, wrap_untrusted
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +38,7 @@ def extract_json(raw: str) -> dict:
     if text.startswith("```"):
         first_newline = text.find("\n")
         if first_newline != -1:
-            text = text[first_newline + 1:]
+            text = text[first_newline + 1 :]
         text = text.removesuffix("```").strip()
     try:
         data = json.loads(text)
@@ -59,7 +59,11 @@ def extract_json(raw: str) -> dict:
 
 
 async def parse_all_sections(text: str) -> CvData:
-    prompt = CV_PARSE_PROMPT.replace("__TEXT__", text[:MAX_TEXT_LENGTH]) + "\n\n" + SAFETY_BOUNDARY
+    prompt = (
+        CV_PARSE_PROMPT.replace("__TEXT__", text[:MAX_TEXT_LENGTH])
+        + "\n\n"
+        + SAFETY_BOUNDARY
+    )
     raw = await chat_completion(
         messages=[
             {
@@ -116,7 +120,13 @@ async def translate_cv(data: CvData, language: str) -> CvData:
     return CvData.model_validate(extract_json(raw))
 
 
-async def generate_cover_letter_ai(job_title: str, company: str, job_description: str, cv_text: str, career_direction: str | None = None) -> str:
+async def generate_cover_letter_ai(
+    job_title: str,
+    company: str,
+    job_description: str,
+    cv_text: str,
+    career_direction: str | None = None,
+) -> str:
     instructions = (
         "Write a warm, ATS-friendly cover letter for the position below.\n"
         "250-350 words. Open with a hook tied to the company. Avoid cliches.\n"
@@ -128,7 +138,11 @@ async def generate_cover_letter_ai(job_title: str, company: str, job_description
         job=job_description,
         cv=cv_text[:8000],
     )
-    career_block = f"\n\n<career_direction>{career_direction}</career_direction>" if career_direction else ""
+    career_block = (
+        f"\n\n<career_direction>{career_direction}</career_direction>"
+        if career_direction
+        else ""
+    )
     prompt = f"{instructions}\n\n{data_block}{career_block}\n\n{SAFETY_BOUNDARY}"
 
     try:

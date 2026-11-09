@@ -49,7 +49,9 @@ def _set_session_cookie(response: RedirectResponse, raw_token: str) -> None:
     )
 
 
-async def _handle_callback(request: Request, db: AsyncSession, provider: str) -> RedirectResponse:
+async def _handle_callback(
+    request: Request, db: AsyncSession, provider: str
+) -> RedirectResponse:
     client = oauth.create_client(provider)
     try:
         token = await client.authorize_access_token(request)
@@ -57,7 +59,9 @@ async def _handle_callback(request: Request, db: AsyncSession, provider: str) ->
     except MismatchingStateError:
         return RedirectResponse("/auth?error=state_mismatch")
 
-    provider_id = str(user_info.get("sub") if provider == "google" else user_info.get("id"))
+    provider_id = str(
+        user_info.get("sub") if provider == "google" else user_info.get("id")
+    )
     try:
         user = await create_user(db, provider, provider_id, user_info.get("email"))
     except ValueError as exc:
@@ -75,7 +79,9 @@ async def _handle_callback(request: Request, db: AsyncSession, provider: str) ->
 
 @router.get("/google")
 async def oauth_google(request: Request):
-    return await oauth.google.authorize_redirect(request, _callback_uri(request, "google"))
+    return await oauth.google.authorize_redirect(
+        request, _callback_uri(request, "google")
+    )
 
 
 @router.get("/google/callback")
@@ -85,7 +91,9 @@ async def oauth_google_callback(request: Request, db: AsyncSession = Depends(get
 
 @router.get("/github")
 async def oauth_github(request: Request):
-    return await oauth.github.authorize_redirect(request, _callback_uri(request, "github"))
+    return await oauth.github.authorize_redirect(
+        request, _callback_uri(request, "github")
+    )
 
 
 @router.get("/github/callback")

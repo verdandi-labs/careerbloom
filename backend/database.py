@@ -1,7 +1,14 @@
 import ssl
-from sqlalchemy import make_url, text
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession, AsyncEngine
+
+from sqlalchemy import make_url
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 from sqlalchemy.orm import DeclarativeBase
+
 from config import get_settings
 
 settings = get_settings()
@@ -36,7 +43,9 @@ class DatabaseRouter:
     def get_factory(self, db_url: str) -> async_sessionmaker[AsyncSession]:
         if db_url not in self._factories:
             engine = self.get_engine(db_url)
-            self._factories[db_url] = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+            self._factories[db_url] = async_sessionmaker(
+                engine, class_=AsyncSession, expire_on_commit=False
+            )
         return self._factories[db_url]
 
     async def dispose_all(self):

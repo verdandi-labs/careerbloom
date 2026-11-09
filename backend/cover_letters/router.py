@@ -5,8 +5,8 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from shared.deps import get_current_user, get_db_for_current_user
-from shared.models.user import User
+
+from career_direction.repository import CareerDirectionRepository
 from cover_letters.repository import CoverLetterRepository
 from cover_letters.schemas import (
     CoverLetterGenerateRequest,
@@ -14,8 +14,9 @@ from cover_letters.schemas import (
     SaveCoverLetterRequest,
 )
 from cv.service import generate_cover_letter_ai, limiter
-from career_direction.repository import CareerDirectionRepository
 from shared.crypto import decrypt, decrypt_user_key
+from shared.deps import get_current_user, get_db_for_current_user
+from shared.models.user import User
 
 router = APIRouter(prefix="/cover-letters", tags=["cover-letters"])
 logger = logging.getLogger(__name__)
@@ -49,7 +50,9 @@ async def generate_letter(
         )
     except Exception:
         logger.error("Cover letter generation failed", exc_info=True)
-        raise HTTPException(status_code=500, detail="Cover letter generation failed, please try again")
+        raise HTTPException(
+            status_code=500, detail="Cover letter generation failed, please try again"
+        )
     repo = CoverLetterRepository(db)
     letter = await repo.create(user.user_id, body.name, text)
     return CoverLetterResponse.model_validate(letter)
@@ -67,7 +70,10 @@ async def save_letter(
 
 
 @router.get("", response_model=list[CoverLetterResponse])
-async def list_letters(user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db_for_current_user)):
+async def list_letters(
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db_for_current_user),
+):
     repo = CoverLetterRepository(db)
     letters = await repo.get_all(user.user_id)
     return [CoverLetterResponse.model_validate(l) for l in letters]
@@ -97,12 +103,12 @@ async def export_letter_pdf(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_for_current_user),
 ):
+    import asyncio
+
     from reportlab.lib.pagesizes import letter
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
     from reportlab.lib.units import inch
     from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
-
-    import asyncio
 
     try:
         parsed = UUID(letter_id)
@@ -152,7 +158,5 @@ async def export_letter_pdf(
     return StreamingResponse(
         buf,
         media_type="application/pdf",
-        headers={
-            "Content-Disposition": f"attachment; filename={slug}.pdf"
-        },
+        headers={"Content-Disposition": f"attachment; filename={slug}.pdf"},
     )

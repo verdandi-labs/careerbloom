@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import delete, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from database import ensure_schema, get_db
 from shared.crypto import decrypt_user_key, encrypt
 from shared.deps import get_current_user
@@ -26,14 +27,23 @@ async def connect_database(
         valid = await validate_connection(body.connection_string)
     except Exception:
         logger.error("validate_connection failed", exc_info=True)
-        raise HTTPException(status_code=400, detail="Invalid database connection string")
+        raise HTTPException(
+            status_code=400, detail="Invalid database connection string"
+        )
     if not valid:
-        raise HTTPException(status_code=400, detail="Could not connect to the database. Check your connection string.")
+        raise HTTPException(
+            status_code=400,
+            detail="Could not connect to the database. Check your connection string.",
+        )
 
     user_key = decrypt_user_key(user.encryption_key)
     encrypted_connection = encrypt(body.connection_string, user_key)
-    stmt = pg_insert(Byodb).values(user_id=user.user_id, connection=encrypted_connection)
-    stmt = stmt.on_conflict_do_update(index_elements=[Byodb.user_id], set_={"connection": encrypted_connection})
+    stmt = pg_insert(Byodb).values(
+        user_id=user.user_id, connection=encrypted_connection
+    )
+    stmt = stmt.on_conflict_do_update(
+        index_elements=[Byodb.user_id], set_={"connection": encrypted_connection}
+    )
     await db.execute(stmt)
 
     db_url = build_db_url(body.connection_string)
@@ -42,7 +52,8 @@ async def connect_database(
     except Exception:
         logger.error("ensure_schema failed", exc_info=True)
         raise HTTPException(
-            status_code=500, detail="Could not connect to the database. Check your connection string."
+            status_code=500,
+            detail="Could not connect to the database. Check your connection string.",
         )
 
     return TenantStatusResponse(connected=True)
@@ -53,7 +64,9 @@ async def tenant_status(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    result = await db.execute(select(Byodb.user_id).where(Byodb.user_id == user.user_id))
+    result = await db.execute(
+        select(Byodb.user_id).where(Byodb.user_id == user.user_id)
+    )
     return TenantStatusResponse(connected=result.scalar_one_or_none() is not None)
 
 

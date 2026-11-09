@@ -59,7 +59,9 @@ async def chat_completion(
                 )
                 continue
             if not response.is_success:
-                logger.warning(f"Model {model} error {response.status_code}, trying next")
+                logger.warning(
+                    f"Model {model} error {response.status_code}, trying next"
+                )
                 continue
 
             return response.json()["choices"][0]["message"]["content"]
@@ -93,29 +95,29 @@ async def stream_chat_completion(
                     },
                 ) as response,
             ):
-                    if response.status_code not in (200,):
-                        logger.warning(
-                            f"Model {model} not available ({response.status_code}), trying next"
-                        )
-                    else:
-                        async for line in response.aiter_lines():
-                            line = line.strip()
-                            if not line.startswith("data:"):
-                                continue
-                            payload = line[len("data:"):].strip()
-                            if payload == "[DONE]":
-                                yield "[DONE]"
-                                succeeded = True
-                                break
-                            try:
-                                chunk = json.loads(payload)
-                            except json.JSONDecodeError:
-                                continue
-                            if not chunk.get("choices"):
-                                continue
-                            content = chunk["choices"][0]["delta"].get("content", "")
-                            if content:
-                                yield content
+                if response.status_code not in (200,):
+                    logger.warning(
+                        f"Model {model} not available ({response.status_code}), trying next"
+                    )
+                else:
+                    async for line in response.aiter_lines():
+                        line = line.strip()
+                        if not line.startswith("data:"):
+                            continue
+                        payload = line[len("data:") :].strip()
+                        if payload == "[DONE]":
+                            yield "[DONE]"
+                            succeeded = True
+                            break
+                        try:
+                            chunk = json.loads(payload)
+                        except json.JSONDecodeError:
+                            continue
+                        if not chunk.get("choices"):
+                            continue
+                        content = chunk["choices"][0]["delta"].get("content", "")
+                        if content:
+                            yield content
         except (httpx.RemoteProtocolError, httpx.ReadError) as e:
             logger.warning(f"Model {model} not available ({e}), trying next")
         if succeeded:

@@ -1,29 +1,18 @@
-from pydantic_settings import BaseSettings
 from functools import lru_cache
+
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    # Neon / PostgreSQL
     NEON_DATABASE_URL: str = ""
 
-    # Crypto
     HMAC_SECRET: str
-    # 32-byte base64-urlsafe Fernet master key that wraps per-user encryption keys
-    # Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
     MASTER_KEY: str
 
-    # OpenCode Zen
-    ZEN_API_KEY: str = ""
-    ZEN_BASE_URL: str = "https://opencode.ai/zen/v1"
-    ZEN_MODEL_REFRESH_HOURS: int = 6
-
-    # OpenAI
     OPENAI_API_KEY: str = ""
     OPENAI_BASE_URL: str = "https://api.openai.com/v1"
-    OPENAI_MODEL: str = "llama-3.3-70b-versatile"
 
-    # SendGrid
-    SENDGRID_API_KEY: str = ""
+    OPENROUTER_API_KEY: str = ""
 
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
@@ -33,7 +22,6 @@ class Settings(BaseSettings):
 
     # App
     DEBUG: bool = False
-    FRONTEND_URL: str = "https://careerbloom-e5ne.onrender.com"
     CORS_ORIGINS: str = "http://localhost:5173,https://careerbloom-e5ne.onrender.com"
     API_V1_PREFIX: str = "/api/v1"
 

@@ -1,7 +1,8 @@
-from pydantic import BaseModel, Field, field_validator
+from datetime import datetime
 from typing import Literal
 from uuid import UUID
-from datetime import datetime
+
+from pydantic import BaseModel, Field, field_validator
 
 from cv.schemas import TEXT_FIELDS
 

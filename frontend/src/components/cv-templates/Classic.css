@@ -1,5 +1,15 @@
-.cv-page.classic .text-xs { font-size: calc(12px * var(--cv-scale, 1)); }
-.cv-page.classic .text-\[10px\] { font-size: calc(10px * var(--cv-scale, 1)); }
-.cv-page.classic .text-\[11px\] { font-size: calc(11px * var(--cv-scale, 1)); }
-.cv-page.classic .text-sm { font-size: calc(14px * var(--cv-scale, 1)); }
-.cv-page.classic .text-5xl { font-size: calc(48px * var(--cv-scale, 1)); }
+.cv-page.classic .text-xs {
+  font-size: calc(12px * var(--cv-scale, 1));
+}
+.cv-page.classic .text-\[10px\] {
+  font-size: calc(10px * var(--cv-scale, 1));
+}
+.cv-page.classic .text-\[11px\] {
+  font-size: calc(11px * var(--cv-scale, 1));
+}
+.cv-page.classic .text-sm {
+  font-size: calc(14px * var(--cv-scale, 1));
+}
+.cv-page.classic .text-5xl {
+  font-size: calc(48px * var(--cv-scale, 1));
+}

@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useSession } from "@/features/auth";
 import { API_BASE } from "@/lib/api";
-import { Chrome, Github, Mail } from "lucide-react";
+import { Chrome, Github } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   ssr: false,
@@ -365,14 +365,6 @@ function LandingPage() {
               <Github className="h-4 w-4" />
               Continue with GitHub
             </a>
-
-            <button
-              onClick={() => navigate({ to: "/auth/mail", search: {} })}
-              className="inline-flex w-full items-center justify-center gap-3 rounded-xl border border-[#3a2a26] bg-[#2a1a15] px-5 py-3.5 text-sm font-medium text-[#fee8e7] transition-colors hover:bg-[#3a2a26]"
-            >
-              <Mail className="h-4 w-4" />
-              Continue with Mail
-            </button>
           </div>
         </div>
       </section>

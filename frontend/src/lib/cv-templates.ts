@@ -87,11 +87,9 @@ export type StructuredCVData = {
   certifications: string;
   references: string;
   other: string;
-  photo?: string;
 };
 
-export type CVTemplateId =
-  "terracotta" | "sage" | "classic" | "bold" | "minimal";
+export type CVTemplateId = "classic";
 
 export type CVTemplateMeta = {
   id: CVTemplateId;
@@ -112,24 +110,6 @@ export type CVTemplateMeta = {
 
 export const CV_TEMPLATES: CVTemplateMeta[] = [
   {
-    id: "terracotta",
-    name: "Terracotta",
-    blurb: "Warm sidebar, Playfair accents.",
-    accent: "#CB6843",
-    bg: "#FFFFFF",
-    font: "sans",
-    layout: "sidebar",
-  },
-  {
-    id: "sage",
-    name: "Sage",
-    blurb: "Clean editorial layout with sage green accents.",
-    accent: "#7B9E87",
-    bg: "#FFFFFF",
-    font: "sans",
-    layout: "split",
-  },
-  {
     id: "classic",
     name: "Classic",
     blurb: "Centered header, clean rules, timeless.",
@@ -138,28 +118,12 @@ export const CV_TEMPLATES: CVTemplateMeta[] = [
     font: "sans",
     layout: "single",
   },
-  {
-    id: "bold",
-    name: "Bold",
-    blurb: "Editorial layout, strong typography.",
-    accent: "#111111",
-    bg: "#E8E5DC",
-    font: "sans",
-    layout: "editorial",
-  },
-  {
-    id: "minimal",
-    name: "Minimal",
-    blurb: "Clean sidebar, photo, structured.",
-    accent: "#111111",
-    bg: "#FFFFFF",
-    font: "sans",
-    layout: "sidebar",
-  },
 ];
 
-export type SectionOrderItem =
-  { type: "section"; key: keyof StructuredCVData } | { type: "page-break" };
+export type SectionOrderItem = {
+  type: "section";
+  key: keyof StructuredCVData;
+};
 
 export const DEFAULT_SECTION_ORDER: SectionOrderItem[] = [
   { type: "section", key: "experience" },
@@ -173,7 +137,7 @@ export const DEFAULT_SECTION_ORDER: SectionOrderItem[] = [
   { type: "section", key: "projects" },
 ];
 
-export const DEFAULT_TEMPLATE: CVTemplateId = "terracotta";
+export const DEFAULT_TEMPLATE: CVTemplateId = "classic";
 
 export function getTemplate(id?: string | null): CVTemplateMeta {
   return CV_TEMPLATES.find((t) => t.id === id) ?? CV_TEMPLATES[0];
@@ -193,27 +157,4 @@ export function orderedSections(
     .map((item) => item.key);
   const missing = keys.filter((k) => !ordered.includes(k));
   return [...ordered, ...missing];
-}
-
-export function splitAtPageBreaks(
-  order: SectionOrderItem[] | undefined,
-  keys: (keyof StructuredCVData)[],
-): (keyof StructuredCVData)[][] {
-  if (!order) return [keys];
-  const groups: (keyof StructuredCVData)[][] = [[]];
-  for (const item of order) {
-    if (item.type === "page-break") {
-      groups.push([]);
-    } else if (
-      item.type === "section" &&
-      keys.includes(item.key as keyof StructuredCVData)
-    ) {
-      groups[groups.length - 1].push(item.key as keyof StructuredCVData);
-    }
-  }
-  const missing = keys.filter((k) => !groups.some((g) => g.includes(k)));
-  if (missing.length > 0) {
-    groups[groups.length - 1].push(...missing);
-  }
-  return groups.filter((g) => g.length > 0);
 }

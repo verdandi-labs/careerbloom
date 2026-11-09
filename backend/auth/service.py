@@ -1,5 +1,5 @@
 import secrets
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,7 +16,6 @@ from shared.crypto import (
 from shared.models.user import Session as SessionRow
 from shared.models.user import User
 
-MAGIC_LINK_TTL_MINUTES = 15
 SESSION_TTL_DAYS = 7
 
 
@@ -31,7 +30,9 @@ async def create_user(
 
     if provider_id:
         result = await db.execute(
-            select(User).where(User.auth_method == auth_method, User.provider_id == provider_id)
+            select(User).where(
+                User.auth_method == auth_method, User.provider_id == provider_id
+            )
         )
         existing = result.scalar_one_or_none()
         if existing:
@@ -53,13 +54,8 @@ async def create_user(
         email_hash=email_hash,
         email=encrypt(normalized_email, user_key) if normalized_email else None,
     )
-    if auth_method == "magic_link":
-        async with db.begin_nested():
-            db.add(user)
-            await db.flush()
-    else:
-        db.add(user)
-        await db.flush()
+    db.add(user)
+    await db.flush()
     return user
 
 
@@ -69,7 +65,7 @@ async def create_session(db: AsyncSession, user_id) -> str:
         SessionRow(
             user_id=user_id,
             token_hash=hash_token(raw_token),
-            expires_at=datetime.now(timezone.utc) + timedelta(days=SESSION_TTL_DAYS),
+            expires_at=datetime.now(UTC) + timedelta(days=SESSION_TTL_DAYS),
         )
     )
     await db.flush()
@@ -77,7 +73,9 @@ async def create_session(db: AsyncSession, user_id) -> str:
 
 
 async def delete_session(db: AsyncSession, raw_token: str) -> None:
-    result = await db.execute(select(SessionRow).where(SessionRow.token_hash == hash_token(raw_token)))
+    result = await db.execute(
+        select(SessionRow).where(SessionRow.token_hash == hash_token(raw_token))
+    )
     row = result.scalar_one_or_none()
     if row:
         await db.delete(row)

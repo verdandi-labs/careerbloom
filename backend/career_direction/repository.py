@@ -29,7 +29,9 @@ class CareerDirectionRepository:
         )
         return result.scalar_one_or_none()
 
-    async def get_by_id(self, user_id: UUID, career_direction_id: UUID) -> CareerDirection | None:
+    async def get_by_id(
+        self, user_id: UUID, career_direction_id: UUID
+    ) -> CareerDirection | None:
         result = await self.db.execute(
             select(CareerDirection).where(
                 CareerDirection.career_direction_id == career_direction_id,
@@ -40,7 +42,9 @@ class CareerDirectionRepository:
 
     async def create_or_rotate(self, user_id: UUID, encrypted: str) -> CareerDirection:
         count = await self.db.execute(
-            select(func.count(CareerDirection.career_direction_id)).where(CareerDirection.user_id == user_id)
+            select(func.count(CareerDirection.career_direction_id)).where(
+                CareerDirection.user_id == user_id
+            )
         )
         if count.scalar_one() >= MAX_CAREER_DIRECTIONS:
             result = await self.db.execute(
