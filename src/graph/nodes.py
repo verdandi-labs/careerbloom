@@ -58,7 +58,7 @@ async def llm_call_node(
     db: AsyncSession,
     selected_model: str | None = None,
 ) -> dict:
-    if state.get("response") in (SAFE_RESPONSE_FAILURE, STRIKE_BLOCK_MESSAGE):
+    if state.get("response") == STRIKE_BLOCK_MESSAGE:
         return {}
 
     start_time = time.monotonic()

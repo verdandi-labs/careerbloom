@@ -6,7 +6,7 @@ from graph.nodes import (
     llm_call_node,
     output_validation_node,
 )
-from graph.security import MAX_RETRIES, SAFE_RESPONSE_FAILURE, STRIKE_BLOCK_MESSAGE
+from graph.security import MAX_RETRIES, SAFE_RESPONSE_FAILURE
 from graph.state import CareerBloomState
 
 
@@ -20,14 +20,8 @@ def _after_output_validation(state: CareerBloomState) -> str:
     response = state.get("response", "")
     retry_count = state.get("retry_count", 0)
 
-    if response in ("", None):
-        return END
-
-    if response in (SAFE_RESPONSE_FAILURE, STRIKE_BLOCK_MESSAGE):
-        if retry_count < MAX_RETRIES:
-            return "llm_call"
-        return END
-
+    if response == SAFE_RESPONSE_FAILURE and retry_count < MAX_RETRIES:
+        return "llm_call"
     return END
 
 
