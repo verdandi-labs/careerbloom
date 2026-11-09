@@ -31,7 +31,12 @@ class SkillRaw(_RawEntry):
     comments: str | None = None
 
 
-class StudyRaw(_RawEntry):
+class TechStackRaw(_RawEntry):
+    name: str | None = None
+    comments: str | None = None
+
+
+class EducationRaw(_RawEntry):
     edu_center: str | None = None
     city: str | None = None
     start_date: str | None = None
@@ -61,7 +66,9 @@ class VolunteeringRaw(_RawEntry):
 
 class ProjectRaw(_RawEntry):
     name: str | None = None
-    url: str | None = None
+    organisation: str | None = None
+    link: str | None = None
+    tech_stack: str | None = None
     comments: str | None = None
 
 
@@ -83,7 +90,11 @@ class SkillItem(SkillRaw):
     line_num: int
 
 
-class StudyItem(StudyRaw):
+class TechStackItem(TechStackRaw):
+    line_num: int
+
+
+class EducationItem(EducationRaw):
     line_num: int
 
 
@@ -111,7 +122,8 @@ RAW_MODELS = {
     "contact_details": ContactDetailRaw,
     "experience": ExperienceRaw,
     "skills": SkillRaw,
-    "studies": StudyRaw,
+    "tech_stack": TechStackRaw,
+    "education": EducationRaw,
     "awards": AwardRaw,
     "publications": PublicationRaw,
     "volunteering": VolunteeringRaw,
@@ -123,7 +135,8 @@ FIELD_MODELS = {
     "contact_details": ContactDetailItem,
     "experience": ExperienceItem,
     "skills": SkillItem,
-    "studies": StudyItem,
+    "tech_stack": TechStackItem,
+    "education": EducationItem,
     "awards": AwardItem,
     "publications": PublicationItem,
     "volunteering": VolunteeringItem,
@@ -131,7 +144,7 @@ FIELD_MODELS = {
     "languages": LanguageItem,
 }
 
-TEXT_FIELDS = {"full_name", "title", "self_summary"}
+TEXT_FIELDS = {"full_name", "headline", "self_summary"}
 
 
 class CvRawText(BaseModel):
@@ -140,19 +153,20 @@ class CvRawText(BaseModel):
 
 class CvData(BaseModel):
     full_name: str | None = None
-    title: str | None = None
+    headline: str | None = None
     self_summary: str | None = None
     contact_details: list[ContactDetailItem] | None = None
     experience: list[ExperienceItem] | None = None
     skills: list[SkillItem] | None = None
-    studies: list[StudyItem] | None = None
+    tech_stack: list[TechStackItem] | None = None
+    education: list[EducationItem] | None = None
     awards: list[AwardItem] | None = None
     publications: list[PublicationItem] | None = None
     volunteering: list[VolunteeringItem] | None = None
     projects: list[ProjectItem] | None = None
     languages: list[LanguageItem] | None = None
 
-    @field_validator("full_name", "title", "self_summary")
+    @field_validator("full_name", "headline", "self_summary")
     @classmethod
     def _clean_text(cls, v: str | None) -> str | None:
         return v.strip() or None if v else None
