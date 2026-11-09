@@ -3,6 +3,9 @@ import re
 MAX_STRIKES = 3
 MAX_RETRIES = 1
 
+SAFE_RESPONSE_FAILURE = "I wasn't able to generate a response with this model. Please select a different model and try again."
+STRIKE_BLOCK_MESSAGE = "Session blocked due to repeated violations"
+
 _session_strikes: dict[str, int] = {}
 
 STRIKE_MESSAGES = {

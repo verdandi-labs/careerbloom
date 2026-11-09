@@ -6,6 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from graph.security import (
     MAX_STRIKES,
+    SAFE_RESPONSE_FAILURE,
+    STRIKE_BLOCK_MESSAGE,
     build_validated_message,
     check_strike,
     get_strike_message,
@@ -21,11 +23,6 @@ from llm.fallback import (
 from llm.security import LimitExceededError
 
 logger = logging.getLogger(__name__)
-
-SAFE_RESPONSE_FAILURE = "I wasn't able to generate a response with this model. Please select a different model and try again."
-STRIKE_BLOCK_MESSAGE = (
-    "Your session has been blocked due to repeated policy violations."
-)
 
 
 async def input_validation_node(
