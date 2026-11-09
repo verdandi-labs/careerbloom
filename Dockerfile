@@ -7,7 +7,7 @@ RUN bun run build
 
 FROM python:3.14-slim
 WORKDIR /app
-COPY backend/pyproject.toml backend/uv.lock ./
+COPY src/pyproject.toml src/uv.lock ./
 RUN pip install uv && uv sync --frozen
 COPY backend/ .
 COPY --from=frontend-build /app/frontend/dist /app/frontend/dist
