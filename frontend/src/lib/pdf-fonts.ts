@@ -1,5 +1,11 @@
 import { Font } from "@react-pdf/renderer";
 
+import dmSans400 from "@/assets/fonts/dm-sans-400.ttf";
+import dmSans500 from "@/assets/fonts/dm-sans-500.ttf";
+import dmSans700 from "@/assets/fonts/dm-sans-700.ttf";
+import playfairDisplay400 from "@/assets/fonts/playfair-display-400.ttf";
+import playfairDisplay700 from "@/assets/fonts/playfair-display-700.ttf";
+
 let registered = false;
 
 export async function registerFonts() {
@@ -10,15 +16,15 @@ export async function registerFonts() {
     family: "DM Sans",
     fonts: [
       {
-        src: "https://fonts.gstatic.com/s/dmsans/v17/rP2tp2ywxg089UriI5-g4vlH9VoD8CmcqZG40F9JadbnoEwAopxhTg.ttf",
+        src: dmSans400,
         fontWeight: 400,
       },
       {
-        src: "https://fonts.gstatic.com/s/dmsans/v17/rP2tp2ywxg089UriI5-g4vlH9VoD8CmcqZG40F9JadbnoEwAkJxhTg.ttf",
+        src: dmSans500,
         fontWeight: 500,
       },
       {
-        src: "https://fonts.gstatic.com/s/dmsans/v17/rP2tp2ywxg089UriI5-g4vlH9VoD8CmcqZG40F9JadbnoEwARZthTg.ttf",
+        src: dmSans700,
         fontWeight: 700,
       },
     ],
@@ -28,11 +34,11 @@ export async function registerFonts() {
     family: "Playfair Display",
     fonts: [
       {
-        src: "https://fonts.gstatic.com/s/playfairdisplay/v40/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdFvUDQ.ttf",
+        src: playfairDisplay400,
         fontWeight: 400,
       },
       {
-        src: "https://fonts.gstatic.com/s/playfairdisplay/v40/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKeiukDQ.ttf",
+        src: playfairDisplay700,
         fontWeight: 700,
       },
     ],
