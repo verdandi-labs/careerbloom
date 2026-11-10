@@ -30,6 +30,11 @@ export type ExperienceItem = {
   line_num: number;
 };
 export type SkillItem = { skill?: string; comments?: string; line_num: number };
+export type TechStackItem = {
+  name?: string;
+  comments?: string;
+  line_num: number;
+};
 export type StudyItem = {
   edu_center?: string;
   city?: string;
@@ -66,27 +71,27 @@ export type VolunteeringItem = {
 };
 export type ProjectItem = {
   name?: string;
-  url?: string;
+  organisation?: string;
+  link?: string;
+  tech_stack?: string;
   comments?: string;
   line_num: number;
 };
 
 export type StructuredCVData = {
-  name: string;
-  title: string;
-  summary: string;
-  contact: ContactItem[];
+  full_name: string;
+  headline: string;
+  self_summary: string;
+  contact_details: ContactItem[];
   experience: ExperienceItem[];
-  education: StudyItem[];
   skills: SkillItem[];
-  languages: LanguageItem[];
+  tech_stack: TechStackItem[];
+  education: StudyItem[];
   awards: AwardItem[];
   publications: PublicationItem[];
-  volunteer: VolunteeringItem[];
+  volunteering: VolunteeringItem[];
   projects: ProjectItem[];
-  certifications: string;
-  references: string;
-  other: string;
+  languages: LanguageItem[];
 };
 
 export type CVTemplateId = "classic";
@@ -129,11 +134,11 @@ export const DEFAULT_SECTION_ORDER: SectionOrderItem[] = [
   { type: "section", key: "experience" },
   { type: "section", key: "education" },
   { type: "section", key: "skills" },
+  { type: "section", key: "tech_stack" },
   { type: "section", key: "languages" },
-  { type: "section", key: "contact" },
   { type: "section", key: "awards" },
   { type: "section", key: "publications" },
-  { type: "section", key: "volunteer" },
+  { type: "section", key: "volunteering" },
   { type: "section", key: "projects" },
 ];
 

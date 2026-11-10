@@ -39,12 +39,13 @@ type CvRow = {
 
 type CvData = {
   full_name: string | null;
-  title: string | null;
+  headline: string | null;
   self_summary: string | null;
   contact_details: CvRow[] | null;
   experience: CvRow[] | null;
   skills: CvRow[] | null;
-  studies: CvRow[] | null;
+  tech_stack: CvRow[] | null;
+  education: CvRow[] | null;
   awards: CvRow[] | null;
   publications: CvRow[] | null;
   volunteering: CvRow[] | null;
@@ -56,7 +57,7 @@ const TRANSLATION_LANGUAGES = LANGUAGES;
 
 const TEXT_SECTIONS = [
   { key: "full_name", label: "Full name" },
-  { key: "title", label: "Title" },
+  { key: "headline", label: "Headline" },
   { key: "self_summary", label: "Summary" },
 ] as const;
 
@@ -65,7 +66,8 @@ type ListKey =
   | "contact_details"
   | "experience"
   | "skills"
-  | "studies"
+  | "tech_stack"
+  | "education"
   | "awards"
   | "publications"
   | "volunteering"
@@ -136,8 +138,17 @@ const LIST_SECTIONS: ListSection[] = [
     text: (r) => join(r, ["skill", "comments"]),
   },
   {
-    key: "studies",
-    label: "Studies",
+    key: "tech_stack",
+    label: "Tech Stack",
+    fields: [
+      { key: "name", label: "Name" },
+      { key: "comments", label: "Comments", textarea: true },
+    ],
+    text: (r) => join(r, ["name", "comments"]),
+  },
+  {
+    key: "education",
+    label: "Education",
     fields: [
       { key: "edu_center", label: "Center" },
       { key: "city", label: "City" },
@@ -186,10 +197,13 @@ const LIST_SECTIONS: ListSection[] = [
     label: "Projects",
     fields: [
       { key: "name", label: "Name" },
-      { key: "url", label: "URL" },
+      { key: "organisation", label: "Organisation" },
+      { key: "link", label: "Link" },
+      { key: "tech_stack", label: "Tech Stack" },
       { key: "comments", label: "Comments", textarea: true },
     ],
-    text: (r) => join(r, ["name", "url", "comments"]),
+    text: (r) =>
+      join(r, ["name", "organisation", "link", "tech_stack", "comments"]),
   },
   {
     key: "languages",
@@ -220,7 +234,9 @@ const listText = (data: CvData, key: string): string => {
           );
         case "skills":
           return join(r, ["skill", "comments"]);
-        case "studies":
+        case "tech_stack":
+          return join(r, ["name", "comments"]);
+        case "education":
           return range(
             r,
             ["edu_center", "city"],
@@ -239,7 +255,13 @@ const listText = (data: CvData, key: string): string => {
             "comments",
           );
         case "projects":
-          return join(r, ["name", "url", "comments"]);
+          return join(r, [
+            "name",
+            "organisation",
+            "link",
+            "tech_stack",
+            "comments",
+          ]);
         case "languages":
           return join(r, ["language", "level", "comments"]);
         default:
@@ -252,12 +274,14 @@ const listText = (data: CvData, key: string): string => {
 function toDocxData(data: CvData): CVData {
   return {
     name: data.full_name ?? "",
-    title: data.title ?? "",
+    title: data.headline ?? "",
     contact: listText(data, "contact_details"),
     summary: data.self_summary ?? "",
     experience: listText(data, "experience"),
-    education: listText(data, "studies"),
-    skills: listText(data, "skills"),
+    education: listText(data, "education"),
+    skills: [listText(data, "skills"), listText(data, "tech_stack")]
+      .filter(Boolean)
+      .join("\n\n"),
     languages: listText(data, "languages"),
     certifications: "",
     projects: listText(data, "projects"),
@@ -271,21 +295,19 @@ function toDocxData(data: CvData): CVData {
 
 function toStructuredData(data: CvData): StructuredCVData {
   return {
-    name: data.full_name ?? "",
-    title: data.title ?? "",
-    summary: data.self_summary ?? "",
-    contact: data.contact_details ?? [],
+    full_name: data.full_name ?? "",
+    headline: data.headline ?? "",
+    self_summary: data.self_summary ?? "",
+    contact_details: data.contact_details ?? [],
     experience: data.experience ?? [],
-    education: data.studies ?? [],
     skills: data.skills ?? [],
-    languages: data.languages ?? [],
+    tech_stack: data.tech_stack ?? [],
+    education: data.education ?? [],
     awards: data.awards ?? [],
     publications: data.publications ?? [],
-    volunteer: data.volunteering ?? [],
+    volunteering: data.volunteering ?? [],
     projects: data.projects ?? [],
-    certifications: "",
-    references: "",
-    other: "",
+    languages: data.languages ?? [],
   };
 }
 
@@ -393,18 +415,21 @@ function PreviewPage() {
   }, [cv]);
 
   function handleChange(field: EditableField, value: string) {
+    const flatFieldMap: Record<EditableField, keyof CVData> = {
+      full_name: "name",
+      headline: "title",
+      self_summary: "summary",
+    };
     setMergedData((prev) => {
       if (!prev) return prev;
-      const next = { ...prev, [field]: value };
+      const next = { ...prev, [flatFieldMap[field]]: value };
       saveLocalEdits(next);
       return next;
     });
-    const structuredFieldMap: Partial<
-      Record<EditableField, keyof StructuredCVData>
-    > = {
-      name: "name",
-      title: "title",
-      summary: "summary",
+    const structuredFieldMap: Record<EditableField, keyof StructuredCVData> = {
+      full_name: "full_name",
+      headline: "headline",
+      self_summary: "self_summary",
     };
     const structuredField = structuredFieldMap[field];
     if (structuredField) {
@@ -506,17 +531,63 @@ function PreviewPage() {
         </>
       );
 
-    if (field === "skills") return input("skill", "Skill");
+    if (field === "skills")
+      return (
+        <>
+          {input("skill", "Skill")}
+          {input("comments", "Comments", true)}
+        </>
+      );
+
+    if (field === "tech_stack")
+      return (
+        <>
+          {input("name", "Name")}
+          {input("comments", "Comments", true)}
+        </>
+      );
 
     if (field === "languages")
       return (
         <>
           {input("language", "Language")}
           {input("level", "Level")}
+          {input("comments", "Comments", true)}
         </>
       );
 
-    if (field === "contact") return input("detail", "Contact detail");
+    if (field === "awards" || field === "publications")
+      return (
+        <>
+          {input("name", "Name")}
+          {input("date", "Date")}
+          {input("comments", "Comments", true)}
+        </>
+      );
+
+    if (field === "volunteering")
+      return (
+        <>
+          {input("center", "Center")}
+          {input("city", "City")}
+          {input("start_date", "Start date")}
+          {input("end_date", "End date")}
+          {input("comments", "Comments", true)}
+        </>
+      );
+
+    if (field === "projects")
+      return (
+        <>
+          {input("name", "Name")}
+          {input("organisation", "Organisation")}
+          {input("link", "Link")}
+          {input("tech_stack", "Tech Stack")}
+          {input("comments", "Comments", true)}
+        </>
+      );
+
+    if (field === "contact_details") return input("detail", "Contact detail");
 
     return null;
   }

@@ -8,44 +8,8 @@ import { orderedSections } from "@/lib/cv-templates";
 
 function groupHasContent(keys: string[], data: StructuredCVData): boolean {
   return keys.some((key) => {
-    switch (key) {
-      case "experience":
-        return Array.isArray(data.experience) && data.experience.length > 0;
-      case "education":
-        return Array.isArray(data.education) && data.education.length > 0;
-      case "skills":
-        return Array.isArray(data.skills) && data.skills.length > 0;
-      case "languages":
-        return Array.isArray(data.languages) && data.languages.length > 0;
-      case "contact":
-        return Array.isArray(data.contact) && data.contact.length > 0;
-      case "awards":
-        return Array.isArray(data.awards) && data.awards.length > 0;
-      case "publications":
-        return Array.isArray(data.publications) && data.publications.length > 0;
-      case "volunteer":
-        return Array.isArray(data.volunteer) && data.volunteer.length > 0;
-      case "projects":
-        return Array.isArray(data.projects) && data.projects.length > 0;
-      case "references":
-        return (
-          typeof data.references === "string" &&
-          data.references.trim().length > 0
-        );
-      case "certifications":
-        return (
-          typeof data.certifications === "string" &&
-          data.certifications.trim().length > 0
-        );
-      case "other":
-        return typeof data.other === "string" && data.other.trim().length > 0;
-      case "summary":
-        return (
-          typeof data.summary === "string" && data.summary.trim().length > 0
-        );
-      default:
-        return false;
-    }
+    const value = data[key as keyof StructuredCVData];
+    return Array.isArray(value) ? value.length > 0 : Boolean(value);
   });
 }
 
@@ -62,7 +26,7 @@ function ClassicPdfDocument({
   sectionOrder?: SectionOrderItem[];
   pdfScale?: number;
 }) {
-  const contactText = data.contact
+  const contactText = data.contact_details
     .map((c) => c.detail)
     .filter(Boolean)
     .join(" · ");
@@ -71,7 +35,12 @@ function ClassicPdfDocument({
     "experience",
     "education",
     "skills",
+    "tech_stack",
     "languages",
+    "awards",
+    "publications",
+    "volunteering",
+    "projects",
   ]);
 
   const sc = 0.75 * pdfScale;
@@ -168,6 +137,17 @@ function ClassicPdfDocument({
     },
   });
 
+  function renderCommentLines(comments: string | undefined) {
+    return (comments ?? "")
+      .split("\n")
+      .filter(Boolean)
+      .map((line, i) => (
+        <Text key={i} style={styles.expComment}>
+          {line}
+        </Text>
+      ));
+  }
+
   function renderSection(key: string) {
     if (key === "experience" && data.experience.length > 0) {
       return (
@@ -195,9 +175,7 @@ function ClassicPdfDocument({
                 <Text style={styles.expCompany}>{item.company}</Text>
               )}
               {item.city && <Text style={styles.expCompany}>{item.city}</Text>}
-              {item.comments && (
-                <Text style={styles.expComment}>{item.comments}</Text>
-              )}
+              {renderCommentLines(item.comments)}
             </View>
           ))}
         </View>
@@ -226,6 +204,7 @@ function ClassicPdfDocument({
                 )}
               </View>
               {item.city && <Text style={styles.expCompany}>{item.city}</Text>}
+              {renderCommentLines(item.comments)}
             </View>
           ))}
         </View>
@@ -241,6 +220,12 @@ function ClassicPdfDocument({
               .filter(Boolean)
               .join(", ")}
           </Text>
+          {renderCommentLines(
+            data.skills
+              .map((item) => item.comments)
+              .filter(Boolean)
+              .join("\n"),
+          )}
         </View>
       );
     }
@@ -249,11 +234,128 @@ function ClassicPdfDocument({
         <View key="languages">
           <Text style={styles.sectionLabel}>Languages</Text>
           {data.languages.map((item, i) => (
-            <View key={i} style={styles.languageRow}>
-              <Text style={styles.languageName}>{item.language}</Text>
-              {item.level && (
-                <Text style={styles.languageLevel}>{item.level}</Text>
+            <View key={i}>
+              <View style={styles.languageRow}>
+                <Text style={styles.languageName}>{item.language}</Text>
+                {item.level && (
+                  <Text style={styles.languageLevel}>{item.level}</Text>
+                )}
+              </View>
+              {renderCommentLines(item.comments)}
+            </View>
+          ))}
+        </View>
+      );
+    }
+    if (key === "tech_stack" && data.tech_stack.length > 0) {
+      return (
+        <View key="tech_stack" style={{ marginBottom: 20 }}>
+          <Text style={styles.sectionLabel}>Tech Stack</Text>
+          {data.tech_stack.map((item, i) => (
+            <View key={i} style={{ marginBottom: 8 }}>
+              <Text style={styles.skillText}>{item.name}</Text>
+              {renderCommentLines(item.comments)}
+            </View>
+          ))}
+        </View>
+      );
+    }
+    if (key === "awards" && data.awards.length > 0) {
+      return (
+        <View key="awards" style={{ marginBottom: 20 }}>
+          <Text style={styles.sectionLabel}>Awards</Text>
+          {data.awards.map((item, i) => (
+            <View key={i} style={{ marginBottom: 16 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginBottom: 2,
+                }}
+              >
+                <Text style={styles.expRole}>{item.name}</Text>
+                {item.date && <Text style={styles.expDate}>{item.date}</Text>}
+              </View>
+              {renderCommentLines(item.comments)}
+            </View>
+          ))}
+        </View>
+      );
+    }
+    if (key === "publications" && data.publications.length > 0) {
+      return (
+        <View key="publications" style={{ marginBottom: 20 }}>
+          <Text style={styles.sectionLabel}>Publications</Text>
+          {data.publications.map((item, i) => (
+            <View key={i} style={{ marginBottom: 16 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginBottom: 2,
+                }}
+              >
+                <Text style={styles.expRole}>{item.name}</Text>
+                {item.date && <Text style={styles.expDate}>{item.date}</Text>}
+              </View>
+              {renderCommentLines(item.comments)}
+            </View>
+          ))}
+        </View>
+      );
+    }
+    if (key === "volunteering" && data.volunteering.length > 0) {
+      return (
+        <View key="volunteering" style={{ marginBottom: 20 }}>
+          <Text style={styles.sectionLabel}>Volunteering</Text>
+          {data.volunteering.map((item, i) => (
+            <View key={i} style={{ marginBottom: 16 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginBottom: 2,
+                }}
+              >
+                <Text style={styles.expRole}>{item.center}</Text>
+                {(item.start_date || item.end_date) && (
+                  <Text style={styles.expDate}>
+                    {item.start_date && item.end_date
+                      ? `${item.start_date} – ${item.end_date}`
+                      : (item.start_date ?? item.end_date)}
+                  </Text>
+                )}
+              </View>
+              {item.city && <Text style={styles.expCompany}>{item.city}</Text>}
+              {renderCommentLines(item.comments)}
+            </View>
+          ))}
+        </View>
+      );
+    }
+    if (key === "projects" && data.projects.length > 0) {
+      return (
+        <View key="projects" style={{ marginBottom: 20 }}>
+          <Text style={styles.sectionLabel}>Projects</Text>
+          {data.projects.map((item, i) => (
+            <View key={i} style={{ marginBottom: 16 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginBottom: 2,
+                }}
+              >
+                <Text style={styles.expRole}>{item.name}</Text>
+                {item.link && <Text style={styles.expDate}>{item.link}</Text>}
+              </View>
+              {item.organisation && (
+                <Text style={styles.expCompany}>{item.organisation}</Text>
               )}
+              {item.tech_stack && (
+                <Text style={styles.expCompany}>{item.tech_stack}</Text>
+              )}
+              {renderCommentLines(item.comments)}
             </View>
           ))}
         </View>
@@ -266,16 +368,16 @@ function ClassicPdfDocument({
     <Document>
       {groupHasContent(allKeys, data) && (
         <Page size="A4" style={styles.page}>
-          <Text style={styles.name}>{data.name}</Text>
+          <Text style={styles.name}>{data.full_name}</Text>
           <Text style={styles.contactLine}>
-            {data.title ? `${data.title}${contactText ? " · " : ""}` : ""}
+            {data.headline ? `${data.headline}${contactText ? " · " : ""}` : ""}
             {contactText}
           </Text>
           <View style={styles.rule} />
-          {data.summary && (
+          {data.self_summary && (
             <View style={{ marginBottom: 20 }}>
               <Text style={styles.sectionLabel}>Profile</Text>
-              <Text style={styles.summaryText}>{data.summary}</Text>
+              <Text style={styles.summaryText}>{data.self_summary}</Text>
             </View>
           )}
           <View style={styles.rule} />

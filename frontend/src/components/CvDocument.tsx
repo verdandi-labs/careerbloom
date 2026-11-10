@@ -8,8 +8,7 @@ import { GripVertical } from "lucide-react";
 import { Classic } from "./cv-templates/Classic";
 import "./cv-templates/common.css";
 
-export type EditableField =
-  "name" | "title" | "summary" | "certifications" | "references" | "other";
+export type EditableField = "full_name" | "headline" | "self_summary";
 
 export type Props = {
   data: StructuredCVData;

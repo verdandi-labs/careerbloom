@@ -30,12 +30,13 @@ type CvRow = {
 
 type CvData = {
   full_name: string | null;
-  title: string | null;
+  headline: string | null;
   self_summary: string | null;
   contact_details: CvRow[] | null;
   experience: CvRow[] | null;
   skills: CvRow[] | null;
-  studies: CvRow[] | null;
+  tech_stack: CvRow[] | null;
+  education: CvRow[] | null;
   awards: CvRow[] | null;
   publications: CvRow[] | null;
   volunteering: CvRow[] | null;
@@ -47,7 +48,7 @@ const TRANSLATION_LANGUAGES = LANGUAGES;
 
 const TEXT_SECTIONS = [
   { key: "full_name", label: "Full name" },
-  { key: "title", label: "Title" },
+  { key: "headline", label: "Headline" },
   { key: "self_summary", label: "Summary" },
 ] as const;
 
@@ -56,7 +57,8 @@ type ListKey =
   | "contact_details"
   | "experience"
   | "skills"
-  | "studies"
+  | "tech_stack"
+  | "education"
   | "awards"
   | "publications"
   | "volunteering"
@@ -127,8 +129,17 @@ const LIST_SECTIONS: ListSection[] = [
     text: (r) => join(r, ["skill", "comments"]),
   },
   {
-    key: "studies",
-    label: "Studies",
+    key: "tech_stack",
+    label: "Tech Stack",
+    fields: [
+      { key: "name", label: "Name" },
+      { key: "comments", label: "Comments", textarea: true },
+    ],
+    text: (r) => join(r, ["name", "comments"]),
+  },
+  {
+    key: "education",
+    label: "Education",
     fields: [
       { key: "edu_center", label: "Center" },
       { key: "city", label: "City" },
@@ -177,10 +188,13 @@ const LIST_SECTIONS: ListSection[] = [
     label: "Projects",
     fields: [
       { key: "name", label: "Name" },
-      { key: "url", label: "URL" },
+      { key: "organisation", label: "Organisation" },
+      { key: "link", label: "Link" },
+      { key: "tech_stack", label: "Tech Stack" },
       { key: "comments", label: "Comments", textarea: true },
     ],
-    text: (r) => join(r, ["name", "url", "comments"]),
+    text: (r) =>
+      join(r, ["name", "organisation", "link", "tech_stack", "comments"]),
   },
   {
     key: "languages",
@@ -219,12 +233,14 @@ const listText = (data: CvData, key: ListKey) =>
 
 const toDocxData = (data: CvData): Record<string, string> => ({
   name: data.full_name ?? "",
-  title: data.title ?? "",
+  title: data.headline ?? "",
   contact: listText(data, "contact_details"),
   summary: data.self_summary ?? "",
   experience: listText(data, "experience"),
-  education: listText(data, "studies"),
-  skills: listText(data, "skills"),
+  education: listText(data, "education"),
+  skills: [listText(data, "skills"), listText(data, "tech_stack")]
+    .filter(Boolean)
+    .join("\n\n"),
   languages: listText(data, "languages"),
   certifications: "",
   projects: listText(data, "projects"),
