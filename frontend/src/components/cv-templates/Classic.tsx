@@ -20,6 +20,9 @@ export function Classic({
   const MUTED = "#666";
   const RULE = "#d0c8c4";
   const e = !!editable;
+  const hasContactDetails = data.contact_details.some((item) =>
+    /\S/.test(item.detail ?? ""),
+  );
 
   const allKeys = orderedSections(sectionOrder, [
     "experience",
@@ -564,21 +567,41 @@ export function Classic({
               className="font-medium"
             />
           )}
-          {data.headline && data.contact_details.length > 0 && (
+          {data.headline && hasContactDetails && (
             <span className="mx-2">·</span>
           )}
-          {data.contact_details.map((item, i) => (
+          {hasContactDetails ? (
+            data.contact_details.map((item, i) => (
+              <span
+                key={item.line_num}
+                onClick={() => onEditItem?.("contact_details", i, item)}
+                className="cursor-pointer"
+              >
+                {item.detail || " "}
+                {i < data.contact_details.length - 1 && (
+                  <span className="mx-2">·</span>
+                )}
+              </span>
+            ))
+          ) : (
             <span
-              key={item.line_num}
-              onClick={() => onEditItem?.("contact_details", i, item)}
-              className="cursor-pointer"
+              onClick={() =>
+                onEditItem?.("contact_details", 0, {
+                  detail: null,
+                  line_num: 1,
+                })
+              }
+              className="cursor-pointer rounded italic"
+              style={{
+                backgroundColor: "#fce8ed",
+                color: MUTED,
+                paddingLeft: "0.5rem",
+                paddingRight: "0.5rem",
+              }}
             >
-              {item.detail || " "}
-              {i < data.contact_details.length - 1 && (
-                <span className="mx-2">·</span>
-              )}
+              Add your contact details
             </span>
-          ))}
+          )}
         </div>
       </div>
       <div className="h-px w-full my-5" style={{ backgroundColor: RULE }} />
