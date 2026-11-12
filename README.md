@@ -1,6 +1,6 @@
 # careerBloom
 
-Career growth app: build your CV, cover letters, and get AI-powered guidance — with magic-link authentication and optional bring-your-own-database.
+Career transition companion for people figuring out what comes next. Helping you understand your assets, where you want to go, and how to present yourself along the way, without the pressure of having it all figured out before you start.
 
 ## Stack
 
