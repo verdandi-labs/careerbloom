@@ -1,30 +1,14 @@
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, StateGraph
 
+from graph.edges import after_input_validation, after_output_validation_with_intent
 from graph.nodes import (
     application_intent_node,
     input_validation_node,
     llm_call_node,
     output_validation_node,
 )
-from graph.security import MAX_RETRIES, SAFE_RESPONSE_FAILURE
 from graph.state import CareerBloomState
-
-
-def _after_input_validation(state: CareerBloomState) -> str:
-    if state.get("response"):
-        return END
-    return "llm_call"
-
-
-def _after_output_validation(state: CareerBloomState) -> str:
-    response = state.get("response", "")
-    retry_count = state.get("retry_count", 0)
-    if response == SAFE_RESPONSE_FAILURE and retry_count < MAX_RETRIES:
-        return "llm_call"
-    if response == SAFE_RESPONSE_FAILURE:
-        return END
-    return "application_intent"
 
 
 async def _input_validation(state: CareerBloomState, config: RunnableConfig) -> dict:
@@ -57,9 +41,11 @@ def build_job_compatibility_graph() -> StateGraph:
     graph.add_node("application_intent", _application_intent)
 
     graph.add_edge(START, "input_validation")
-    graph.add_conditional_edges("input_validation", _after_input_validation)
+    graph.add_conditional_edges("input_validation", after_input_validation)
     graph.add_edge("llm_call", "output_validation")
-    graph.add_conditional_edges("output_validation", _after_output_validation)
+    graph.add_conditional_edges(
+        "output_validation", after_output_validation_with_intent
+    )
     graph.add_edge("application_intent", END)
 
     return graph.compile()
