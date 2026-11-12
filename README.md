@@ -1,4 +1,4 @@
-# careerBloom
+# CareerBloom
 
 Career transition companion for people figuring out what comes next. Helping you understand your assets, where you want to go, and how to present yourself along the way, without the pressure of having it all figured out before you start.
 
