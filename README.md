@@ -1,31 +1,44 @@
 # careerBloom
 
-Career transition app: build your CV, cover letters, and get AI-powered guidance — with Google and GitHub sign in and optional bring-your-own-database.
+Career transition companion for people figuring out what comes next. Helping you understand your assets, where you want to go, and how to present yourself along the way, without the pressure of having it all figured out before you start.
 
 ## Stack
 
 | Layer    | Tech |
 | -------- | ---- |
 | Frontend | Vite + React 19, TanStack Router + Query, Zustand, Tailwind CSS 4, bun |
+| AI       | LangGraph + LangChain, Groq (primary), Cloudflare Workers AI (fallback) |
 | Backend  | FastAPI, SQLAlchemy (async), PostgreSQL (Neon), uv |
 | Auth     |  Google + GitHub OAuth, httpOnly session cookies |
 | Deploy   | Docker, Render |
 
 ## Repo layout
 
-- `frontend/` — Vite + React app (bun)
-- `backend/` — FastAPI app (uv)
+- `src/` — new Python code and the uv project root (source of truth): `graph/`, `llm/`, `prompts/`, `workflows/`, `cv/`
+- `backend/` — legacy FastAPI app, kept for the deploy until the refactor is done. Do not add new features here
 - `backend/migrations/` — numbered SQL files for schema changes (no Alembic)
-- `supabase/functions/` — Supabase edge functions
+- `frontend/` — Vite + React app (bun)
+- `docs/` — architecture notes and feature specs
 
 ## Setup
 
-### Backend
+### Python (src)
+
+This is the source of truth for new AI code and the uv project root.
+
+```sh
+cd src
+cp .env.example .env   # fill in the values
+uv sync
+uv run ruff check --fix .
+uv run ruff format .
+```
+
+### Backend (legacy app)
 
 ```sh
 cd backend
-cp .env.example .env   # fill in the values
-uv sync
+# create .env with the vars below, then
 uv run uvicorn main:app --reload --port 8000
 ```
 
@@ -36,13 +49,17 @@ Required env vars:
 | `NEON_DATABASE_URL` | PostgreSQL connection string |
 | `HMAC_SECRET` | Secret for hashing emails |
 | `MASTER_KEY` | Fernet master key that wraps per-user encryption keys (32-byte base64-urlsafe, no default) |
-| `SESSION_SECRET` | Secret for signing session cookies (no default — app refuses to start without it) |
+| `SESSION_SECRET` | Secret for signing session cookies |
 | `GOOGLE_CLIENT_ID` | For Google sign-in |
 | `GOOGLE_CLIENT_SECRET` | For Google sign-in |
 | `GITHUB_CLIENT_ID` | For GitHub sign-in |
 | `GITHUB_CLIENT_SECRET` | For GitHub sign-in |
-| `GEMINI_API_KEY` | For AI features |
+| `GROQ_API_KEY` | Groq API key for AI workflows |
+| `GROQ_BASE_URL` | Groq OpenAI-compatible base URL |
+| `CLOUDFLARE_API_KEY` | Cloudflare Workers AI key (fallback) |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID (fallback) |
 | `CORS_ORIGINS` | Comma-separated allowed origins |
+| `DEBUG` | Enable debug mode (default `false`) |
 
 Generate the `MASTER_KEY` with:
 ```sh
@@ -55,7 +72,8 @@ python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().d
 cd frontend
 bun install
 bun run dev        # http://localhost:5173
-bun run lint       # eslint + prettier
+bun run lint       # eslint
+bun run format     # prettier
 bun run build      # production build
 ```
 
