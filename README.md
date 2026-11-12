@@ -50,7 +50,6 @@ Required env vars:
 | `HMAC_SECRET` | Secret for hashing emails and magic-link tokens |
 | `MASTER_KEY` | Fernet master key that wraps per-user encryption keys (32-byte base64-urlsafe, no default) |
 | `SESSION_SECRET` | Secret for signing session cookies (no default — app refuses to start without it) |
-| `SENDGRID_API_KEY` | For magic-link emails |
 | `GOOGLE_CLIENT_ID` | For Google sign-in |
 | `GOOGLE_CLIENT_SECRET` | For Google sign-in |
 | `GITHUB_CLIENT_ID` | For GitHub sign-in |
