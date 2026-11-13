@@ -5,11 +5,14 @@ from typing import ClassVar
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from slowapi.errors import RateLimitExceeded
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
 from config import get_settings
 from database import dispose_engine, ensure_schema
+from shared.limiter import limiter
 
 logger = logging.getLogger("startup")
 
@@ -74,6 +77,14 @@ app = FastAPI(
     title="CareerBloom API",
     version="1.0.0",
     lifespan=lifespan,
+)
+
+app.state.limiter = limiter
+app.add_exception_handler(
+    RateLimitExceeded,
+    lambda req, exc: JSONResponse(
+        {"detail": "Too many requests, please slow down"}, status_code=429
+    ),
 )
 
 app.add_middleware(
