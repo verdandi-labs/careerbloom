@@ -63,6 +63,10 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 async def lifespan(app: FastAPI):
     logging.getLogger().addFilter(ScrubFilter())
     import chat.models  # noqa: F401
+    import shared.models.applications
+    import shared.models.career_direction
+    import shared.models.cover_letters
+    import shared.models.cv
     import shared.models.user  # noqa: F401
 
     await ensure_schema()
