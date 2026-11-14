@@ -1,6 +1,7 @@
 import logging
 import time
 
+from langchain_core.callbacks import adispatch_custom_event
 from langchain_core.messages import BaseMessage, HumanMessage
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,6 +24,8 @@ from llm.fallback import (
 from llm.security import LimitExceededError
 
 logger = logging.getLogger(__name__)
+
+FALLBACK_STATUS_EVENT = "fallback_status"
 
 
 async def input_validation_node(
@@ -65,6 +68,7 @@ async def llm_call_node(
     full_response = ""
     tokens_used = 0
     model_name = ""
+    last_status: str | None = None
 
     try:
         async for update in run_with_fallback(
@@ -75,6 +79,12 @@ async def llm_call_node(
         ):
             if update.chunk:
                 full_response += update.chunk
+            if update.status != last_status:
+                last_status = update.status
+                await adispatch_custom_event(
+                    FALLBACK_STATUS_EVENT,
+                    {"status": update.status},
+                )
             if update.result:
                 tokens_used = update.result.tokens_used
                 model_name = update.result.model_name
