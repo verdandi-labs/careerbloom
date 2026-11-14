@@ -38,6 +38,7 @@ class GroqClient(BaseLLMClient):
             user_id: str,
             db: AsyncSession,
             bypass_limits: bool = False,
+            register: bool = True,
     ) -> LLMResponse:
         if not bypass_limits:
             await check_daily_limits(user_id, db)
@@ -46,7 +47,8 @@ class GroqClient(BaseLLMClient):
             response = await self._client.ainvoke(prompt)
             usage = response.usage_metadata or {}
             tokens_used = usage.get("total_tokens", 0)
-            await register_request(user_id, tokens_used, db)
+            if register:
+                await register_request(user_id, tokens_used, db)
             return LLMResponse(
                 text=response.content,
                 tokens_used=tokens_used,
@@ -61,6 +63,7 @@ class GroqClient(BaseLLMClient):
             user_id: str,
             db: AsyncSession,
             bypass_limits: bool = False,
+            register: bool = True,
     ) -> AsyncIterator[str]:
         if not bypass_limits:
             await check_daily_limits(user_id, db)
@@ -72,6 +75,7 @@ class GroqClient(BaseLLMClient):
                 tokens_used += usage.get("output_tokens", 0)
                 if chunk.content:
                     yield chunk.content
-            await register_request(user_id, tokens_used, db)
+            if register:
+                await register_request(user_id, tokens_used, db)
         except Exception as e:
             raise RuntimeError(f"Groq model {self._model} failed: {e}") from e

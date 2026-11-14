@@ -21,6 +21,7 @@ class BaseLLMClient(ABC):
             user_id: str,
             db: AsyncSession,
             bypass_limits: bool = False,
+            register: bool = True,
     ) -> LLMResponse:
         pass
 
@@ -31,6 +32,7 @@ class BaseLLMClient(ABC):
             user_id: str,
             db: AsyncSession,
             bypass_limits: bool = False,
+            register: bool = True,
     ) -> AsyncIterator[str]:
         pass
 
