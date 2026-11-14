@@ -171,6 +171,9 @@ class CvData(BaseModel):
     def _clean_text(cls, v: str | None) -> str | None:
         return v.strip() or None if v else None
 
+    def has_content(self) -> bool:
+        return any(getattr(self, field) for field in type(self).model_fields)
+
     model_config = {"from_attributes": True}
 
 
