@@ -1,10 +1,12 @@
 import logging
 import time
+from uuid import UUID
 
 from langchain_core.callbacks import adispatch_custom_event
-from langchain_core.messages import BaseMessage, HumanMessage
+from langchain_core.messages import HumanMessage
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from applications.repository import ApplicationRepository
 from graph.security import (
     MAX_STRIKES,
     SAFE_RESPONSE_FAILURE,
@@ -18,7 +20,6 @@ from graph.security import (
 from graph.state import CareerBloomState
 from llm.fallback import (
     AllModelsUnavailableError,
-    run_invoke_with_fallback,
     run_with_fallback,
 )
 from llm.security import LimitExceededError
@@ -154,27 +155,19 @@ async def application_intent_node(
     if response in (SAFE_RESPONSE_FAILURE, STRIKE_BLOCK_MESSAGE):
         return {}
 
-    classification_prompt: list[BaseMessage] = [
-        HumanMessage(
-            content=(
-                "Based on this conversation, did the user express intent to apply for the job? "
-                "Reply with only 'yes' or 'no'.\n\n"
-                f"Conversation:\n{response}"
-            )
-        )
-    ]
-
     try:
-        result = await run_invoke_with_fallback(
-            prompt=classification_prompt,
-            user_id=state["user_id"],
-            db=db,
+        repo = ApplicationRepository(db)
+        await repo.create_if_not_duplicate(
+            UUID(state["user_id"]),
+            state.get("job_title"),
+            state.get("company_name"),
+            None,
         )
-        intent = result.text.strip().lower() == "yes"
-    except AllModelsUnavailableError:
-        intent = False
+    except Exception:  # noqa: BLE001
+        logger.warning("Failed to save application for user %s", state["user_id"])
+        return {}
 
-    return {"application_intent": intent}
+    return {"application_intent": True}
 
 
 async def _log_event(

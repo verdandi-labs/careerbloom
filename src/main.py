@@ -10,6 +10,7 @@ from slowapi.errors import RateLimitExceeded
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
+from applications.router import router as applications_router
 from config import get_settings
 from database import dispose_engine, ensure_schema
 from shared.limiter import limiter
@@ -108,6 +109,8 @@ app.add_middleware(
     https_only=not settings.DEBUG,
     same_site="lax",
 )
+
+app.include_router(applications_router, prefix=settings.API_V1_PREFIX)
 
 
 @app.get("/health")
