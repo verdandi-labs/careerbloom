@@ -8,6 +8,7 @@ from graph.nodes import (
     output_validation_node,
 )
 from graph.state import CareerBloomState
+from prompts.career_direction import SYSTEM_PROMPT
 
 
 async def _input_validation(state: CareerBloomState, config: RunnableConfig) -> dict:
@@ -18,7 +19,7 @@ async def _input_validation(state: CareerBloomState, config: RunnableConfig) -> 
 async def _llm_call(state: CareerBloomState, config: RunnableConfig) -> dict:
     db = config["configurable"]["db"]
     selected_model = config["configurable"].get("selected_model")
-    return await llm_call_node(state, db, selected_model)
+    return await llm_call_node(state, db, selected_model, SYSTEM_PROMPT)
 
 
 async def _output_validation(state: CareerBloomState, config: RunnableConfig) -> dict:

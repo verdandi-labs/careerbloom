@@ -3,11 +3,17 @@ from langgraph.graph import START, StateGraph
 
 from graph.edges import after_input_validation, after_output_validation
 from graph.nodes import (
+    cv_context_node,
     input_validation_node,
     llm_call_node,
     output_validation_node,
 )
 from graph.state import CareerBloomState
+from prompts.cv_chat import SYSTEM_PROMPT
+
+
+async def _cv_context(state: CareerBloomState, config: RunnableConfig) -> dict:
+    return await cv_context_node(state)
 
 
 async def _input_validation(state: CareerBloomState, config: RunnableConfig) -> dict:
@@ -18,7 +24,7 @@ async def _input_validation(state: CareerBloomState, config: RunnableConfig) -> 
 async def _llm_call(state: CareerBloomState, config: RunnableConfig) -> dict:
     db = config["configurable"]["db"]
     selected_model = config["configurable"].get("selected_model")
-    return await llm_call_node(state, db, selected_model)
+    return await llm_call_node(state, db, selected_model, SYSTEM_PROMPT)
 
 
 async def _output_validation(state: CareerBloomState, config: RunnableConfig) -> dict:
@@ -29,11 +35,13 @@ async def _output_validation(state: CareerBloomState, config: RunnableConfig) ->
 def build_cv_chat_graph() -> StateGraph:
     graph = StateGraph(CareerBloomState)
 
+    graph.add_node("cv_context", _cv_context)
     graph.add_node("input_validation", _input_validation)
     graph.add_node("llm_call", _llm_call)
     graph.add_node("output_validation", _output_validation)
 
-    graph.add_edge(START, "input_validation")
+    graph.add_edge(START, "cv_context")
+    graph.add_edge("cv_context", "input_validation")
     graph.add_conditional_edges("input_validation", after_input_validation)
     graph.add_edge("llm_call", "output_validation")
     graph.add_conditional_edges("output_validation", after_output_validation)

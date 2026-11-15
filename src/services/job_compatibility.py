@@ -12,8 +12,6 @@ from graph.nodes import FALLBACK_STATUS_EVENT
 from graph.state import CareerBloomState
 from services.cv_context import build_cv_context
 from services.streaming import StreamEvent
-from shared.crypto import decrypt, decrypt_user_key
-from shared.models.user import User
 from workflows.job_compatibility import job_compatibility_graph
 
 logger = logging.getLogger(__name__)
@@ -24,16 +22,13 @@ CV_UPLOAD_PROMPT = (
 )
 
 
-async def _fetch_career_context(
-    user_id: UUID, user: User, db: AsyncSession
-) -> str | None:
+async def _fetch_career_context(user_id: UUID, db: AsyncSession) -> str | None:
     try:
         repo = CareerDirectionRepository(db)
         latest = await repo.get_latest(user_id)
         if not latest:
             return None
-        user_key = decrypt_user_key(user.encryption_key)
-        return decrypt(latest.summary, user_key)
+        return latest.summary
     except Exception:
         logger.exception("Failed to load career direction context")
         return None
@@ -41,7 +36,6 @@ async def _fetch_career_context(
 
 async def stream_job_compatibility(
     user_id: UUID,
-    user: User,
     conversation_id: UUID | None,
     message: str,
     job_title: str | None,
@@ -72,10 +66,11 @@ async def stream_job_compatibility(
         yield StreamEvent(kind="token", text=CV_UPLOAD_PROMPT)
         return
 
-    career_context = await _fetch_career_context(user_id, user, db)
+    career_context = await _fetch_career_context(user_id, db)
 
     state = CareerBloomState(
         user_id=str(user_id),
+        feature="job_compatibility",
         cv_data=cv_data,
         message_history=message_history,
         response="",

@@ -55,6 +55,7 @@ async def stream_cover_letter(
 
     state = CareerBloomState(
         user_id=str(user_id),
+        feature="cover_letter",
         cv_data=cv_data,
         message_history=message_history,
         response="",

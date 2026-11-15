@@ -38,6 +38,7 @@ async def stream_career_direction(
 
     state = CareerBloomState(
         user_id=str(user_id),
+        feature="career_direction",
         cv_data=None,
         message_history=message_history,
         response="",

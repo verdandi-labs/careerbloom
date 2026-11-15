@@ -3,7 +3,7 @@ import time
 from uuid import UUID
 
 from langchain_core.callbacks import adispatch_custom_event
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from applications.repository import ApplicationRepository
@@ -57,13 +57,115 @@ async def input_validation_node(
     return {"message_history": updated_history}
 
 
+def _date_range(start: str | None, end: str | None) -> str | None:
+    if start and end:
+        return f"{start}–{end}"
+    return start or end
+
+
+def _row_line(segments: list[str | None], comments: str | None = None) -> str | None:
+    line = ", ".join(s for s in segments if s)
+    if comments:
+        line = f"{line}: {comments}" if line else comments
+    return line or None
+
+
+def _section(title: str, rows: list | None, build) -> str | None:
+    if not rows:
+        return None
+    lines = [line for row in rows if (line := build(row))]
+    if not lines:
+        return None
+    return f"{title}:\n" + "\n".join(lines)
+
+
+async def cv_context_node(state: CareerBloomState) -> dict:
+    cv = state.get("cv_data")
+    if cv is None or not cv.has_content():
+        return {}
+
+    parts: list[str] = []
+
+    if cv.headline:
+        parts.append(f"Headline: {cv.headline}")
+
+    if cv.self_summary:
+        parts.append(f"Summary:\n{cv.self_summary}")
+
+    def build_experience(row) -> str | None:
+        head = " at ".join(p for p in (row.title, row.company) if p)
+        return _row_line(
+            [head, _date_range(row.start_date, row.end_date)], row.comments
+        )
+
+    def build_simple(name_field: str):
+        def build(row) -> str | None:
+            return _row_line([getattr(row, name_field)], row.comments)
+
+        return build
+
+    def build_dated(row) -> str | None:
+        return _row_line(
+            [row.center, _date_range(row.start_date, row.end_date)], row.comments
+        )
+
+    def build_education(row) -> str | None:
+        return _row_line(
+            [row.edu_center, _date_range(row.start_date, row.end_date)], row.comments
+        )
+
+    def build_language(row) -> str | None:
+        line = f"{row.language} ({row.level})" if row.level else row.language
+        if row.comments:
+            line = f"{line}: {row.comments}" if line else row.comments
+        return line or None
+
+    def build_project(row) -> str | None:
+        return _row_line(
+            [row.name, row.organisation, row.link, row.tech_stack], row.comments
+        )
+
+    for section in (
+        _section("Experience", cv.experience, build_experience),
+        _section("Skills", cv.skills, build_simple("skill")),
+        _section("Tech Stack", cv.tech_stack, build_simple("name")),
+        _section("Education", cv.education, build_education),
+        _section("Languages", cv.languages, build_language),
+        _section("Awards", cv.awards, build_simple("name")),
+        _section("Publications", cv.publications, build_simple("name")),
+        _section("Volunteering", cv.volunteering, build_dated),
+        _section("Projects", cv.projects, build_project),
+    ):
+        if section:
+            parts.append(section)
+
+    return {"cv_context_str": "\n\n".join(parts)}
+
+
+async def career_context_node(state: CareerBloomState) -> dict:
+    career_context = state["career_context"]
+    if career_context is None:
+        return {}
+    return {"career_context_str": career_context}
+
+
 async def llm_call_node(
     state: CareerBloomState,
     db: AsyncSession,
-    selected_model: str | None = None,
+    selected_model: str | None,
+    system_prompt: str,
 ) -> dict:
     if state.get("response") == STRIKE_BLOCK_MESSAGE:
         return {}
+
+    prompt: list[BaseMessage] = [SystemMessage(content=system_prompt)]
+    cv_context_str = state.get("cv_context_str")
+    if cv_context_str is not None:
+        prompt.append(HumanMessage(content=cv_context_str))
+    career_context_str = state.get("career_context_str")
+    if career_context_str is not None:
+        prompt.append(HumanMessage(content=career_context_str))
+    prompt.extend(state["message_history"])
 
     start_time = time.monotonic()
     full_response = ""
@@ -73,7 +175,7 @@ async def llm_call_node(
 
     try:
         async for update in run_with_fallback(
-            prompt=state["message_history"],
+            prompt=prompt,
             user_id=state["user_id"],
             db=db,
             selected_model=selected_model,
@@ -97,7 +199,7 @@ async def llm_call_node(
 
     await _log_event(
         user_id=state["user_id"],
-        feature=_detect_feature(state),
+        feature=state["feature"],
         duration_ms=int((time.monotonic() - start_time) * 1000),
         suspicious=False,
         db=db,
@@ -133,7 +235,7 @@ async def output_validation_node(
         )
         await _log_event(
             user_id=state["user_id"],
-            feature=_detect_feature(state),
+            feature=state["feature"],
             duration_ms=0,
             suspicious=True,
             db=db,
@@ -195,13 +297,3 @@ async def _log_event(
         await db.commit()
     except Exception:
         logger.warning("Failed to write log entry for user %s", user_id)
-
-
-def _detect_feature(state: CareerBloomState) -> str:
-    if state.get("job_description") and state.get("job_title"):
-        return "cover_letter"
-    if state.get("job_description"):
-        return "job_compatibility"
-    if state.get("career_context"):
-        return "career_direction"
-    return "cv_chat"
