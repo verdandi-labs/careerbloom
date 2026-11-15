@@ -20,7 +20,7 @@ Concrete steps the user could take to become a stronger candidate.
 Also consider fit the other way: does this role align with the user's
 career direction? Note any alignment or tension.
 
-Ask for job title and company name if not provided — you will need them
+Ask for job title and company name if not provided, you will need them
 to log the application.
 
 After your analysis, end with:
