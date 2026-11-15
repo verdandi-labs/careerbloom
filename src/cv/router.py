@@ -18,6 +18,7 @@ from cv.parse import parse_all_sections
 from cv.repository import CvRepository
 from cv.schemas import (
     FIELD_MODELS,
+    RAW_MODELS,
     TEXT_FIELDS,
     CvData,
     CvEditRequest,
@@ -135,7 +136,12 @@ async def upload_cv(
             status_code=400, detail="Could not read any text from the file."
         )
 
-    return CvRawText(text=extract_raw_text(text))
+    text = extract_raw_text(text)
+    if len(text.split()) < 200:
+        raise HTTPException(
+            status_code=400, detail="CV text is too short. Please check your file."
+        )
+    return CvRawText(text=text[:MAX_TEXT_LENGTH])
 
 
 @router.post("/save")
@@ -171,7 +177,7 @@ async def save_cv(
 
             yield _sse({"done": True})
         except Exception:
-            logger.error("CV save failed", exc_info=True)
+            logger.exception("CV save failed")
             yield _sse({"error": "Could not parse your CV, please try again"})
 
     return StreamingResponse(
@@ -242,23 +248,12 @@ async def patch_cv_row(
     if not cv:
         raise HTTPException(status_code=404, detail="No CV found")
 
-    PATCHABLE = {
-        "experience": ["title", "comments"],
-        "skills": ["skill", "comments"],
-        "languages": ["language", "level"],
-        "studies": ["comments"],
-        "awards": ["comments"],
-        "publications": ["comments"],
-        "volunteering": ["comments"],
-        "projects": ["comments"],
-    }
-
-    if section not in PATCHABLE:
+    if section not in FIELD_MODELS:
         raise HTTPException(
             status_code=400, detail=f"Section '{section}' is not patchable"
         )
 
-    allowed = PATCHABLE[section]
+    allowed = set(RAW_MODELS[section].model_fields)
     fields = {k: v for k, v in body.fields.items() if k in allowed}
     if not fields:
         raise HTTPException(status_code=400, detail="No valid fields to patch")
@@ -309,11 +304,9 @@ async def translate(
         )
 
     try:
-        translated = await translate_cv(
-            current, body.language, str(user.user_id), db
-        )
+        translated = await translate_cv(current, body.language, str(user.user_id), db)
     except Exception:
-        logger.error("CV translation failed", exc_info=True)
+        logger.exception("CV translation failed")
         raise HTTPException(
             status_code=500, detail="CV translation failed, please try again"
         )
