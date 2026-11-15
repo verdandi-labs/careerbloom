@@ -3,7 +3,7 @@ import time
 from uuid import UUID
 
 from langchain_core.callbacks import adispatch_custom_event
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from applications.repository import ApplicationRepository
@@ -23,6 +23,7 @@ from llm.fallback import (
     run_with_fallback,
 )
 from llm.security import LimitExceededError
+from prompts.base import GENERAL_TONE
 
 logger = logging.getLogger(__name__)
 
@@ -158,14 +159,20 @@ async def llm_call_node(
     if state.get("response") == STRIKE_BLOCK_MESSAGE:
         return {}
 
-    prompt: list[BaseMessage] = [SystemMessage(content=system_prompt)]
-    cv_context_str = state.get("cv_context_str")
-    if cv_context_str is not None:
-        prompt.append(HumanMessage(content=cv_context_str))
-    career_context_str = state.get("career_context_str")
-    if career_context_str is not None:
-        prompt.append(HumanMessage(content=career_context_str))
-    prompt.extend(state["message_history"])
+    prompt = (
+        [SystemMessage(GENERAL_TONE), SystemMessage(system_prompt)]
+        + (
+            [HumanMessage(state["cv_context_str"])]
+            if state.get("cv_context_str")
+            else []
+        )
+        + (
+            [HumanMessage(state["career_context_str"])]
+            if state.get("career_context_str")
+            else []
+        )
+        + state["message_history"]
+    )
 
     start_time = time.monotonic()
     full_response = ""
