@@ -11,8 +11,10 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
 from applications.router import router as applications_router
+from career_direction.router import router as career_direction_router
 from config import get_settings
 from cover_letters.router import router as cover_letters_router
+from cv.router import router as cv_router
 from database import dispose_engine, ensure_schema
 from shared.limiter import limiter
 
@@ -113,6 +115,8 @@ app.add_middleware(
 
 app.include_router(applications_router, prefix=settings.API_V1_PREFIX)
 app.include_router(cover_letters_router, prefix=settings.API_V1_PREFIX)
+app.include_router(career_direction_router, prefix=settings.API_V1_PREFIX)
+app.include_router(cv_router, prefix=settings.API_V1_PREFIX)
 
 
 @app.get("/health")
