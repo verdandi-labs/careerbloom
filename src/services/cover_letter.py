@@ -7,10 +7,9 @@ from langchain_core.runnables import RunnableConfig
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from chat.repository import ChatRepository
-from cv.repository import CvRepository
-from cv.schemas import CvData
 from graph.nodes import FALLBACK_STATUS_EVENT
 from graph.state import CareerBloomState
+from services.cv_context import build_cv_context
 from services.streaming import StreamEvent
 from workflows.cover_letter import cover_letter_graph
 
@@ -20,19 +19,6 @@ CV_UPLOAD_PROMPT = (
     "I don't see a CV on file yet. Could you please upload your CV "
     "so I can help you in a better way?"
 )
-
-
-async def _build_cv_data_for_job(user_id: UUID, db: AsyncSession) -> CvData:
-    repo = CvRepository(db)
-    full_cv = await repo.get_current_cv(user_id)
-    if not full_cv.has_content():
-        return full_cv
-    needed = {"headline", "self_summary", "experience", "skills", "tech_stack"}
-    filtered = {
-        field: (getattr(full_cv, field) if field in needed else None)
-        for field in CvData.model_fields
-    }
-    return CvData(**filtered)
 
 
 async def stream_cover_letter(
@@ -58,7 +44,7 @@ async def stream_cover_letter(
     message_history.append(HumanMessage(content=message))
     await chat_repo.add_message(user_id, conversation.id, "user", message)
 
-    cv_data = await _build_cv_data_for_job(user_id, db)
+    cv_data = await build_cv_context(user_id, db)
 
     if not cv_data.has_content():
         await chat_repo.add_message(
