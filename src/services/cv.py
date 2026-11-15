@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 CV_UPLOAD_PROMPT = (
     "I don't see a CV on file yet. Could you please upload your CV "
-    "so I can help you with this?"
+    "so I can help you in a better way?"
 )
 
 
