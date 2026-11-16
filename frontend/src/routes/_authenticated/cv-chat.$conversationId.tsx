@@ -48,7 +48,7 @@ function ConversationPage() {
   const cvLoaded = cv ? Object.values(cv).some(Boolean) : false;
 
   async function startNewChat() {
-    const id = await createConversation();
+    const id = await createConversation("cv_chat");
     if (id)
       navigate({
         to: "/cv-chat/$conversationId",
@@ -81,7 +81,7 @@ function ConversationPage() {
       </header>
       <ChatPanel
         conversationId={conversationId}
-        context="cv_chat"
+        feature="cv_chat"
         greeting="Hi, I'm Bloom your career companion. Tell me a little about where you are and where you'd like to go."
         placeholder="Tell me about yourself..."
         mapMessage={mapMessage}

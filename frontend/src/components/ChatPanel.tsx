@@ -1,5 +1,6 @@
 import { Loader2, Send, Sparkles } from "lucide-react";
 import { useChat, type MessagePayload } from "@/hooks/useChat";
+import type { Feature } from "@/lib/chat";
 
 type BaseMsg = {
   id?: string;
@@ -10,7 +11,7 @@ type BaseMsg = {
 
 type ChatPanelProps<T extends BaseMsg> = {
   conversationId: string | null;
-  context: "cv_chat" | "cover_letter" | "career_direction";
+  feature: Feature;
   greeting: string;
   placeholder: string;
   mapMessage: (payload: MessagePayload) => T;
@@ -24,7 +25,7 @@ type ChatPanelProps<T extends BaseMsg> = {
 
 export function ChatPanel<T extends BaseMsg>({
   conversationId,
-  context,
+  feature,
   greeting,
   placeholder,
   mapMessage,
@@ -45,7 +46,7 @@ export function ChatPanel<T extends BaseMsg>({
     retry,
   } = useChat<T>({
     conversationId,
-    context,
+    feature,
     greeting,
     mapMessage,
   });

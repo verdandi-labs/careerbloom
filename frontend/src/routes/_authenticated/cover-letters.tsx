@@ -364,7 +364,7 @@ function ConversationView({
 
       <ChatPanel
         conversationId={conversationId}
-        context="cover_letter"
+        feature="cover_letter"
         greeting={GREETING}
         placeholder="Which role are you applying for?"
         mapMessage={mapMessage}

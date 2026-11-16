@@ -129,7 +129,7 @@ function CareerDirectionPage() {
 
           <ChatPanel
             conversationId={conversationId}
-            context="career_direction"
+            feature="career_direction"
             greeting="Hi, I'm Bloom your career companion. Tell me a little about where you are and where you'd like to go."
             placeholder="Tell me about your career goals..."
             inputDisabled={!conversationId}

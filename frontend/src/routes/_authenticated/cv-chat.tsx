@@ -12,14 +12,14 @@ import { ConversationDeleteControl } from "@/components/ConversationDeleteContro
 import { api, errorMessage } from "@/lib/api";
 import { createConversation } from "@/lib/chat";
 import { useDeleteConversation } from "@/hooks/useDeleteConversation";
-import { MessageCircleHeart, Plus, X, Pin, History } from "lucide-react";
+import { MessageCircleHeart, Plus, X, History } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cv-chat")({
   head: () => ({ meta: [{ title: "CV Chat · careerBloom" }] }),
   component: ChatLayout,
 });
 
-type Conversation = { id: string; title: string; is_career_direction: boolean };
+type Conversation = { id: string; title: string };
 
 function ChatLayout() {
   const navigate = useNavigate();
@@ -52,11 +52,8 @@ function ChatLayout() {
   const load = useCallback(async () => {
     setListError("");
     try {
-      const data = await api<Conversation[]>("/chat/conversations");
-      const all = data ?? [];
-      const pinned = all.filter((c) => c.is_career_direction);
-      const rest = all.filter((c) => !c.is_career_direction);
-      setConvs([...pinned, ...rest]);
+      const data = await api<Conversation[]>("/chat/cv_chat/conversations");
+      setConvs(data ?? []);
     } catch (e) {
       setListError(
         errorMessage(e, "Couldn't load conversations, please refresh"),
@@ -74,8 +71,8 @@ function ChatLayout() {
     (async () => {
       setListError("");
       try {
-        const data = await api<Conversation[]>("/chat/conversations");
-        const id = data?.[0]?.id ?? (await createConversation());
+        const data = await api<Conversation[]>("/chat/cv_chat/conversations");
+        const id = data?.[0]?.id ?? (await createConversation("cv_chat"));
         if (id)
           navigate({
             to: "/cv-chat/$conversationId",
@@ -91,7 +88,7 @@ function ChatLayout() {
   }, [activeId, pathname, navigate]);
 
   async function handleNew() {
-    const id = await createConversation();
+    const id = await createConversation("cv_chat");
     if (id) {
       await load();
       navigate({
@@ -144,7 +141,6 @@ function ChatLayout() {
             )}
             {convs.map((c) => {
               const active = c.id === activeId;
-              const pinned = c.is_career_direction;
               return (
                 <div
                   key={c.id}
@@ -157,23 +153,15 @@ function ChatLayout() {
                     className="flex flex-1 items-center gap-2 truncate text-xs"
                     title={c.title}
                   >
-                    {pinned ? (
-                      <Pin className="h-3.5 w-3.5 shrink-0 text-secondary-foreground" />
-                    ) : (
-                      <MessageCircleHeart className="h-3.5 w-3.5 shrink-0 text-foreground/60" />
-                    )}
-                    <span className={`truncate ${pinned ? "font-medium" : ""}`}>
-                      {c.title}
-                    </span>
+                    <MessageCircleHeart className="h-3.5 w-3.5 shrink-0 text-foreground/60" />
+                    <span className="truncate">{c.title}</span>
                   </Link>
-                  {!pinned && (
-                    <ConversationDeleteControl
-                      isDeleting={deletingId === c.id}
-                      onDelete={() => setDeletingId(c.id)}
-                      onCancel={() => setDeletingId(null)}
-                      onConfirm={() => void confirmDelete(c.id)}
-                    />
-                  )}
+                  <ConversationDeleteControl
+                    isDeleting={deletingId === c.id}
+                    onDelete={() => setDeletingId(c.id)}
+                    onCancel={() => setDeletingId(null)}
+                    onConfirm={() => void confirmDelete(c.id)}
+                  />
                 </div>
               );
             })}

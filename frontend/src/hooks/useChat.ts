@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, apiStream, errorMessage } from "@/lib/api";
+import type { Feature } from "@/lib/chat";
 
 export type MessagePayload = {
   id: string;
@@ -11,7 +12,7 @@ export type MessagePayload = {
 interface UseChatOptions<T> {
   conversationId: string | null;
   greeting: string;
-  context?: "cv_chat" | "cover_letter" | "career_direction";
+  feature?: Feature;
   mapMessage: (payload: MessagePayload) => T;
   onStreamEnd?: (
     lastServerMessage: MessagePayload,
@@ -24,7 +25,7 @@ export function useChat<
 >({
   conversationId,
   greeting,
-  context = "cv_chat",
+  feature = "cv_chat",
   mapMessage,
   onStreamEnd,
 }: UseChatOptions<T>) {
@@ -45,7 +46,7 @@ export function useChat<
     (async () => {
       try {
         const msgs = await api<MessagePayload[]>(
-          `/chat/conversations/${conversationId}/messages`,
+          `/chat/${feature}/conversations/${conversationId}/messages`,
         );
         const loaded: T[] = (msgs ?? []).map(mapMessage);
         if (loaded.length === 0) {
@@ -60,7 +61,7 @@ export function useChat<
       }
       setLoaded(true);
     })();
-  }, [conversationId, greeting, mapMessage]);
+  }, [conversationId, greeting, mapMessage, feature]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -85,8 +86,8 @@ export function useChat<
 
       try {
         const stream = await apiStream(
-          `/chat/conversations/${conversationId}/messages`,
-          { method: "POST", json: { content: msg, context } },
+          `/chat/${feature}/conversations/${conversationId}/messages`,
+          { method: "POST", json: { content: msg } },
         );
 
         const reader = stream.getReader();
@@ -149,7 +150,7 @@ export function useChat<
 
         try {
           const msgs = await api<MessagePayload[]>(
-            `/chat/conversations/${conversationId}/messages`,
+            `/chat/${feature}/conversations/${conversationId}/messages`,
           );
           if (!msgs || msgs.length < preSendCount + 2) return;
           const last = msgs[msgs.length - 1];
@@ -182,7 +183,7 @@ export function useChat<
       input,
       isStreaming,
       conversationId,
-      context,
+      feature,
       messages,
       mapMessage,
       onStreamEnd,
