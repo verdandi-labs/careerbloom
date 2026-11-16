@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { ChatPanel } from "@/components/ChatPanel";
 import { api, ApiError, errorMessage } from "@/lib/api";
+import { getOrCreateCareerDirection } from "@/lib/chat";
 import { type MessagePayload } from "@/hooks/useChat";
 import { Compass, Loader2 } from "lucide-react";
 
@@ -54,10 +55,8 @@ function CareerDirectionPage() {
   useEffect(() => {
     (async () => {
       try {
-        const conv = await api<{ id: string }>(
-          "/chat/conversations/career-direction",
-        );
-        setConversationId(conv.id);
+        const id = await getOrCreateCareerDirection();
+        setConversationId(id);
       } catch {
         /* conversationId stays null, hook won't load */
       }
