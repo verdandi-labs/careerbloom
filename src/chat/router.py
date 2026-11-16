@@ -122,8 +122,8 @@ async def send_message(
             "db": db,
         }
         if feature in _JOB_CONTEXT_FEATURES:
-            kwargs["job_title"] = None
-            kwargs["company_name"] = None
+            kwargs["job_title"] = body.job_title
+            kwargs["company_name"] = body.company_name
         try:
             async for event in _STREAMERS[feature](**kwargs):
                 yield sse_frame(event)
@@ -156,11 +156,6 @@ async def delete_conversation(
     conversation = await repo.get_conversation(user.user_id, conversation_id)
     if conversation is None:
         raise HTTPException(status_code=404, detail="Conversation not found")
-    if str(conversation.feature) == "career_direction":
-        raise HTTPException(
-            status_code=403,
-            detail="Career direction conversations cannot be deleted",
-        )
     await repo.delete_conversation(user.user_id, conversation_id)
     await db.commit()
 
