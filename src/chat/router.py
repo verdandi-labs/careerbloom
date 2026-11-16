@@ -37,11 +37,12 @@ _STREAMERS = {
     "career_direction": stream_career_direction,
     "job_compatibility": stream_job_compatibility,
 }
+FEATURES = set(_STREAMERS)
 _JOB_CONTEXT_FEATURES = ("cover_letter", "job_compatibility")
 
 
 def _require_feature(feature: str) -> None:
-    if feature not in _STREAMERS:
+    if feature not in FEATURES:
         raise HTTPException(status_code=404, detail="Unknown feature")
 
 
@@ -118,7 +119,7 @@ async def send_message(
             "user_id": user.user_id,
             "conversation_id": conversation_id,
             "message": body.content,
-            "selected_model": None,
+            "selected_model": body.selected_model,
             "db": db,
         }
         if feature in _JOB_CONTEXT_FEATURES:
@@ -129,6 +130,7 @@ async def send_message(
                 yield sse_frame(event)
             await db.commit()
         except Exception:
+            await db.rollback()
             logger.exception("Chat stream failed")
             yield sse_frame(
                 StreamEvent(
@@ -156,6 +158,8 @@ async def delete_conversation(
     conversation = await repo.get_conversation(user.user_id, conversation_id)
     if conversation is None:
         raise HTTPException(status_code=404, detail="Conversation not found")
+    if conversation.feature is None:
+        raise HTTPException(status_code=400, detail="Conversation has no feature")
     await repo.delete_conversation(user.user_id, conversation_id)
     await db.commit()
 

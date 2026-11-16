@@ -22,7 +22,7 @@ class ConversationResponse(BaseModel):
 
 class MessageCreate(BaseModel):
     content: str = Field(..., max_length=10_000)
-    conversation_id: UUID | None = None
+    selected_model: str | None = None
     job_title: str | None = None
     company_name: str | None = None
 
