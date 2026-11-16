@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from career_direction.repository import CareerDirectionRepository
 from chat.repository import ChatRepository
+from chat.service import parse_suggestion
 from graph.nodes import FALLBACK_STATUS_EVENT
 from graph.state import CareerBloomState
 from services.cv_context import build_cv_context
@@ -103,6 +104,7 @@ async def stream_job_compatibility(
             yield StreamEvent(kind="status", text=event["data"]["status"])
 
     if full_response:
+        clean, suggestion = parse_suggestion(full_response)
         await chat_repo.add_message(
-            user_id, conversation.id, "assistant", full_response
+            user_id, conversation.id, "assistant", clean, suggestion=suggestion
         )
