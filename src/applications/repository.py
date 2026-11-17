@@ -18,7 +18,6 @@ class ApplicationRepository:
         user_id: UUID,
         job_title: str | None,
         company_name: str | None,
-        job_description: str | None,
     ) -> Application | None:
         cutoff = datetime.now(UTC) - timedelta(days=DUPLICATE_WINDOW_DAYS)
         result = await self.db.execute(
@@ -35,7 +34,6 @@ class ApplicationRepository:
             user_id=user_id,
             job_title=job_title,
             company_name=company_name,
-            job_description=job_description,
         )
         self.db.add(application)
         await self.db.flush()

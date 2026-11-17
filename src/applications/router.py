@@ -28,7 +28,6 @@ async def save_application(
         user.user_id,
         body.job_title,
         body.company_name,
-        None,
     )
     if application is None:
         response.status_code = status.HTTP_200_OK

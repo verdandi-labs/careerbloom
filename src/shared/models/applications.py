@@ -17,7 +17,6 @@ class Application(Base):
     )
     job_title = Column(Text)
     company_name = Column(Text)
-    job_description = Column(Text)
     created_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )

@@ -270,7 +270,6 @@ async def application_intent_node(
             UUID(state["user_id"]),
             state.get("job_title"),
             state.get("company_name"),
-            None,
         )
     except Exception:  # noqa: BLE001
         logger.warning("Failed to save application for user %s", state["user_id"])
