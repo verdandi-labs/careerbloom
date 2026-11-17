@@ -1,6 +1,8 @@
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Loader2, Send, Sparkles } from "lucide-react";
 import { useChat, type MessagePayload } from "@/hooks/useChat";
-import type { Feature } from "@/lib/chat";
+import { getModels, type Feature } from "@/lib/chat";
 
 type BaseMsg = {
   id?: string;
@@ -18,6 +20,7 @@ type ChatPanelProps<T extends BaseMsg> = {
   renderMessageExtra?: (
     msg: T,
     send: (text: string) => void,
+    isLast: boolean,
   ) => React.ReactNode;
   inputDisabled?: boolean;
   className?: string;
@@ -33,6 +36,13 @@ export function ChatPanel<T extends BaseMsg>({
   inputDisabled,
   className,
 }: ChatPanelProps<T>) {
+  const [selectedModel, setSelectedModel] = useState<string | null>(null);
+  const { data: models } = useQuery({
+    queryKey: ["models"],
+    queryFn: getModels,
+    staleTime: Infinity,
+  });
+
   const {
     messages,
     input,
@@ -48,8 +58,14 @@ export function ChatPanel<T extends BaseMsg>({
     conversationId,
     feature,
     greeting,
+    selectedModel,
     mapMessage,
   });
+
+  const lastAssistantIdx = messages.reduce(
+    (acc, m, i) => (m.role === "assistant" ? i : acc),
+    -1,
+  );
 
   return (
     <div className={`flex flex-col min-h-0 ${className ?? ""}`}>
@@ -91,7 +107,12 @@ export function ChatPanel<T extends BaseMsg>({
                   {m.content}
                 </div>
               )}
-              {m.role === "assistant" && renderMessageExtra?.(m, send)}
+              {m.role === "assistant" &&
+                renderMessageExtra?.(
+                  m,
+                  send,
+                  i === lastAssistantIdx && !isStreaming,
+                )}
             </div>
           </div>
         ))}
@@ -111,6 +132,34 @@ export function ChatPanel<T extends BaseMsg>({
           </div>
         )}
       </div>
+
+      {models && models.providers.length > 0 && (
+        <div className="flex items-center justify-end gap-2 pb-2">
+          <label
+            htmlFor="chat-model-select"
+            className="text-xs text-foreground/60"
+          >
+            Model
+          </label>
+          <select
+            id="chat-model-select"
+            value={selectedModel ?? ""}
+            onChange={(e) => setSelectedModel(e.target.value || null)}
+            className="rounded-full bg-white/75 px-3 py-1.5 text-xs text-foreground/80 backdrop-blur outline-none"
+          >
+            {models.providers.map((provider) => (
+              <optgroup key={provider.name} label={provider.name}>
+                <option value="">Default</option>
+                {provider.models.map((model) => (
+                  <option key={model.id} value={model.id}>
+                    {model.display_name}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+        </div>
+      )}
 
       <form
         onSubmit={(e) => {

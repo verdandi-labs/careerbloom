@@ -13,6 +13,7 @@ interface UseChatOptions<T> {
   conversationId: string | null;
   greeting: string;
   feature?: Feature;
+  selectedModel?: string | null;
   mapMessage: (payload: MessagePayload) => T;
   onStreamEnd?: (
     lastServerMessage: MessagePayload,
@@ -26,6 +27,7 @@ export function useChat<
   conversationId,
   greeting,
   feature = "cv_chat",
+  selectedModel = null,
   mapMessage,
   onStreamEnd,
 }: UseChatOptions<T>) {
@@ -87,7 +89,10 @@ export function useChat<
       try {
         const stream = await apiStream(
           `/chat/${feature}/conversations/${conversationId}/messages`,
-          { method: "POST", json: { content: msg } },
+          {
+            method: "POST",
+            json: { content: msg, selected_model: selectedModel },
+          },
         );
 
         const reader = stream.getReader();
@@ -184,6 +189,7 @@ export function useChat<
       isStreaming,
       conversationId,
       feature,
+      selectedModel,
       messages,
       mapMessage,
       onStreamEnd,

@@ -47,3 +47,22 @@ export async function getOrCreateCareerDirection(): Promise<string | null> {
   if (existing) return existing.id;
   return createConversation("career_direction");
 }
+
+export type ModelInfo = {
+  id: string;
+  display_name: string;
+};
+
+export type ModelProvider = {
+  name: string;
+  default: string;
+  models: ModelInfo[];
+};
+
+export type ModelsResponse = {
+  providers: ModelProvider[];
+};
+
+export async function getModels(): Promise<ModelsResponse> {
+  return api<ModelsResponse>("/models");
+}
