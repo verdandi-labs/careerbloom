@@ -15,7 +15,6 @@ Career transition companion for people figuring out what comes next. Helping you
 ## Repo layout
 
 - `src/` — Python app and the uv project root (source of truth and deploy target): `graph/`, `llm/`, `prompts/`, `workflows/`, `cv/`, `auth/`
-- `backend/` — legacy FastAPI app, kept only until the refactor is done. Do not add new features there
 - `migrations/` — numbered SQL files for schema changes (no Alembic)
 - `frontend/` — Vite + React app (bun)
 - `docs/` — architecture notes and feature specs
