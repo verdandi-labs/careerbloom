@@ -292,7 +292,7 @@ async def _log_event(
         await db.execute(
             text("""
                  INSERT INTO logs (user_id, feature, duration_ms, suspicious, created_at)
-                 VALUES (:user_id::uuid, :feature, :duration_ms, :suspicious, NOW())
+                 VALUES (CAST(:user_id AS uuid), :feature, :duration_ms, :suspicious, NOW())
                  """),
             {
                 "user_id": user_id,

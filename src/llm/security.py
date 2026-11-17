@@ -39,7 +39,7 @@ async def register_request(
     await db.execute(
         text("""
              INSERT INTO usage (user_id, date, request_count, tokens_used)
-             VALUES (:user_id::uuid, :today, 1, :tokens)
+             VALUES (CAST(:user_id AS uuid), :today, 1, :tokens)
                  ON CONFLICT (user_id, date)
             DO UPDATE SET
                  request_count = usage.request_count + 1,
