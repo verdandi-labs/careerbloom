@@ -21,6 +21,7 @@ type ChatPanelProps<T extends BaseMsg> = {
     msg: T,
     send: (text: string) => void,
     isLast: boolean,
+    messages: T[],
   ) => React.ReactNode;
   inputDisabled?: boolean;
   className?: string;
@@ -112,6 +113,7 @@ export function ChatPanel<T extends BaseMsg>({
                   m,
                   send,
                   i === lastAssistantIdx && !isStreaming,
+                  messages,
                 )}
             </div>
           </div>

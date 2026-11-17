@@ -3,10 +3,12 @@ import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { ChatPanel } from "@/components/ChatPanel";
+import { ConversationDeleteControl } from "@/components/ConversationDeleteControl";
 import { api, ApiError, errorMessage } from "@/lib/api";
-import { getOrCreateCareerDirection } from "@/lib/chat";
+import { getOrCreateCareerDirection, listConversations } from "@/lib/chat";
+import { useDeleteConversation } from "@/hooks/useDeleteConversation";
 import { type MessagePayload } from "@/hooks/useChat";
-import { Compass, Loader2 } from "lucide-react";
+import { Compass, Loader2, MessageCircleHeart } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/career-direction")({
   head: () => ({ meta: [{ title: "My Career Direction · careerBloom" }] }),
@@ -39,6 +41,27 @@ function CareerDirectionPage() {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [saveErr, setSaveErr] = useState("");
+  const [listErr, setListErr] = useState("");
+
+  const { data: conversations } = useQuery({
+    queryKey: ["career-direction-conversations"],
+    queryFn: () => listConversations("career_direction"),
+  });
+
+  const {
+    deletingId: deletingConvId,
+    setDeletingId: setDeletingConvId,
+    confirmDelete: confirmDeleteConv,
+  } = useDeleteConversation({
+    items: conversations ?? [],
+    setItems: (updated) =>
+      qc.setQueryData(["career-direction-conversations"], updated),
+    onSuccess: () =>
+      void qc.invalidateQueries({
+        queryKey: ["career-direction-conversations"],
+      }),
+    onError: (_, message) => setListErr(message),
+  });
 
   const {
     data: current,
@@ -115,6 +138,42 @@ function CareerDirectionPage() {
           <section className="glass p-5">
             <div className="grid place-items-center py-4">
               <Loader2 className="h-5 w-5 animate-spin text-foreground/50" />
+            </div>
+          </section>
+        )}
+
+        {conversations && conversations.length > 0 && (
+          <section className="mt-4">
+            <h2 className="font-display text-xl">Past conversations</h2>
+            {listErr && (
+              <p className="mt-2 rounded-2xl bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
+                {listErr}
+              </p>
+            )}
+            <div className="mt-2 space-y-2">
+              {conversations.map((c) => (
+                <div key={c.id} className="glass flex items-center gap-3 p-4">
+                  <div className="grid h-9 w-9 shrink-0 place-items-center rounded-2xl bg-secondary text-secondary-foreground">
+                    <MessageCircleHeart className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">{c.title}</p>
+                    <p className="text-xs text-foreground/60">
+                      {new Date(c.created_at).toLocaleDateString(undefined, {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </p>
+                  </div>
+                  <ConversationDeleteControl
+                    isDeleting={deletingConvId === c.id}
+                    onDelete={() => setDeletingConvId(c.id)}
+                    onCancel={() => setDeletingConvId(null)}
+                    onConfirm={() => void confirmDeleteConv(c.id)}
+                  />
+                </div>
+              ))}
             </div>
           </section>
         )}

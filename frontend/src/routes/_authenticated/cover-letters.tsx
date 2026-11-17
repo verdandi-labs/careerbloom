@@ -369,13 +369,18 @@ function ConversationView({
         placeholder="Which role are you applying for?"
         mapMessage={mapMessage}
         className="flex-1"
-        renderMessageExtra={(msg, send) => {
+        renderMessageExtra={(msg, send, _isLast, messages) => {
           const s = (msg as Msg).suggestion;
           if (!s || s.type !== "cover_letter") return null;
+          const recentAssistantTexts = messages
+            .filter((m) => m.role === "assistant")
+            .slice(-3)
+            .map((m) => m.content);
           return (
             <CoverLetterSuggestionCard
               suggestion={s as CoverLetterSuggestion}
               onSave={saveLetter}
+              recentAssistantTexts={recentAssistantTexts}
               onDislike={() =>
                 send(
                   "I don't like this suggestion, ask me questions to understand what I'm looking for",
