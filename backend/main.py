@@ -110,7 +110,6 @@ from chat.router import router as chat_router
 from cover_letters.router import router as cover_letters_router
 from cv.router import router as cv_router
 from cv.service import limiter
-from tenant.router import router as tenant_router
 
 app.state.limiter = limiter
 app.add_exception_handler(
@@ -125,7 +124,6 @@ app.include_router(oauth_router, prefix=settings.API_V1_PREFIX)
 app.include_router(cv_router, prefix=settings.API_V1_PREFIX)
 app.include_router(chat_router, prefix=settings.API_V1_PREFIX)
 app.include_router(cover_letters_router, prefix=settings.API_V1_PREFIX)
-app.include_router(tenant_router, prefix=settings.API_V1_PREFIX)
 app.include_router(career_direction_router, prefix=settings.API_V1_PREFIX)
 
 

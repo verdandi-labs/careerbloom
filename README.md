@@ -14,9 +14,9 @@ Career transition companion for people figuring out what comes next. Helping you
 
 ## Repo layout
 
-- `src/` — new Python code and the uv project root (source of truth): `graph/`, `llm/`, `prompts/`, `workflows/`, `cv/`
-- `backend/` — legacy FastAPI app, kept for the deploy until the refactor is done. Do not add new features here
-- `backend/migrations/` — numbered SQL files for schema changes (no Alembic)
+- `src/` — Python app and the uv project root (source of truth and deploy target): `graph/`, `llm/`, `prompts/`, `workflows/`, `cv/`, `auth/`
+- `backend/` — legacy FastAPI app, kept only until the refactor is done. Do not add new features there
+- `migrations/` — numbered SQL files for schema changes (no Alembic)
 - `frontend/` — Vite + React app (bun)
 - `docs/` — architecture notes and feature specs
 
@@ -34,11 +34,10 @@ uv run ruff check --fix .
 uv run ruff format .
 ```
 
-### Backend (legacy app)
+### Run the API
 
 ```sh
-cd backend
-# create .env with the vars below, then
+cd src
 uv run uvicorn main:app --reload --port 8000
 ```
 
@@ -79,7 +78,7 @@ bun run build      # production build
 
 ## Schema migrations
 
-No Alembic. Schema changes are documented as numbered SQL files in `backend/migrations/`.
+No Alembic. Schema changes are documented as numbered SQL files in `migrations/`.
 
 Convention: `001_description.sql`, `002_description.sql`, etc.
 - One file per change

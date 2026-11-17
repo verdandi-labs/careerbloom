@@ -1,40 +1,57 @@
 # Chat Prompt Architecture
 
 ## Rule
-Every chat feature must build its system prompt starting from `BLOOM_SYSTEM_PROMPT`.
-Never define a standalone persona or security block — those live in `bloom.md` and `safety.md`.
+Every chat feature builds its system prompt from `GENERAL_TONE` and `SAFETY` in `prompts/base.py`.
+Never define a standalone persona or security block — those live in `base.py`.
 
 ## Adding a new chat feature — checklist
-1. Create `backend/prompts/my_feature.md` and `docs/prompts/my_feature.md` (source of truth copy)
-2. Add `load("my_feature")` to `backend/prompts/__init__.py` if needed
-3. Build your system prompt constant in `backend/chat/service.py`:
+1. Create `src/prompts/my_feature.py` exporting `SYSTEM_PROMPT`:
 ```python
-   MY_FEATURE_SYSTEM_PROMPT = (
-       BLOOM_SYSTEM_PROMPT
-       + "\n\n"
-       + load("my_feature")
-   )
+from prompts.base import GENERAL_TONE, SAFETY
+
+SYSTEM_PROMPT = (
+    """
+Feature-specific instructions only
+"""
+    + GENERAL_TONE
+    + SAFETY
+)
 ```
-4. Add a column to the table below
-5. Never put persona, tone, or security rules in `my_feature.md` — those come from `BLOOM_SYSTEM_PROMPT`
+2. Import it in `src/workflows/my_feature.py` and pass it to the shared LLM node:
+```python
+from prompts.my_feature import SYSTEM_PROMPT
+
+return await llm_call_node(state, db, selected_model, SYSTEM_PROMPT)
+```
+3. Add a column to the table below
+4. Never put persona, tone, or security rules in `my_feature.py` — those come from `GENERAL_TONE` and `SAFETY`
 
 ## What goes where
-- `bloom.md` — Bloom's persona, tone, and behavioral rules
-- `safety.md` — security and prompt injection rules
-- `my_feature.md` — feature-specific instructions only. No persona, no security.
+- `prompts/base.py` — `GENERAL_TONE` (Bloom's persona, tone, and behavioral rules) and `SAFETY` (security and prompt injection rules)
+- `prompts/my_feature.py` — feature-specific instructions only. No persona, no security.
 
 ## Composition pattern
 ```python
-MY_FEATURE_SYSTEM_PROMPT = (
-    BLOOM_SYSTEM_PROMPT        # bloom.md + safety.md + CHAT_APPLY_RULE
-    + "\n\n"
-    + load("my_feature")       # feature-specific instructions only
+SYSTEM_PROMPT = (
+    """
+    feature-specific instructions only
+    """
+    + GENERAL_TONE    # persona, tone, behavioral rules
+    + SAFETY          # security and injection hardening
 )
 ```
 
+Prompts are typed `.py` modules, not `.md` files. There is no `load()` and no
+prompt markdown — see `docs/architecture.md` for why.
+
 ## Current prompts
-| Feature | Prompt file | System prompt constant |
+| Feature | Prompt module | System prompt constant |
 |---|---|---|
-| CV chat | `cv.md` | `BLOOM_SYSTEM_PROMPT` + `cv.md` |
-| Cover letter | `cover_letter.md` | `COVER_LETTER_SYSTEM_PROMPT` |
-| Career direction | `career_direction.md` | `BLOOM_SYSTEM_PROMPT` + `career_direction.md` |
+| CV chat | `prompts/cv_chat.py` | `SYSTEM_PROMPT` |
+| Cover letter | `prompts/cover_letter.py` | `SYSTEM_PROMPT` |
+| Career direction | `prompts/career_direction.py` | `SYSTEM_PROMPT` |
+| Job compatibility | `prompts/job_compatibility.py` | `SYSTEM_PROMPT` |
+
+Non-chat consumers of `base.py`: `cv/parse.py` and `cv/translate.py` append
+`SAFETY` to their own prompts; `graph/nodes.py` sends `GENERAL_TONE` as a
+separate system message ahead of the feature prompt.

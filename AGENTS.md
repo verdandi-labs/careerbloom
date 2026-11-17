@@ -1,6 +1,6 @@
 ## Schema migrations
 
-No Alembic. Schema changes are documented as numbered SQL files in `backend/migrations/`.
+No Alembic. Schema changes are documented as numbered SQL files in `migrations/`.
 
 Convention: `001_description.sql`, `002_description.sql`, etc.
 - One file per change
@@ -26,7 +26,8 @@ Convention: `001_description.sql`, `002_description.sql`, etc.
 
 ## Frontend vs backend
 - `frontend/` = Vite + React app (frontend)
-- `backend/` = FastAPI app (backend)
+- `src/` = the Python app (FastAPI, graph, llm, prompts, workflows, cv, auth) and the uv project root (`src/pyproject.toml`, `src/uv.lock`). This is the source of truth and the deploy target.
+- `backend/` = legacy FastAPI app, kept only until the refactor is done, then it will be deleted. Do not add new features there.
 - Supabase functions live in `supabase/functions/`
 
 ## Frontend architecture

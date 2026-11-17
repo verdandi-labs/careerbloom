@@ -2,7 +2,7 @@
 
 ## Architecture overview
 
-CV data lives in Postgres across three tables (`backend/shared/models/cv.py`):
+CV data lives in Postgres across three tables (`src/shared/models/cv.py`):
 
 | Table | Holds |
 |---|---|
@@ -10,7 +10,7 @@ CV data lives in Postgres across three tables (`backend/shared/models/cv.py`):
 | `cv_edit` | Per-field edits applied after the upload |
 | `cv_saved_versions` | User-saved snapshots (full `CvData`) |
 
-`GET /cv` returns the **current merged state**, computed in `CvRepository.get_current_cv` (`backend/cv/repository.py`):
+`GET /cv` returns the **current merged state**, computed in `CvRepository.get_current_cv` (`src/cv/repository.py`):
 
 1. Load the latest `cv_upload`.
 2. Load all `cv_edit` rows with `edit_date > upload.created_at`.
@@ -33,7 +33,7 @@ The first three share one TanStack Query cache entry: `queryKey: ["cv"]`, `query
 
 ## Three ways data changes
 
-**1. Upload** — `POST /cv/upload` extracts text, the LLM parses it (`backend/prompts/cv_parse.md`) into `CvData`, validated through `RAW_MODELS` → `FIELD_MODELS` in `backend/cv/schemas.py`, stored on `cv_upload`.
+**1. Upload** — `POST /cv/upload` extracts text, the LLM parses it (`src/prompts/cv_parse.py`) into `CvData`, validated through `RAW_MODELS` → `FIELD_MODELS` in `src/cv/schemas.py`, stored on `cv_upload`.
 
 **2. Editor pages** — both pages save via `POST /cv/edit` with the *entire field value* (a whole string for text fields, a whole array for list sections). Validation goes through `FIELD_MODELS[field]`, so unknown keys are dropped here — the model is a whitelist. Deletes send the filtered array, or `null` when the last row is removed (`deleteRow`, `cv-editor.tsx`).
 
@@ -42,14 +42,14 @@ The first three share one TanStack Query cache entry: `queryKey: ["cv"]`, `query
 ## The chat → editor round trip
 
 1. `POST /chat/conversations/{id}/messages` streams the reply; before streaming, `send_message` loads the merged CV as context.
-2. The model returns a fenced JSON block. `parse_suggestion` (`backend/chat/service.py`) validates it into one of three shapes and strips it from the visible text:
+2. The model returns a fenced JSON block. `parse_suggestion` (`src/chat/service.py`) validates it into one of three shapes and strips it from the visible text:
    - `{"type":"suggestion", section, text}` — plain text field (`ChatSuggestion`, section must be in `TEXT_FIELDS`)
    - `{"type":"row_suggestion", section, line_num, fields}` — list row (`CvRowSuggestion`, `line_num: null` = new row)
    - `{"type":"cover_letter", text}` — cover letter flow
 3. The parsed dict is persisted on `chat_messages.suggestion` and returned in `MessageResponse`.
 4. Frontend `mapMessage` attaches it to the message; `CvSuggestionCard` renders editable inputs (`ROW_FIELD_LABELS` supplies the labels).
 5. Save:
-   - **row** → `PATCH /cv/sections/{section}/rows/{line_num}` (the card sends `-1` for a new row, `line_num ?? -1`), fields whitelisted by `PATCHABLE` in `backend/cv/router.py:patch_cv_row`
+   - **row** → `PATCH /cv/sections/{section}/rows/{line_num}` (the card sends `-1` for a new row, `line_num ?? -1`), fields whitelisted by `PATCHABLE` in `src/cv/router.py:patch_cv_row`
    - **text** → `POST /cv/edit`
 6. The PATCH handler reads rows as dicts (`model_dump()`), merges `{ ...r, ...fields }`, and writes the whole array back through `create_edit`.
 
@@ -99,9 +99,9 @@ Any refactor that instead builds `values` from non-empty inputs only (e.g. sprea
 1. Add the key to the section's `fields` config (editor input appears automatically).
 2. Keep the unconditional `values[f.key] = v || null` seeding — empty means `null`, never absent.
 3. If the field is new in the backend too, align all of these in one pass:
-   - `backend/prompts/cv_parse.md` (what the parser extracts)
-   - the Pydantic raw model in `backend/cv/schemas.py` (what validation keeps — undeclared keys are silently dropped)
-   - `PATCHABLE` in `backend/cv/router.py` (what the chat PATCH endpoint accepts)
+   - `src/prompts/cv_parse.py` (what the parser extracts)
+   - the Pydantic raw model in `src/cv/schemas.py` (what validation keeps — undeclared keys are silently dropped)
+   - `PATCHABLE` in `src/cv/router.py` (what the chat PATCH endpoint accepts)
    - `ROW_FIELD_LABELS` in `frontend/src/components/CvSuggestionCard.tsx` (chat card labels)
    - the section's `text:`/`listText` entry in both `cv-editor.tsx` and `cv.tsx` (export text)
    - `ExperienceItem` in `frontend/src/lib/cv-templates.ts` plus the templates (preview rendering)

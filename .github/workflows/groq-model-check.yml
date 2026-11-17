@@ -34,7 +34,7 @@ jobs:
             for m in "${MISSING[@]}"; do
               BODY+="- \`$m\`\n"
             done
-            BODY+="\nUpdate \`MODELS\` in \`backend/shared/ai_client.py\` and redeploy."
+            BODY+="\nUpdate \`AVAILABLE_MODELS\` in \`src/llm/groq.py\` and redeploy."
 
             gh issue create \
               --repo ${{ github.repository }} \

@@ -4,15 +4,15 @@ Copy this file and adapt it for a specific future re-encryption migration
 Do not run as-is, the placeholder functions raise NotImplementedError
 Fill in _decrypt_old and _encrypt_new for the exact old and new key schemes
 For the 2026 KMS-to-Fernet migration: _decrypt_old used the old google-cloud-kms client
-against the KMS-wrapped ciphertext (backend/shared/crypto.py pre-Fernet), _encrypt_new
+against the KMS-wrapped ciphertext (shared/crypto.py pre-Fernet), _encrypt_new
 is Fernet(MASTER_KEY).encrypt(plaintext) and the NEW_KEY_VERSION is 2
 The production DB had no legacy rows, so the migration was not run
 Confirm the target table, field, key_version column and new version before running
 Run planned changes against a staging copy before touching a live database
 
-Usage
-  uv run python scripts/reencrypt_template.py --table users --dry-run
-  uv run python scripts/reencrypt_template.py --table users --no-dry-run --batch-size 500
+Usage (from src/)
+  uv run python -m scripts.reencrypt_template --table users --dry-run
+  uv run python -m scripts.reencrypt_template --table users --no-dry-run --batch-size 500
 """
 
 import argparse
@@ -21,7 +21,7 @@ import re
 
 from sqlalchemy import text
 
-from database import global_engine
+from database import get_engine
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("reencrypt")
@@ -54,11 +54,11 @@ async def process_batch(session, table, offset, batch_size, dry_run, failures):
     for row in rows:
         mapping = row._mapping
         pk = mapping[0]
-        pk_column = list(mapping.keys())[0]
+        pk_column = next(iter(mapping.keys()))
         old_value = mapping[FIELD]
         try:
             new_value = _encrypt_new(_decrypt_old(old_value))
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             failures.append((table, pk, str(exc)))
             logger.warning("row %s skipped, error %s", pk, exc)
             continue
@@ -87,7 +87,7 @@ async def run(table, batch_size, dry_run):
     if not TABLE_RE.match(table):
         raise ValueError(f"invalid table name {table}")
 
-    async with global_engine.begin() as session:
+    async with get_engine().begin() as session:
         offset = 0
         processed_total = 0
         errors_total = 0

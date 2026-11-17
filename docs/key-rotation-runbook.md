@@ -4,7 +4,7 @@ Two independent rotation scenarios. Read the one that matches what broke, follow
 
 ## Section 1 — Master key rotation (Fernet MASTER_KEY)
 
-`encrypt_user_key` / `decrypt_user_key` (backend/shared/crypto.py) wrap each per-user Fernet key with a single `MASTER_KEY` Fernet key from `config.py`. There is no automatic rotation: changing `MASTER_KEY` invalidates every stored `users.encryption_key`, so rotate only via the field re-encryption procedure in Section 2.
+`encrypt_user_key` / `decrypt_user_key` (`shared/crypto.py`) wrap each per-user Fernet key with a single `MASTER_KEY` Fernet key from `config.py`. There is no automatic rotation: changing `MASTER_KEY` invalidates every stored `users.encryption_key`, so rotate only via the field re-encryption procedure in Section 2.
 
 1. Generate a new `MASTER_KEY` with `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`
 2. Bump `NEW_KEY_VERSION` in the re-encryption script and set `users.key_version` accordingly (migration `009_add_key_version.sql` tracks the scheme version)
@@ -21,13 +21,13 @@ Needed when the per-user Fernet key itself changes, or when the encryption schem
 
 Pre-reqs:
 - `users.key_version` exists to track which scheme version each user's data is under (added in migration `009_add_key_version.sql`)
-- `backend/scripts/reencrypt_template.py` is the scaffold
+- `src/scripts/reencrypt_template.py` is the scaffold
 
 Steps:
 
 1. Back up the table that holds the affected field first
    - Use a `pg_dump` or a snapshot in Neon, and record the backup name with the date
-2. Copy the template: `cp backend/scripts/reencrypt_template.py backend/scripts/reencrypt_<description>.py`
+2. Copy the template: `cp src/scripts/reencrypt_template.py src/scripts/reencrypt_<description>.py`
 3. Fill in `_decrypt_old` and `_encrypt_new` for the specific old-scheme decrypt and new-scheme encrypt
 4. Confirm the constants at the top: `FIELD`, `KEY_VERSION_COLUMN`, `NEW_KEY_VERSION`
 5. Run dry-run against production data and review the failure summary
