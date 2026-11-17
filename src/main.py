@@ -17,6 +17,7 @@ from config import get_settings
 from cover_letters.router import router as cover_letters_router
 from cv.router import router as cv_router
 from database import dispose_engine, ensure_schema
+from models.router import router as models_router
 from shared.limiter import limiter
 
 logger = logging.getLogger("startup")
@@ -119,6 +120,7 @@ app.include_router(chat_router, prefix=settings.API_V1_PREFIX)
 app.include_router(cover_letters_router, prefix=settings.API_V1_PREFIX)
 app.include_router(career_direction_router, prefix=settings.API_V1_PREFIX)
 app.include_router(cv_router, prefix=settings.API_V1_PREFIX)
+app.include_router(models_router, prefix=settings.API_V1_PREFIX)
 
 
 @app.get("/health")
