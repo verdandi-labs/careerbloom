@@ -9,6 +9,6 @@ FROM python:3.14-slim
 WORKDIR /app
 COPY src/pyproject.toml src/uv.lock ./
 RUN pip install uv && uv sync --frozen
-COPY backend/ .
+COPY src/ .
 COPY --from=frontend-build /app/frontend/dist /app/frontend/dist
 CMD ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
