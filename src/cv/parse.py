@@ -19,7 +19,9 @@ self_summary: string | null
 contact_details: array of objects with only the key: detail
 experience: array of objects with only the keys: title, company, city, start_date, end_date, comments
 skills: array of objects with only the keys: skill, comments
+Group related skills where natural. Do not create one object per bullet point or per word — combine related items into one entry with context in comments where helpful.
 tech_stack: array of objects with only the keys: name, comments
+Group related technologies where natural (e.g. "Python, FastAPI, SQLAlchemy" → one entry with name "Python / FastAPI / SQLAlchemy"). Keep entries meaningful — do not create one object per word or per technology if they belong together. Use comments for context, proficiency, or years of experience if mentioned.
 education: array of objects with only the keys: edu_center, city, start_date, end_date, comments
 awards: array of objects with only the keys: name, date, comments
 publications: array of objects with only the keys: name, date, comments
