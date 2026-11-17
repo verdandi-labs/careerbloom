@@ -11,6 +11,8 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
 from applications.router import router as applications_router
+from auth.oauth_router import router as oauth_router
+from auth.router import router as auth_router
 from career_direction.router import router as career_direction_router
 from chat.router import router as chat_router
 from config import get_settings
@@ -115,6 +117,8 @@ app.add_middleware(
     same_site="lax",
 )
 
+app.include_router(auth_router, prefix=settings.API_V1_PREFIX)
+app.include_router(oauth_router, prefix=settings.API_V1_PREFIX)
 app.include_router(applications_router, prefix=settings.API_V1_PREFIX)
 app.include_router(chat_router, prefix=settings.API_V1_PREFIX)
 app.include_router(cover_letters_router, prefix=settings.API_V1_PREFIX)
