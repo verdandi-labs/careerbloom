@@ -76,6 +76,8 @@ async def lifespan(app: FastAPI):
     import shared.models.career_direction
     import shared.models.cover_letters
     import shared.models.cv
+    import shared.models.logs
+    import shared.models.usage
     import shared.models.user  # noqa: F401
 
     await ensure_schema()

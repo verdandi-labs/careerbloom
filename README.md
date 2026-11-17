@@ -93,6 +93,8 @@ Sign in with Google or GitHub OAuth. Sessions are 7-day httpOnly cookies; the ra
 
 Single Docker image (Dockerfile) builds the frontend and serves it from FastAPI. Set `CORS_ORIGINS` and `MASTER_KEY` to the deployed values in the host's env vars — `.env` files do not ship with the image.
 
+Health check: `GET /health` deliberately sits at the root, not under `/api/v1` — point uptime probes there.
+
 ## License
 
 Source-available, not open source. Licensed under the PolyForm Noncommercial License 1.0.0. Free for personal, educational and research use. Any commercial use requires a separate licence: verdandi.labs@gmail.com
