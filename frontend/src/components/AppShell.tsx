@@ -8,6 +8,7 @@ import {
   Upload,
   LogOut,
   Compass,
+  Briefcase,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { useSignOut } from "@/features/auth";
@@ -19,6 +20,7 @@ const nav = [
   { to: "/cv", label: "My CV", icon: FileText },
   { to: "/cover-letters", label: "Cover Letters", icon: Mail },
   { to: "/career-direction", label: "Career Direction", icon: Compass },
+  { to: "/job-compatibility", label: "Job Compatibility", icon: Briefcase },
   { to: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
