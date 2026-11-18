@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str = ""
     GROQ_BASE_URL: str = "https://api.groq.com/openai/v1"
 
+    TAVILY_API_KEY: str = ""
+
     CLOUDFLARE_API_KEY: str = ""
     CLOUDFLARE_ACCOUNT_ID: str = ""
 
