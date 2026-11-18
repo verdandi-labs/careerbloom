@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { fetchMe, sessionKeys } from "@/features/auth";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -15,5 +15,4 @@ export const Route = createFileRoute("/_authenticated")({
       throw redirect({ to: "/auth", search: {} });
     }
   },
-  component: () => <Outlet />,
 });
