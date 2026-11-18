@@ -210,8 +210,8 @@ function UploadReviewPage() {
           <div>
             <h1 className="font-display text-3xl">Review your CV text</h1>
             <p className="mt-1 text-sm text-foreground/70">
-              Review your CV text before saving. You can remove anything you
-              don't want to share.
+              Take your time reviewing your CV. Your data stays local until you
+              choose to save it
             </p>
 
             <textarea
