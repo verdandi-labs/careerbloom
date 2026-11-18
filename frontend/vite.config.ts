@@ -22,7 +22,7 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  build: { sourcemap: true },
+  build: { sourcemap: process.env.NODE_ENV !== "production" },
   server: {
     proxy: {
       "/api": {
