@@ -4,6 +4,7 @@ from langgraph.graph import END, START, StateGraph
 from graph.edges import after_input_validation, after_output_validation_with_intent
 from graph.nodes import (
     application_intent_node,
+    company_research_node,
     cv_context_node,
     input_validation_node,
     llm_call_node,
@@ -15,6 +16,11 @@ from prompts.cover_letter import SYSTEM_PROMPT
 
 async def _cv_context(state: CareerBloomState, config: RunnableConfig) -> dict:
     return await cv_context_node(state)
+
+
+async def _company_research(state: CareerBloomState, config: RunnableConfig) -> dict:
+    db = config["configurable"]["db"]
+    return await company_research_node(state, db)
 
 
 async def _input_validation(state: CareerBloomState, config: RunnableConfig) -> dict:
@@ -42,13 +48,15 @@ def build_cover_letter_graph() -> StateGraph:
     graph = StateGraph(CareerBloomState)
 
     graph.add_node("cv_context", _cv_context)
+    graph.add_node("company_research", _company_research)
     graph.add_node("input_validation", _input_validation)
     graph.add_node("llm_call", _llm_call)
     graph.add_node("output_validation", _output_validation)
     graph.add_node("application_intent", _application_intent)
 
     graph.add_edge(START, "cv_context")
-    graph.add_edge("cv_context", "input_validation")
+    graph.add_edge("cv_context", "company_research")
+    graph.add_edge("company_research", "input_validation")
     graph.add_conditional_edges("input_validation", after_input_validation)
     graph.add_edge("llm_call", "output_validation")
     graph.add_conditional_edges(
