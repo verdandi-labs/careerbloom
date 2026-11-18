@@ -278,6 +278,33 @@ async def application_intent_node(
     return {"application_intent": True}
 
 
+async def company_research_node(
+    state: CareerBloomState,
+    db: AsyncSession,
+) -> dict:
+    company_name = state.get("company_name")
+    if not company_name:
+        return {}
+    if state.get("company_research"):
+        return {}
+
+    from company_research.repository import CompanyResearchRepository
+    from llm.tavily import search_company
+
+    repo = CompanyResearchRepository(db)
+    cached = await repo.get(company_name)
+    if cached:
+        return {"company_research": cached}
+
+    summary = await search_company(company_name)
+    if summary:
+        await repo.set(company_name, summary)
+        await db.commit()
+        return {"company_research": summary}
+
+    return {}
+
+
 async def _log_event(
     user_id: str,
     feature: str,

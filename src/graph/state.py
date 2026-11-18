@@ -16,6 +16,7 @@ class CareerBloomState(TypedDict):
     job_description: str | None
     job_title: str | None
     company_name: str | None
+    company_research: str | None
     application_intent: bool | None
     career_context: str | None
     cv_context_str: str | None
