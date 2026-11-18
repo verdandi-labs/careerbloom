@@ -1,5 +1,5 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { ChatPanel } from "@/components/ChatPanel";
@@ -104,6 +104,25 @@ function CoverLettersPage() {
       void qc.invalidateQueries({ queryKey: ["cover-letter-conversations"] }),
     onError: (_, message) => setActionErr(message),
   });
+
+  const autoCreated = useRef(false);
+
+  useEffect(() => {
+    if (autoCreated.current) return;
+    if (conversations === undefined) return;
+    if (conversations.length > 0) return;
+    autoCreated.current = true;
+    (async () => {
+      try {
+        const id = await createCoverLetterConversation();
+        if (id) setActiveId(id);
+      } catch (e) {
+        setActionErr(
+          errorMessage(e, "Couldn't start a cover letter, please try again"),
+        );
+      }
+    })();
+  }, [conversations]);
 
   async function newCoverLetter() {
     setCreating(true);
