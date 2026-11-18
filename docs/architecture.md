@@ -71,5 +71,18 @@ The graph layer is stateless — any workflow can be invoked with a manually con
 
 ## Prompts as typed `.py` modules
 
-Each `prompts/*.py` exports `SYSTEM_PROMPT: str` and `build_messages(state: CareerBloomState) -> list[BaseMessage]`. Prompts are code — they receive typed state and return typed messages. Inline strings in nodes or `.md` files cannot be type-checked, tested in isolation, or traced cleanly through the pipeline. No prompt content lives anywhere else.
+Each `prompts/*.py` exports `SYSTEM_PROMPT: str` and `build_messages(state: CareerBloomState) -> list[BaseMessage]`. Prompts are code — they receive typed state and return typed messages. Inline strings in nodes or `.md` files cannot be type-checked, tested in isolation, or traced cleanly through the pipeline.
+
+## Web search
+
+CareerBloom uses Tavily for external company research in the job compatibility workflow.
+
+- Provider: Tavily (tavily-python AsyncTavilyClient)
+- Trigger: company_research_node runs when company_name is set in state and company_research is not yet populated
+- Cache: company_research table in Neon, keyed by company_name (case-insensitive), TTL 90 days
+- Query format: "{company_name} company culture values work environment"
+- Result: Tavily answer field if present, fallback to first 2 result snippets
+- Scope: job_compatibility workflow only in v1
+- v2: extend to any workflow when user triggers with "search online", "look this up", "think deep"
+- Node sequence: cv_context → career_context → company_research → input_validation → llm_call → output_validation → application_intent
 
