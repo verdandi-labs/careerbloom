@@ -126,7 +126,7 @@ export function CvSuggestionCard({
       {err && <p className="text-xs text-destructive">{err}</p>}
 
       {saved ? (
-        <p className="inline-flex items-center gap-1 text-xs text-accent">
+        <p className="inline-flex items-center gap-1 text-xs text-[#284934]">
           <Check className="h-3 w-3" />
           {isNew
             ? `${sectionLabel} entry added to your CV`

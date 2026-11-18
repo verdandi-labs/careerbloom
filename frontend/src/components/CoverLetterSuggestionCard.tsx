@@ -120,7 +120,7 @@ export function CoverLetterSuggestionCard({
         </div>
       )}
       {saved && (
-        <p className="inline-flex items-center gap-1 text-xs text-accent">
+        <p className="inline-flex items-center gap-1 text-xs text-[#284934]">
           <Check className="h-3 w-3" /> Saved to your cover letters
         </p>
       )}
@@ -169,7 +169,7 @@ export function CoverLetterSuggestionCard({
         </div>
       )}
       {saved && logStatus === "logged" && (
-        <p className="inline-flex items-center gap-1 text-xs text-accent">
+        <p className="inline-flex items-center gap-1 text-xs text-[#284934]">
           <Check className="h-3 w-3" /> Saved to your applications.
         </p>
       )}
