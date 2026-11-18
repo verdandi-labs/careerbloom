@@ -5,9 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { api, errorMessage } from "@/lib/api";
 import { CvDocument, type EditableField } from "@/components/CvDocument";
 import {
-  CV_TEMPLATES,
   type CVData,
-  type CVTemplateId,
   type StructuredCVData,
   type SectionOrderItem,
   DEFAULT_SECTION_ORDER,
@@ -357,8 +355,6 @@ function PreviewPage() {
     retryDelay: 500,
   });
 
-  const [selectedTemplate, setSelectedTemplate] =
-    useState<CVTemplateId>(DEFAULT_TEMPLATE);
   const [mergedData, setMergedData] = useState<CVData | null>(null);
   const [structuredData, setStructuredData] = useState<StructuredCVData | null>(
     null,
@@ -737,7 +733,7 @@ function PreviewPage() {
       const blob = await pdf(
         <CvPdfDocument
           data={structuredData}
-          template={selectedTemplate}
+          template={DEFAULT_TEMPLATE}
           sectionOrder={sectionOrder}
           pdfScale={pdfScale}
         />,
@@ -820,21 +816,6 @@ function PreviewPage() {
             <h1 className="font-display text-3xl">My CV</h1>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-1 rounded-full bg-white/60 p-1">
-              {CV_TEMPLATES.map((t) => (
-                <button
-                  key={t.id}
-                  onClick={() => setSelectedTemplate(t.id)}
-                  className={`rounded-full px-3 py-1.5 text-xs transition ${
-                    selectedTemplate === t.id
-                      ? "bg-foreground text-background"
-                      : "text-foreground/70 hover:bg-white"
-                  }`}
-                >
-                  {t.name}
-                </button>
-              ))}
-            </div>
             <div className="relative">
               <button
                 onClick={() => setTranslateOpen((v) => !v)}
@@ -944,7 +925,7 @@ function PreviewPage() {
                 <CvDocument
                   pdfScale={pdfScale}
                   data={structuredData}
-                  template={selectedTemplate}
+                  template={DEFAULT_TEMPLATE}
                   editable={true}
                   onChange={handleChange}
                   onUpdateItem={handleUpdateItem}
