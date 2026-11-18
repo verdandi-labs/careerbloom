@@ -10,9 +10,9 @@ import {
   Compass,
   Briefcase,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import { useSignOut } from "@/features/auth";
-import { CvUploadModal } from "./CvUploadModal";
+import { isSupportedCvFile, useCvUploadStore } from "@/features/cv";
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -28,7 +28,14 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const signOut = useSignOut();
-  const [uploadOpen, setUploadOpen] = useState(false);
+  const setUploadFile = useCvUploadStore((state) => state.setFile);
+  const uploadInputRef = useRef<HTMLInputElement>(null);
+
+  function handleUploadPick(selected: File) {
+    if (!isSupportedCvFile(selected)) return;
+    setUploadFile(selected);
+    void navigate({ to: "/cv/upload-review" });
+  }
 
   const isActive = (to: string) =>
     pathname === to || pathname.startsWith(`${to}/`);
@@ -70,15 +77,26 @@ export function AppShell({ children }: { children: ReactNode }) {
           </nav>
 
           <div className="flex items-center gap-2 shrink-0">
+            <input
+              ref={uploadInputRef}
+              type="file"
+              accept=".pdf,.docx,.txt"
+              hidden
+              onChange={(e) => {
+                const selected = e.target.files?.[0];
+                e.target.value = "";
+                if (selected) handleUploadPick(selected);
+              }}
+            />
             <button
-              onClick={() => setUploadOpen(true)}
+              onClick={() => uploadInputRef.current?.click()}
               aria-label="Upload CV"
               className="grid h-11 w-11 place-items-center rounded-full bg-foreground text-background transition-transform hover:scale-[1.02] sm:hidden"
             >
               <Upload className="h-4 w-4" />
             </button>
             <button
-              onClick={() => setUploadOpen(true)}
+              onClick={() => uploadInputRef.current?.click()}
               className="hidden items-center gap-2 rounded-full bg-foreground px-4 py-2 text-xs font-medium uppercase tracking-wider text-background transition-transform hover:scale-[1.02] sm:flex"
             >
               <Upload className="h-3.5 w-3.5" />
@@ -129,8 +147,6 @@ export function AppShell({ children }: { children: ReactNode }) {
           );
         })}
       </nav>
-
-      <CvUploadModal open={uploadOpen} onClose={() => setUploadOpen(false)} />
     </div>
   );
 }

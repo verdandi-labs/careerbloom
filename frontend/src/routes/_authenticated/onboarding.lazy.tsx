@@ -1,8 +1,8 @@
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSession, sessionKeys } from "@/features/auth";
-import { CvUploadModal } from "@/components/CvUploadModal";
+import { isSupportedCvFile, useCvUploadStore } from "@/features/cv";
 
 export const Route = createLazyFileRoute("/_authenticated/onboarding")({
   component: Onboarding,
@@ -12,8 +12,15 @@ function Onboarding() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { data: user } = useSession();
-  const [uploadOpen, setUploadOpen] = useState(false);
+  const setUploadFile = useCvUploadStore((state) => state.setFile);
+  const uploadInputRef = useRef<HTMLInputElement>(null);
   const [saving, setSaving] = useState(false);
+
+  function handleUploadPick(selected: File) {
+    if (!isSupportedCvFile(selected)) return;
+    setUploadFile(selected);
+    void navigate({ to: "/cv/upload-review" });
+  }
 
   useEffect(() => {
     if (user?.onboarding) {
@@ -50,8 +57,19 @@ function Onboarding() {
             Upload your current CV — even a rough one. We'll read it carefully.
           </p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <input
+              ref={uploadInputRef}
+              type="file"
+              accept=".pdf,.docx,.txt"
+              hidden
+              onChange={(e) => {
+                const selected = e.target.files?.[0];
+                e.target.value = "";
+                if (selected) handleUploadPick(selected);
+              }}
+            />
             <button
-              onClick={() => setUploadOpen(true)}
+              onClick={() => uploadInputRef.current?.click()}
               className="flex-1 rounded-2xl bg-foreground px-6 py-4 text-sm text-background"
             >
               Upload CV (PDF or DOCX)
@@ -64,10 +82,6 @@ function Onboarding() {
               Skip for now
             </button>
           </div>
-          <CvUploadModal
-            open={uploadOpen}
-            onClose={() => setUploadOpen(false)}
-          />
         </div>
       </div>
     </div>

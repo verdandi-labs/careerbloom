@@ -1,7 +1,8 @@
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
+import { isSupportedCvFile, useCvUploadStore } from "@/features/cv";
 import { api, errorMessage } from "@/lib/api";
 import { DEFAULT_TEMPLATE } from "@/lib/cv-templates";
 import { LANGUAGES } from "@/lib/languages";
@@ -16,7 +17,6 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import { CvUploadModal } from "@/components/CvUploadModal";
 
 export const Route = createLazyFileRoute("/_authenticated/cv-editor")({
   component: CVPage,
@@ -291,7 +291,8 @@ function CVPage() {
   const [saving, setSaving] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [translateOpen, setTranslateOpen] = useState(false);
-  const [uploadOpen, setUploadOpen] = useState(false);
+  const setUploadFile = useCvUploadStore((state) => state.setFile);
+  const uploadInputRef = useRef<HTMLInputElement>(null);
   const [translating, setTranslating] = useState(false);
   const [translated, setTranslated] = useState<TranslatedCv | null>(null);
   const [actionErr, setActionErr] = useState("");
@@ -503,11 +504,24 @@ function CVPage() {
               <BookMarked className="h-3 w-3" /> Saved CVs
             </button>
             <button
-              onClick={() => setUploadOpen(true)}
+              onClick={() => uploadInputRef.current?.click()}
               className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs text-foreground hover:bg-white"
             >
               <FileUp className="h-3 w-3" /> Upload new CV
             </button>
+            <input
+              ref={uploadInputRef}
+              type="file"
+              accept=".pdf,.docx,.txt"
+              hidden
+              onChange={(e) => {
+                const selected = e.target.files?.[0];
+                e.target.value = "";
+                if (!selected || !isSupportedCvFile(selected)) return;
+                setUploadFile(selected);
+                void navigate({ to: "/cv/upload-review" });
+              }}
+            />
             <div className="relative">
               <button
                 onClick={() => setTranslateOpen((v) => !v)}
@@ -892,7 +906,6 @@ function CVPage() {
           </div>
         </div>
       )}
-      <CvUploadModal open={uploadOpen} onClose={() => setUploadOpen(false)} />
 
       {saveModalOpen && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/20 backdrop-blur-md">

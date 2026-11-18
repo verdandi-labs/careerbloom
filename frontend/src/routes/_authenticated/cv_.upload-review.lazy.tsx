@@ -1,9 +1,15 @@
-import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { AppShell } from "@/components/AppShell";
 import { useSession } from "@/features/auth";
+import { isSupportedCvFile, useCvUploadStore } from "@/features/cv";
 import { API_BASE, apiUpload } from "@/lib/api";
-import { Check, FileText, Loader2, UploadCloud, X } from "lucide-react";
+import { Check, FileText, Loader2, UploadCloud } from "lucide-react";
+
+export const Route = createLazyFileRoute("/_authenticated/cv_/upload-review")({
+  component: UploadReviewPage,
+});
 
 type CvRawText = {
   text: string;
@@ -19,13 +25,13 @@ const SAVE_STAGES: Array<{ key: SaveStage; label: string }> = [
   { key: "almost", label: "Almost there" },
 ];
 
-export function CvUploadModal({
-  open,
-  onClose,
-}: {
-  open: boolean;
-  onClose: () => void;
-}) {
+function UploadReviewPage() {
+  const qc = useQueryClient();
+  const navigate = useNavigate();
+  const { data: user } = useSession();
+  const file = useCvUploadStore((state) => state.file);
+  const setFile = useCvUploadStore((state) => state.setFile);
+  const clear = useCvUploadStore((state) => state.clear);
   const [status, setStatus] = useState<Status>("idle");
   const [fileName, setFileName] = useState<string | null>(null);
   const [text, setText] = useState("");
@@ -33,37 +39,13 @@ export function CvUploadModal({
   const [dragOver, setDragOver] = useState(false);
   const [saveStage, setSaveStage] = useState<SaveStage>("opening");
   const inputRef = useRef<HTMLInputElement>(null);
-  const qc = useQueryClient();
-  const navigate = useNavigate();
-  const { data: user } = useSession();
 
-  useEffect(() => {
-    if (!open) {
-      setStatus("idle");
-      setFileName(null);
-      setText("");
-      setErrorMsg(null);
-      setDragOver(false);
-    }
-  }, [open]);
-
-  if (!open) return null;
-
-  async function handleFile(file: File) {
+  const uploadFile = useCallback(async (selected: File) => {
+    setFileName(selected.name);
     setErrorMsg(null);
-    const name = file.name.toLowerCase();
-    if (
-      !name.endsWith(".pdf") &&
-      !name.endsWith(".docx") &&
-      !name.endsWith(".txt")
-    ) {
-      setErrorMsg("Please upload a PDF, DOCX, or TXT file.");
-      return;
-    }
-    setFileName(file.name);
     setStatus("uploading");
     try {
-      const result = await apiUpload<CvRawText>("/cv/upload", file);
+      const result = await apiUpload<CvRawText>("/cv/upload", selected);
       setText(result.text);
       setStatus("review");
     } catch (err) {
@@ -71,6 +53,23 @@ export function CvUploadModal({
       setErrorMsg(err instanceof Error ? err.message : "Upload failed");
       setStatus("error");
     }
+  }, []);
+
+  useEffect(() => {
+    if (file) void uploadFile(file);
+  }, [file, uploadFile]);
+
+  function handlePick(selected: File) {
+    setErrorMsg(null);
+    if (!isSupportedCvFile(selected)) {
+      setErrorMsg("Please upload a PDF, DOCX, or TXT file.");
+      return;
+    }
+    if (selected === file) {
+      void uploadFile(selected);
+      return;
+    }
+    setFile(selected);
   }
 
   async function handleSave() {
@@ -110,8 +109,6 @@ export function CvUploadModal({
       if (!finished)
         throw new Error("Could not parse your CV, please try again");
 
-      // Commit rotated session cookie via plain JSON endpoint before
-      // firing authenticated requests
       const pingMe = await fetch(`${API_BASE}/auth/me`, {
         credentials: "include",
       });
@@ -120,13 +117,8 @@ export function CvUploadModal({
         await fetch(`${API_BASE}/auth/me`, { credentials: "include" });
       }
 
-      // Navigate first — let the CV page trigger its own fresh fetch
-      // rather than refetching here while still in modal context
-      onClose();
+      clear();
       navigate({ to: "/cv" });
-
-      // Invalidate after navigation so the CV page's mounted query
-      // picks up the fresh data
       qc.invalidateQueries({ queryKey: ["cv"] });
       if (!user?.onboarding) {
         qc.invalidateQueries({ queryKey: ["session"] });
@@ -139,18 +131,23 @@ export function CvUploadModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/30 p-4 backdrop-blur-md">
-      <div className="glass-strong relative w-full max-w-2xl p-8">
-        <button
-          onClick={onClose}
-          className="absolute right-2 top-2 grid h-11 w-11 place-items-center rounded-full bg-white/60 text-foreground hover:bg-white"
-        >
-          <X className="h-4 w-4" />
-        </button>
+    <AppShell>
+      <div className="glass-strong relative mx-auto w-full max-w-3xl p-8">
+        <input
+          ref={inputRef}
+          type="file"
+          accept=".pdf,.docx,.txt"
+          hidden
+          onChange={(e) => {
+            const selected = e.target.files?.[0];
+            e.target.value = "";
+            if (selected) handlePick(selected);
+          }}
+        />
 
         {status === "idle" && (
           <>
-            <h2 className="font-display text-3xl">Upload your CV</h2>
+            <h1 className="font-display text-3xl">Upload your CV</h1>
             <p className="mt-1 text-sm text-foreground/70">
               PDF, DOCX, or TXT format, size: 20KB-5MB. We'll read your file and
               fill your CV builder.
@@ -165,8 +162,8 @@ export function CvUploadModal({
               onDrop={(e) => {
                 e.preventDefault();
                 setDragOver(false);
-                if (e.dataTransfer.files?.[0])
-                  handleFile(e.dataTransfer.files[0]);
+                const selected = e.dataTransfer.files?.[0];
+                if (selected) handlePick(selected);
               }}
               onClick={() => inputRef.current?.click()}
               className={`mt-6 grid cursor-pointer place-items-center rounded-3xl border-2 border-dashed p-10 text-center transition-colors ${
@@ -182,15 +179,6 @@ export function CvUploadModal({
               <p className="mt-1 text-xs text-foreground/60">
                 or click to choose a file
               </p>
-              <input
-                ref={inputRef}
-                type="file"
-                accept=".pdf,.docx,.txt"
-                hidden
-                onChange={(e) => {
-                  if (e.target.files?.[0]) handleFile(e.target.files[0]);
-                }}
-              />
             </div>
 
             {errorMsg && (
@@ -202,7 +190,7 @@ export function CvUploadModal({
         )}
 
         {status === "uploading" && (
-          <div className="py-10 text-center">
+          <div className="py-16 text-center">
             <div className="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-secondary/40">
               <Loader2 className="h-7 w-7 animate-spin text-foreground" />
             </div>
@@ -220,7 +208,7 @@ export function CvUploadModal({
 
         {status === "review" && (
           <div>
-            <h2 className="font-display text-3xl">Review your CV text</h2>
+            <h1 className="font-display text-3xl">Review your CV text</h1>
             <p className="mt-1 text-sm text-foreground/70">
               Review your CV text before saving. You can remove anything you
               don't want to share.
@@ -229,7 +217,7 @@ export function CvUploadModal({
             <textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
-              className="mt-6 block h-[420px] w-full resize-none overflow-y-auto rounded-2xl border border-foreground/10 bg-white/50 p-4 font-mono text-base text-foreground/90 outline-none [scrollbar-width:none] focus:border-accent focus:ring-1 focus:ring-accent/30 [&::-webkit-scrollbar]:hidden"
+              className="mt-6 block h-[60vh] w-full resize-none overflow-y-auto rounded-2xl border border-foreground/10 bg-white/50 p-4 font-mono text-base text-foreground/90 outline-none [scrollbar-width:none] focus:border-accent focus:ring-1 focus:ring-accent/30 [&::-webkit-scrollbar]:hidden"
             />
 
             {errorMsg && (
@@ -240,18 +228,14 @@ export function CvUploadModal({
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <button
-                onClick={handleSave}
+                onClick={() => void handleSave()}
                 disabled={!text.trim()}
                 className="rounded-2xl bg-secondary px-6 py-3 text-sm font-medium text-secondary-foreground disabled:opacity-50"
               >
                 Save CV
               </button>
               <button
-                onClick={() => {
-                  setStatus("idle");
-                  setText("");
-                  setErrorMsg(null);
-                }}
+                onClick={() => inputRef.current?.click()}
                 className="rounded-2xl bg-white/60 px-6 py-3 text-sm font-medium text-foreground/70 hover:bg-white"
               >
                 Choose another file
@@ -261,7 +245,7 @@ export function CvUploadModal({
         )}
 
         {status === "saving" && (
-          <div className="py-10 text-center">
+          <div className="py-16 text-center">
             <p className="font-display text-2xl italic">Saving your CV</p>
             <div className="mx-auto mt-6 flex w-fit flex-col gap-3">
               {SAVE_STAGES.map((stage, i) => {
@@ -291,23 +275,28 @@ export function CvUploadModal({
         )}
 
         {status === "error" && (
-          <div className="py-8 text-center">
+          <div className="py-12 text-center">
             <p className="font-display text-2xl">Hmm, that didn't work</p>
             <p className="mt-2 text-sm text-foreground/70">
               {errorMsg ?? "Please try again."}
             </p>
-            <button
-              onClick={() => {
-                setStatus("idle");
-                setErrorMsg(null);
-              }}
-              className="mt-6 rounded-2xl bg-secondary px-5 py-3 text-sm font-medium text-secondary-foreground"
-            >
-              Try again
-            </button>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <button
+                onClick={() => file && void uploadFile(file)}
+                className="rounded-2xl bg-secondary px-5 py-3 text-sm font-medium text-secondary-foreground"
+              >
+                Try again
+              </button>
+              <button
+                onClick={() => inputRef.current?.click()}
+                className="rounded-2xl bg-white/60 px-5 py-3 text-sm font-medium text-foreground/70 hover:bg-white"
+              >
+                Choose another file
+              </button>
+            </div>
           </div>
         )}
       </div>
-    </div>
+    </AppShell>
   );
 }
