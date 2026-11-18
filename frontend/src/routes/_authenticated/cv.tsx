@@ -21,9 +21,6 @@ import {
   Save,
   X,
 } from "lucide-react";
-import { pdf } from "@react-pdf/renderer";
-import { CvPdfDocument } from "@/components/CvPdfDocument";
-import { registerFonts } from "@/lib/pdf-fonts";
 
 export const Route = createFileRoute("/_authenticated/cv")({
   head: () => ({ meta: [{ title: "My CV · careerBloom" }] }),
@@ -729,6 +726,13 @@ function PreviewPage() {
     if (!structuredData) return;
     setExporting(true);
     try {
+      const [{ pdf }, { CvPdfDocument }, { registerFonts }] = await Promise.all(
+        [
+          import("@react-pdf/renderer"),
+          import("@/components/CvPdfDocument"),
+          import("@/lib/pdf-fonts"),
+        ],
+      );
       await registerFonts();
       const blob = await pdf(
         <CvPdfDocument
