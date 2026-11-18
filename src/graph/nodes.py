@@ -171,6 +171,11 @@ async def llm_call_node(
             if state.get("career_context_str")
             else []
         )
+        + (
+            [HumanMessage(state["company_research"])]
+            if state.get("company_research")
+            else []
+        )
         + state["message_history"]
     )
 
