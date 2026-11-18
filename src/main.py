@@ -74,6 +74,7 @@ async def lifespan(app: FastAPI):
     import chat.models  # noqa: F401
     import shared.models.applications
     import shared.models.career_direction
+    import shared.models.company_research
     import shared.models.cover_letters
     import shared.models.cv
     import shared.models.logs
