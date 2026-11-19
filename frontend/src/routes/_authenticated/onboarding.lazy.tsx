@@ -1,7 +1,7 @@
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useSession, sessionKeys } from "@/features/auth";
+import { completeOnboarding, useSession, sessionKeys } from "@/features/auth";
 import { isSupportedCvFile, useCvUploadStore } from "@/features/cv";
 
 export const Route = createLazyFileRoute("/_authenticated/onboarding")({
@@ -30,6 +30,7 @@ function Onboarding() {
 
   async function complete() {
     setSaving(true);
+    await completeOnboarding();
     await qc.invalidateQueries({ queryKey: sessionKeys.all });
     navigate({ to: "/dashboard" });
   }

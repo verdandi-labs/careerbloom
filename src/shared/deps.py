@@ -6,12 +6,14 @@ from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.service import SESSION_TTL_DAYS, create_session
+from config import get_settings
 from database import get_db
 from shared.crypto import hash_token
 from shared.models.user import Session as SessionRow
 from shared.models.user import User
 
 SESSION_COOKIE = "session"
+settings = get_settings()
 
 
 async def get_current_user(
@@ -56,7 +58,7 @@ async def get_current_user(
         SESSION_COOKIE,
         new_raw,
         httponly=True,
-        secure=True,
+        secure=not settings.DEBUG,
         samesite="lax",
         max_age=SESSION_TTL_DAYS * 24 * 60 * 60,
     )
@@ -68,9 +70,10 @@ def rotated_session_headers(request: Request) -> dict[str, str]:
     raw = getattr(request.state, "session_refresh_cookie", None)
     if not raw:
         return {}
+    secure = "" if settings.DEBUG else "; secure"
     return {
         "Set-Cookie": (
-            f"{SESSION_COOKIE}={raw}; httponly; secure; samesite=lax; "
+            f"{SESSION_COOKIE}={raw}; httponly{secure}; samesite=lax; "
             f"max-age={SESSION_TTL_DAYS * 24 * 60 * 60}; path=/"
         )
     }

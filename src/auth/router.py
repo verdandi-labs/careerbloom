@@ -24,8 +24,12 @@ async def me(user: Annotated[User, Depends(get_current_user)]):
 
 
 @router.post("/complete-onboarding", response_model=UserResponse)
-async def complete_onboarding(user: Annotated[User, Depends(get_current_user)]):
+async def complete_onboarding(
+    user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db_for_current_user)],
+):
     user.onboarding = True
+    await db.commit()
     return UserResponse(
         user_id=user.user_id,
         email=get_user_email(user),
