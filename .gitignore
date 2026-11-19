@@ -2,6 +2,7 @@
 .env
 .env.*
 !.env.example
+**/.env
 
 # ── Node / frontend ──────────────────────────────────────────────────────────
 node_modules
@@ -82,3 +83,4 @@ NUL
 # ── Wrangler / Cloudflare ─────────────────────────────────────────────────────
 .wrangler/
 .dev.vars
+
