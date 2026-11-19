@@ -47,7 +47,6 @@ const STAGES = [
   {
     title: "Job Match",
     desc: "Paste a job offer and get an honest read on how well it fits your profile, skills, and career direction",
-    incoming: true,
   },
 ];
 
