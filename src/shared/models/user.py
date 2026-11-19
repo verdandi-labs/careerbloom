@@ -1,8 +1,9 @@
 from uuid import uuid4
 
-from database import Base
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Text, func
 from sqlalchemy.dialects.postgresql import UUID
+
+from database import Base
 
 
 class User(Base):
@@ -29,6 +30,8 @@ class Session(Base):
         UUID, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False
     )
     token_hash = Column(Text, unique=True, nullable=False)
+    previous_token_hash = Column(Text, nullable=True)
+    rotated_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )

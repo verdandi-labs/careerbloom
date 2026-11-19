@@ -59,12 +59,18 @@ async def create_user(
     return user
 
 
-async def create_session(db: AsyncSession, user_id) -> str:
+async def create_session(
+    db: AsyncSession,
+    user_id,
+    previous_token_hash: str | None = None,
+) -> str:
     raw_token = secrets.token_urlsafe(32)
     db.add(
         SessionRow(
             user_id=user_id,
             token_hash=hash_token(raw_token),
+            previous_token_hash=previous_token_hash,
+            rotated_at=datetime.now(UTC) if previous_token_hash else None,
             expires_at=datetime.now(UTC) + timedelta(days=SESSION_TTL_DAYS),
         )
     )
