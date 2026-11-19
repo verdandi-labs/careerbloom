@@ -42,7 +42,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   function handleSignOut() {
     signOut();
-    navigate({ to: "/auth", search: {} });
+    navigate({ to: "/" });
   }
 
   return (

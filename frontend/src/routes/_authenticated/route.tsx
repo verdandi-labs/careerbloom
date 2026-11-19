@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authenticated")({
         staleTime: 5 * 60 * 1000,
       });
     } catch {
-      throw redirect({ to: "/auth", search: {} });
+      throw redirect({ to: "/" });
     }
   },
 });

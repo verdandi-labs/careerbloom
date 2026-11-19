@@ -16,12 +16,12 @@ function SettingsPage() {
 
   async function signOut() {
     await signOutFn();
-    navigate({ to: "/auth", search: {} });
+    navigate({ to: "/" });
   }
 
   async function deleteAccount() {
     await signOutFn();
-    navigate({ to: "/auth", search: {} });
+    navigate({ to: "/" });
   }
 
   return (
